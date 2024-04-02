@@ -1,0 +1,79 @@
+CREATE DATABASE IF NOT EXISTS foodsharing; 
+CREATE ROLE foodsharing_admin WITH PASSWORD '9rjJ2dT87SAqNybC2ZKY' SUPERUSER;
+
+CREATE TABLE users(
+    Id uuid PRIMARY KEY,
+    Email varchar NOT NULL,
+    PasswordHash varchar NOT NULL,
+    FirstName varchar ,
+    LastName varchar,
+    Phone varchar,
+    AvatarUrl varchar,
+    CreatedUserId uuid NOT NULL,
+    ModifiedUserId uuid ,
+    CreatedDateTimeUtc timestamp NOT NULL,
+    ModifiedDateTimeUtc timestamp 
+    IsRemoved bool NOT NULL
+);
+
+CREATE TABLE announcements(
+    Id uuid PRIMARY KEY,
+    Name varchar NOT NULL,
+    OwnerUserId uuid NOT NULL,
+    Description varchar NOT NULL,
+    CategoryId uuid NOT NULL,
+    Weight float8 NOT NULL,
+    ImagesUrls _varchar NOT NULL,
+    CreatedUserId uuid NOT NULL,
+    ModifiedUserId uuid,
+    CreatedDateTimeUtc timestamp NOT NULL,
+    ModifiedDateTimeUtc timestamp,
+    IsRemoved bool NOT NULL
+);
+
+CREATE TABLE announcementcategories(
+    Id uuid PRIMARY KEY,
+    Name varchar NOT NULL,
+    IconUrl varchar NOT NULL
+);
+
+CREATE TABLE messages(
+    Id uuid PRIMARY KEY,
+    DialogId uuid NOT NULL,
+    FromUserId uuid NOT NULL,
+    ToUserId uuid NOT NULL,
+    Content varchar NOT NULL,
+    CreatedDateTimeUtc timestamp NOT NULL,
+    ModifiedDateTimeUtc timestamp,
+    IsRemoved bool NOT NULL
+);
+
+CREATE TABLE dialogs (
+    Id uuid PRIMARY KEY,
+    FromUserId uuid NOT NULL,
+    ToUserId uuid NOT NULL,
+    CreatedDateTimeUtc timestamp NOT NULL,
+    ModifiedDateTimeUtc timestamp,
+    IsRemoved bool NOT NULL
+);
+
+CREATE TABLE favoriteannouncements (
+    AnnouncementId uuid NOT NULL,
+    UserId uuid NOT NULL,
+    AdditionDateTimeUtc timestamp NOT NULL,
+    CONSTRAINT favoriteannouncements_pkey PRIMARY KEY (AnnouncementId, UserId)
+);
+
+CREATE TABLE confirmationcodes(
+    Email varchar NOT NULL, 
+    Code int NOT NULL, 
+    ExpirationDateTimeUtc timestamp
+);
+
+CREATE TABLE tokens (
+	Token varchar PRIMARY KEY,
+	UserId uuid NOT NULL,
+	ExpirationDateTimeUtc timestamp NOT NULL,
+	CreatedDateTimeUtc timestamp DEFAULT now() NOT NULL,
+	ModifiedDateTimeUtc timestamp NULL
+);

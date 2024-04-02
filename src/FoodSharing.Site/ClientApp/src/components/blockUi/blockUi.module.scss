@@ -1,0 +1,49 @@
+.block_ui {
+    width: 100%;
+    height: 100%;
+}
+
+.block {
+    position: absolute;
+    display: none;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+}
+
+.blocking {
+    position: relative;
+
+    .block {
+        display: block;
+    }
+
+    .overlay {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        z-index: 1000;
+        background-color: #fef8f9;
+        opacity: 0.5;
+    }
+
+    .content {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        z-index: 2000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 3rem;
+        font-weight: bold;
+
+        .fa-spinner {
+            color: #ef2b47;
+        }
+    }
+}

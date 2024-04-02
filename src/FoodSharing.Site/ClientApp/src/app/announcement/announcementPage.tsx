@@ -1,0 +1,135 @@
+import LikeIcon from '@mui/icons-material/FavoriteBorder';
+import { Avatar, Box, Button, Grid, Stack, Typography } from '@mui/material';
+import { Map, Placemark, SearchControl, YMaps } from '@pbe/react-yandex-maps';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { BlockUi } from '../../components/blockUi/blockUi';
+import { Link } from '../../components/link';
+import { AnnouncementDetailInfo } from '../../domain/announcements/announcementInfo';
+import { AnnouncementsProvider } from '../../domain/announcements/announcementsProvider';
+import { useNotifications } from '../../hooks/useNotifications';
+import { UsersLinks } from '../../tools/constants/links';
+import Page from '../infrastructure/page';
+
+export function AnnouncementPage() {
+    const { id } = useParams();
+
+    const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
+    const [announcementInfo, setAnnouncementInfo] = useState<AnnouncementDetailInfo | null>(null);
+
+    const { addErrorNotification } = useNotifications();
+
+    useEffect(() => {
+        loadAnnouncement();
+    }, [])
+
+    function loadAnnouncement() {
+        BlockUi.block(async () => {
+            if (id == null) return;
+
+            const announcement = await AnnouncementsProvider.getInfo(id);
+
+            setAnnouncementInfo(announcement);
+            setSelectedImageUrl(announcement.imagesUrls[0])
+        })
+    }
+
+    function convertGramsToKilogram(grams: number) {
+        return grams / 1_000;
+    }
+
+
+    return (
+        <Page>
+            {
+                announcementInfo != null
+                    ?
+                    <Box sx={{ p: 2 }}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={8}>
+                                <Stack gap={2}>
+                                    <Box>
+                                        <Typography variant="h4" fontWeight='bold'>{announcementInfo.name}</Typography>
+                                    </Box>
+                                    <Box >
+                                        <Button size="small" startIcon={<LikeIcon />} variant="outlined">
+                                            Добавить в избранное
+                                        </Button>
+                                    </Box>
+                                    <Stack gap={1}>
+                                        <Box width="600px" height="500px">
+                                            <img src={selectedImageUrl ?? ""} style={{ width: "100%", height: "100%", objectFit: 'contain' }} />
+                                        </Box>
+                                        <Box>
+                                            <Grid container direction='row' sx={{ overflow: 'hidden' }} spacing={1}>
+                                                {
+                                                    announcementInfo.imagesUrls.map((url, index) =>
+                                                        <Grid item xs={1.5} key={index}>
+                                                            <img
+                                                                src={url}
+                                                                onClick={() => setSelectedImageUrl(url)}
+                                                                style={{ outline: selectedImageUrl == url ? '2px solid #1976d2' : "", width: "100%", height: "100%", objectFit: 'cover' }}
+                                                            />
+                                                        </Grid>
+                                                    )
+                                                }
+                                            </Grid>
+                                        </Box>
+                                    </Stack>
+                                    <Grid item>
+                                        <Stack gap={2}>
+                                            <Box>
+                                                <Typography variant='h5' mb={1} fontWeight='bold'>Адрес</Typography>
+                                                <YMaps>
+                                                    <Map
+                                                        defaultState={{ center: [55.75, 37.57], zoom: 9 }}
+                                                        width="100%"
+                                                        height="400px"
+                                                    >
+                                                        <Placemark geometry={[55.75, 37.57]} />
+                                                        <SearchControl options={{ float: 'right' }} />
+                                                    </Map>
+                                                </YMaps>
+
+                                            </Box>
+                                            <Box>
+                                                <Typography variant='h5' mb={1} fontWeight='bold'>Описание</Typography>
+                                                <Typography>{announcementInfo.description}</Typography>
+                                            </Box>
+                                            <Stack>
+                                                <Typography variant='h5' mb={1} fontWeight='bold'>Характеристики</Typography>
+                                                <Typography>Доступное количество: {convertGramsToKilogram(announcementInfo.gramsWeight)}кг</Typography>
+                                            </Stack>
+                                        </Stack>
+                                    </Grid>
+                                </Stack>
+                            </Grid>
+                            <Grid item xs={4}>
+                                <Stack>
+                                    <Stack gap={1} direction='row' justifyContent='space-between'>
+                                        <Stack>
+                                            <Link text={announcementInfo.owner.getFullName ?? "Пользователь"} href={UsersLinks.toUser(announcementInfo.owner.id)} />
+                                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                                                0,0 - 0 отзывов
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" >
+                                                На платформе с {announcementInfo.owner.registrationDate.getFullYear()} года
+                                            </Typography>
+
+                                        </Stack>
+                                        <Avatar alt="Avatar" sx={{ width: 50, height: 50 }} src={announcementInfo.owner.avatarUrl ?? 'https://www.abc.net.au/news/image/8314104-1x1-940x940.jpg'} />
+                                    </Stack>
+                                    <Button variant='outlined' fullWidth sx={{ mt: 2 }}>
+                                        Написать
+                                    </Button>
+                                </Stack>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                    :
+                    <Typography>Такого объявления нет!</Typography>
+            }
+        </Page>
+
+    )
+}
