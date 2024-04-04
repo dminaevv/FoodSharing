@@ -1,4 +1,5 @@
 import LikeIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import { Avatar, Box, Button, Grid, Stack, Typography } from '@mui/material';
 import { Map, Placemark, SearchControl, YMaps } from '@pbe/react-yandex-maps';
 import { useEffect, useState } from 'react';
@@ -7,7 +8,6 @@ import { BlockUi } from '../../components/blockUi/blockUi';
 import { Link } from '../../components/link';
 import { AnnouncementDetailInfo } from '../../domain/announcements/announcementInfo';
 import { AnnouncementsProvider } from '../../domain/announcements/announcementsProvider';
-import { useNotifications } from '../../hooks/useNotifications';
 import { UsersLinks } from '../../tools/constants/links';
 import Page from '../infrastructure/page';
 
@@ -16,8 +16,6 @@ export function AnnouncementPage() {
 
     const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
     const [announcementInfo, setAnnouncementInfo] = useState<AnnouncementDetailInfo | null>(null);
-
-    const { addErrorNotification } = useNotifications();
 
     useEffect(() => {
         loadAnnouncement();
@@ -38,6 +36,13 @@ export function AnnouncementPage() {
         return grams / 1_000;
     }
 
+    function toggleFavorite() {
+        if (announcementInfo == null) return;
+
+        const isFavorite = announcementInfo.isFavorite;
+        setAnnouncementInfo({ ...announcementInfo, isFavorite: !isFavorite })
+        AnnouncementsProvider.toggleFavorite(announcementInfo.id);
+    }
 
     return (
         <Page>
@@ -52,8 +57,12 @@ export function AnnouncementPage() {
                                         <Typography variant="h4" fontWeight='bold'>{announcementInfo.name}</Typography>
                                     </Box>
                                     <Box >
-                                        <Button size="small" startIcon={<LikeIcon />} variant="outlined">
-                                            Добавить в избранное
+                                        <Button size="small" startIcon={announcementInfo.isFavorite ? <FavoriteRoundedIcon /> : <LikeIcon />} variant="outlined" onClick={toggleFavorite}>
+                                            {
+                                                announcementInfo.isFavorite
+                                                    ? "В избранном"
+                                                    : "Добавить в избранное"
+                                            }
                                         </Button>
                                     </Box>
                                     <Stack gap={1}>

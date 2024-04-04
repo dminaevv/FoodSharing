@@ -66,17 +66,14 @@ public class AnnouncementService : IAnnouncementService
         return _announcementRepository.GetAnnouncement(announcementId); 
     }
 
-    public AnnouncementDetailInfo GetAnnouncementInfo(Guid announcementId)
+    public AnnouncementDetailInfo GetAnnouncementInfo(Guid announcementId, Guid requestedUserId)
     {
-        Announcement? announcement = _announcementRepository.GetAnnouncement(announcementId);
-        if (announcement is null) throw new Exception($"Не удалось найти объявление id {announcementId}"); 
+        Announcement announcement = _announcementRepository.GetAnnouncement(announcementId).NotNullOrThrow();
+        User owner = _usersService.GetUser(announcement.OwnerUserId).NotNullOrThrow();
+        AnnouncementCategory category = GetAnnouncementCategory(announcement.CategoryId);
+        Boolean isFavorite = GetFavoriteAnnouncement(announcementId, requestedUserId) is not null; 
 
-        User? owner = _usersService.GetUser(announcement.OwnerUserId);
-        if (owner == null) throw new Exception($"Не найден владелец объявления {announcementId}");
-
-        AnnouncementCategory category = GetAnnouncementCategory(announcement.CategoryId); 
-
-        return new AnnouncementDetailInfo(announcement, owner, category); 
+        return new AnnouncementDetailInfo(announcement, owner, category, isFavorite); 
     }
 
     public Announcement[] GetAnnouncements(Guid userId)
@@ -86,9 +83,17 @@ public class AnnouncementService : IAnnouncementService
 
     public PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo(Guid? userId, Int32 page, Int32 pageSize)
     {
-        PagedResult<Announcement> announcements = _announcementRepository.GetAnnouncements(userId, page, pageSize);
+        PagedResult<Announcement> announcements = _announcementRepository.GetAnnouncements(userId: null, page, pageSize);
+        Announcement[] favoriteAnnouncements = userId is { } id
+            ? _announcementRepository.GetFavoriteAnnouncements(id)
+            : new Announcement[0];
+
         AnnouncementShortInfo[] announcementInfo = announcements.Values
-            .Select(a => new AnnouncementShortInfo(a))
+            .Select(announcement =>
+            {
+                Boolean isFavorite = favoriteAnnouncements.Any(a => announcement.Id == a.Id);
+                return new AnnouncementShortInfo(announcement, isFavorite);
+            })
             .ToArray();
 
         return new PagedResult<AnnouncementShortInfo>(announcementInfo, announcements.TotalRows);
@@ -99,6 +104,21 @@ public class AnnouncementService : IAnnouncementService
         _announcementRepository.RemoveAnnouncement(announcementId, userId);
         
         return Result.Success();
+    }
+
+    public void ToggleFavoriteAnnouncement(Guid announcementId, Guid userId)
+    {
+        Announcement? favoriteAnnouncement = GetFavoriteAnnouncement(announcementId, userId);
+        Boolean IsFavorite = favoriteAnnouncement is not null;
+
+        if (IsFavorite)
+        {
+            RemoveFavoriteAnnouncement(announcementId, userId);
+        }
+        else
+        {
+            AddFavoriteAnnouncement(announcementId, userId);
+        }
     }
 
     public void AddFavoriteAnnouncement(Guid announcementId, Guid userId)
@@ -118,6 +138,12 @@ public class AnnouncementService : IAnnouncementService
     public Announcement[] GetFavoriteAnnouncements(Guid userId)
     {
         return _announcementRepository.GetFavoriteAnnouncements(userId);
+    }
+
+    public AnnouncementShortInfo[] GetFavoriteAnnouncementsShortInfo(Guid userId)
+    {
+        var favoriteAnnouncements = GetFavoriteAnnouncements(userId);
+        return favoriteAnnouncements.Select(announcement => new AnnouncementShortInfo(announcement, isFavorite: true)).ToArray();
     }
 
     public void RemoveFavoriteAnnouncement(Guid announcementId, Guid userId)

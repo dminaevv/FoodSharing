@@ -1,9 +1,9 @@
-import { Container, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export function FeedbacksPage() {
     return (
-        <Container>
-            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Мои отзывы</Typography>
-        </Container>
+        <Box>
+            <Typography variant="h4" my={2} sx={{ fontWeight: 'bold' }}>Мои отзывы</Typography>
+        </Box>
     )
 }

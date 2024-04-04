@@ -42,7 +42,7 @@ export function ProfileAnnouncementPage() {
             <Grid container direction='column' wrap='nowrap' spacing={2} width="100%">
                 {
                     announcements.map(announcement =>
-                        <Grid item xs container columnSpacing={2} wrap="nowrap" sx={{ height: " 170px" }}>
+                        <Grid key={announcement.id} item xs container columnSpacing={2} wrap="nowrap" sx={{ height: " 170px" }}>
                             <Grid item xs={3}>
                                 <img src={announcement.imagesUrls[0]} width="100%" height={"100%"} style={{ objectFit: "cover", borderRadius: 10 }} />
                             </Grid>

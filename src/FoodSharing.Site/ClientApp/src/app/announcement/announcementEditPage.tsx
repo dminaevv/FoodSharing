@@ -12,6 +12,8 @@ import { AnnouncementPhotoGrid } from "./announcementPhotoGrid";
 export function AnnouncementEditPage() {
     const { id } = useParams();
     const [announcementBlank, setAnnouncementBlank] = useState<AnnouncementBlank>(AnnouncementBlank.Empty());
+    const [uploadPhotos, setUploadPhotos] = useState<File[]>([]);
+
     const [categories, setCategories] = useState<AnnouncementCategory[]>([]);
 
     useEffect(() => {
@@ -40,7 +42,7 @@ export function AnnouncementEditPage() {
 
     function saveAnnouncement() {
         BlockUi.block(async () => {
-            //TODO Denis ДОДЕЛАТЬ 
+            AnnouncementsProvider.save(announcementBlank, uploadPhotos);
         })
     }
 
@@ -103,7 +105,12 @@ export function AnnouncementEditPage() {
                         />
                     </Stack>
 
-                    <AnnouncementPhotoGrid photoUrls={announcementBlank.imagesUrls} setAnnouncementBlank={setAnnouncementBlank} />
+                    <AnnouncementPhotoGrid
+                        photoUrls={announcementBlank.imagesUrls}
+                        setAnnouncementBlank={setAnnouncementBlank}
+                        uploadPhotos={uploadPhotos}
+                        setUploadPhotos={setUploadPhotos}
+                    />
 
                     <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
                         Сохранить

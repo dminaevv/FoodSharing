@@ -1,9 +1,9 @@
-import { Container, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export function SettingsPage() {
     return (
-        <Container>
+        <Box>
             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Настойки</Typography>
-        </Container>
+        </Box>
     )
 }

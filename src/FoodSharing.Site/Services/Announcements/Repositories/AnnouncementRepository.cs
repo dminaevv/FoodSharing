@@ -190,12 +190,12 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             new("p_userId", userId),
         };
 
-        return _mainConnector.Get<AnnouncementDB[]>(expression, parameters).Select(a => a.ToAnnouncement()).ToArray();
+        return _mainConnector.GetList<AnnouncementDB>(expression, parameters).Select(a => a.ToAnnouncement()).ToArray();
     }
 
     public void RemoveFavoriteAnnouncement(Guid announcementId, Guid userId)
     {
-        String expression = @"DELETE FROM favoriteannouncements WHERE announcementId = @p_announcementId AND userid = p_userId ;";
+        String expression = @"DELETE FROM favoriteannouncements WHERE announcementId = @p_announcementId AND userid = @p_userId ;";
 
         NpgsqlParameter[] parameters = {
             new("p_announcementId", announcementId),

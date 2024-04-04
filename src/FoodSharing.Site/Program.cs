@@ -1,6 +1,8 @@
 using FoodSharing.Site.Infrastructure;
 using FoodSharing.Site.Services;
+using Microsoft.AspNetCore.Builder;
 using System.Text.Json;
+using Typography.Startup;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,7 @@ app.Use((context, next) =>
     context.Request.EnableBuffering();
     return next();
 });
+app.UseExceptionsHandler();
 app.UseStatusCodePagesWithRedirects("/Error/{0}");
 app.UseStaticFiles();
 app.UseResponseCompression();

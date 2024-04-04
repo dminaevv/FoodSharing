@@ -5,7 +5,8 @@ export class AnnouncementShortInfo {
         public name: string,
         public description: string,
         public mainImgUrl: string,
-        public createdAt: Date
+        public createdAt: Date,
+        public isFavorite: boolean
     ) { }
 }
 
@@ -15,6 +16,7 @@ export function mapToAnnouncementShortInfo(data: any) {
         data.name,
         data.description,
         data.mainImgUrl,
-        data.createdAt
+        data.createdAt,
+        data.isFavorite
     )
 }

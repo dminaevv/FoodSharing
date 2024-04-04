@@ -1,23 +1,24 @@
 import { AddCircleOutline } from "@mui/icons-material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, IconButton, ImageList, ImageListItem, ImageListItemBar, Typography } from "@mui/material";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { AnnouncementBlank } from "../../domain/announcements/announcementBlank";
 import { useNotifications } from "../../hooks/useNotifications";
 
 interface IProps {
     photoUrls: string[];
-    setAnnouncementBlank: React.Dispatch<React.SetStateAction<AnnouncementBlank>>
+    setAnnouncementBlank: React.Dispatch<React.SetStateAction<AnnouncementBlank>>;
+    uploadPhotos: File[];
+    setUploadPhotos: React.Dispatch<React.SetStateAction<File[]>>
 }
 
 export function AnnouncementPhotoGrid(props: IProps) {
-    const [uploadPhotos, setUploadPhotos] = useState<File[]>([]);
     const inputFileRef = useRef<HTMLInputElement>(null);
 
     const { addErrorNotification } = useNotifications();
 
     function getAllPhotoCount() {
-        return props.photoUrls.length + uploadPhotos.length;
+        return props.photoUrls.length + props.uploadPhotos.length;
     }
 
     function handlePhotoChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -25,21 +26,21 @@ export function AnnouncementPhotoGrid(props: IProps) {
             const selectedPhotos = Array.from(event.target.files);
             const maxPhotoCount = 10;
 
-            const availableQuantityToAdd = maxPhotoCount - uploadPhotos.length;
+            const availableQuantityToAdd = maxPhotoCount - props.uploadPhotos.length;
             if (availableQuantityToAdd == 0) return addErrorNotification(`Максимальное количество изображений - ${maxPhotoCount}`);
 
             const availablePhoto = selectedPhotos.length <= availableQuantityToAdd
                 ? selectedPhotos
                 : selectedPhotos.slice(0, availableQuantityToAdd)
 
-            setUploadPhotos([...uploadPhotos, ...availablePhoto]);
+            props.setUploadPhotos(prev => [...prev, ...availablePhoto]);
         }
     };
 
     function handleDeleteUploadedPhoto(photoIndex: number) {
-        const updatedPhotos = [...uploadPhotos];
+        const updatedPhotos = [...props.uploadPhotos];
         updatedPhotos.splice(photoIndex, 1);
-        setUploadPhotos(updatedPhotos);
+        props.setUploadPhotos(updatedPhotos);
 
         if (inputFileRef.current) {
             inputFileRef.current.value = '';
@@ -89,7 +90,7 @@ export function AnnouncementPhotoGrid(props: IProps) {
                         />
                     </ImageListItem>
                 ))}
-                {uploadPhotos.map((photo, index) => (
+                {props.uploadPhotos.map((photo, index) => (
                     <ImageListItem key={index}>
                         <img src={URL.createObjectURL(photo)} alt={`photo-${index}`} style={{
                             objectFit: 'contain'

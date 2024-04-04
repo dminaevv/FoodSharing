@@ -5,7 +5,7 @@ import { NeverUnreachable } from '../../tools/errors/neverUnreachable';
 import { enumToArrayNumber } from '../../tools/extensions/enumUtils';
 import Page from '../infrastructure/page';
 import { UserShortInfoCard } from '../users/userShortInfoCard';
-import { FavouritesPage } from './favouritesPage';
+import { FavoritesPage } from './favouritesPage';
 import { FeedbacksPage } from './feedbacksPage';
 import { ProfileAnnouncementPage } from './profileAnnouncementPage';
 import { SettingsPage } from './settingsPage';
@@ -42,7 +42,7 @@ export function ProfilePage() {
         switch (selectedPage) {
             case PageType.Announcement: return <ProfileAnnouncementPage />;
             case PageType.Feedbacks: return <FeedbacksPage />;
-            case PageType.Favourites: return <FavouritesPage />;
+            case PageType.Favourites: return <FavoritesPage />;
             case PageType.Settings: return <SettingsPage />;
 
             default: throw new NeverUnreachable(selectedPage)

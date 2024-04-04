@@ -12,9 +12,10 @@ public class AnnouncementDetailInfo
     public String[] ImagesUrls { get; }
     public DateTime CreatedAt { get; }
     public User Owner { get;  }
+    public Boolean IsFavorite { get; }
 
     public AnnouncementDetailInfo(
-        Announcement? announcement, User owner, AnnouncementCategory category
+        Announcement announcement, User owner, AnnouncementCategory category, Boolean isFavorite
     )
     {
         Id = announcement.Id;
@@ -25,5 +26,6 @@ public class AnnouncementDetailInfo
         ImagesUrls = announcement.ImagesUrls;
         CreatedAt = announcement.CreatedAt;
         Owner = owner;
+        IsFavorite = isFavorite;
     }
 }

@@ -23,10 +23,11 @@ public class AnnouncementController : BaseController
         return ReactApp();
     }
 
+    public record UploadPhotosRequest(AnnouncementBlank blank, IFormFile[] uploadPhotos);
     [HttpPost("/announcement/save")]
-    public Result SaveAnnouncement(AnnouncementBlank blank)
+    public Result SaveAnnouncement(UploadPhotosRequest uploadPhotos)
     {
-        return _announcementService.SaveAnnouncement(blank, SystemUser.Id);
+        return Result.Success();
     }
 
     public record GetAnnouncementRequest(Guid Id);
@@ -49,7 +50,7 @@ public class AnnouncementController : BaseController
     [HttpPost("/announcement/get-info")]
     public AnnouncementDetailInfo GetAnnouncementInfo([FromBody] GetAnnouncementRequest request)
     {
-        return _announcementService.GetAnnouncementInfo(request.Id);
+        return _announcementService.GetAnnouncementInfo(request.Id, SystemUser.Id);
     }
 
     [HttpGet("/announcement/get-user")]
@@ -61,7 +62,7 @@ public class AnnouncementController : BaseController
     [HttpGet("/announcement/get-page")]
     public PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo([FromQuery] Int32 page, [FromQuery] Int32 pageSize)
     {
-        return _announcementService.GetAnnouncementsPageInfo(userId: null, page, pageSize);
+        return _announcementService.GetAnnouncementsPageInfo(SystemUser.Id, page, pageSize);
     }
 
     public record RemoveAnnouncementRequest(Guid Id);
@@ -71,11 +72,18 @@ public class AnnouncementController : BaseController
        return _announcementService.RemoveAnnouncement(request.Id, SystemUser.Id);
     }
 
-    public record AddFavoriteAnnouncementRequest(Guid AnnouncementId);
-    [HttpPost("/announcement/favorite/add")]
-    public void AddFavoriteAnnouncement(AddFavoriteAnnouncementRequest request)
+
+    [HttpGet("/announcement/favorite/get-all")]
+    public AnnouncementShortInfo[] AddFavoriteAnnouncement()
     {
-        _announcementService.RemoveAnnouncement(request.AnnouncementId, SystemUser.Id);
+        return _announcementService.GetFavoriteAnnouncementsShortInfo(SystemUser.Id);
+    }
+
+    public record AddFavoriteAnnouncementRequest(Guid AnnouncementId);
+    [HttpPost("/announcement/favorite/toggle")]
+    public void AddFavoriteAnnouncement([FromBody] AddFavoriteAnnouncementRequest request)
+    {
+        _announcementService.ToggleFavoriteAnnouncement(request.AnnouncementId, SystemUser.Id);
     }
 
     #region Category

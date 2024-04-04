@@ -9,7 +9,8 @@ export class AnnouncementDetailInfo {
         public category: AnnouncementCategory,
         public gramsWeight: number,
         public imagesUrls: string[],
-        public owner: User
+        public owner: User,
+        public isFavorite: boolean
     ) { }
 }
 
@@ -21,6 +22,7 @@ export function mapToAnnouncementDetailInfo(data: any) {
         mapToAnnouncementCategory(data.category),
         data.gramsWeight,
         data.imagesUrls,
-        mapToUser(data.owner)
+        mapToUser(data.owner),
+        data.isFavorite
     )
 }

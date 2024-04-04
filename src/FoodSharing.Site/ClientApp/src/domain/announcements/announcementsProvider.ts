@@ -2,11 +2,18 @@ import { HttpClient } from "../../tools/httpClient";
 import { PagedResult } from "../../tools/results/pagedResult";
 import { mapToResult } from "../../tools/results/result";
 import { Announcement, mapToAnnouncement } from "./announcement";
+import { AnnouncementBlank } from "./announcementBlank";
 import { AnnouncementCategory, mapToAnnouncementCategory } from "./announcementCategory";
 import { AnnouncementDetailInfo, mapToAnnouncementDetailInfo } from "./announcementInfo";
 import { AnnouncementShortInfo, mapToAnnouncementShortInfo } from "./announcementShortInfo";
 
 export class AnnouncementsProvider {
+    public static async save(blank: AnnouncementBlank, uploadPhotos: File[]): Promise<Announcement> {
+        const any = await HttpClient.formData("/announcement/save", { blank, uploadPhotos });
+
+        return mapToAnnouncement(any);
+    }
+
     public static async get(id: string): Promise<Announcement> {
         const any = await HttpClient.post("/announcement/get", { id });
 
@@ -53,6 +60,16 @@ export class AnnouncementsProvider {
         const any = await HttpClient.get("/announcement/get-categories");
 
         return (any as any[]).map(a => mapToAnnouncementCategory(a));
+    }
+
+    public static async getFavoriteAnnouncements(): Promise<AnnouncementShortInfo[]> {
+        const any = await HttpClient.get("/announcement/favorite/get-all");
+
+        return (any as Announcement[]).map(v => mapToAnnouncementShortInfo(v));
+    }
+
+    public static async toggleFavorite(announcementId: string) {
+        await HttpClient.post("/announcement/favorite/toggle", { announcementId });
     }
 
 
