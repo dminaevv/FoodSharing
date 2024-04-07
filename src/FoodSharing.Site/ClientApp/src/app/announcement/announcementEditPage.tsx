@@ -8,6 +8,7 @@ import { AnnouncementCategory } from "../../domain/announcements/announcementCat
 import { AnnouncementsProvider } from "../../domain/announcements/announcementsProvider";
 import Page from "../infrastructure/page";
 import { AnnouncementPhotoGrid } from "./announcementPhotoGrid";
+import { BeachAccess } from "@mui/icons-material";
 
 export function AnnouncementEditPage() {
     const { id } = useParams();
@@ -15,6 +16,15 @@ export function AnnouncementEditPage() {
     const [uploadPhotos, setUploadPhotos] = useState<File[]>([]);
 
     const [categories, setCategories] = useState<AnnouncementCategory[]>([]);
+
+    useEffect(() => {
+        loadPhoto();
+    }, [uploadPhotos])
+
+    async function loadPhoto(){
+        const base64 = await Promise.all(uploadPhotos.map(photo => convertFileToBase64(photo)))
+        setAnnouncementBlank(prev => ({...prev, uploadPhotosBase64: base64}))
+    }
 
     useEffect(() => {
         loadAnnouncementCategories();
@@ -42,9 +52,19 @@ export function AnnouncementEditPage() {
 
     function saveAnnouncement() {
         BlockUi.block(async () => {
-            AnnouncementsProvider.save(announcementBlank, uploadPhotos);
+            await AnnouncementsProvider.save(announcementBlank);
         })
     }
+
+    async function convertFileToBase64(file: File): Promise<string> {
+        return new Promise((resolve, _) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result!.toString());
+            reader.readAsDataURL(file);
+        });
+    }
+
+
 
     function changeCategory(category: AnnouncementCategory | null) {
         const categoryId = category == null ? null : category.id;

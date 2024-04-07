@@ -22,31 +22,6 @@ export class HttpClient {
         return HttpClient.handleResponse(response);
     }
 
-    public static async formData(url: string, any: any) {
-        let headers = { 'Content-Type': "multipart/form-data; charset=utf-8; boundary=" + Math.random().toString().substr(2) };
-        const response = await this.formDataAxios.post(url, any, { headers });
-
-        return HttpClient.handleResponse(response);
-    }
-
-    private static formDataAxios = axios.create({
-        transformRequest: [function (data) {
-            const form = new FormData();
-            for (const key in data) {
-                const value = data[key];
-                if (Array.isArray(value)) {
-                    const arrayKey = `${key}[]`;
-                    value.forEach(v => {
-                        form.append(arrayKey, v);
-                    });
-                } else {
-                    form.append(key, value);
-                }
-            }
-            return form;
-        }],
-    });
-
     private static async handleResponse(response: AxiosResponse) {
         const { addErrorNotification } = useNotifications();
 

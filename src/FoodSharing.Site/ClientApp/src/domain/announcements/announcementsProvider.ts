@@ -8,8 +8,8 @@ import { AnnouncementDetailInfo, mapToAnnouncementDetailInfo } from "./announcem
 import { AnnouncementShortInfo, mapToAnnouncementShortInfo } from "./announcementShortInfo";
 
 export class AnnouncementsProvider {
-    public static async save(blank: AnnouncementBlank, uploadPhotos: File[]): Promise<Announcement> {
-        const any = await HttpClient.formData("/announcement/save", { blank, uploadPhotos });
+    public static async save(blank: AnnouncementBlank): Promise<Announcement> {
+        const any = await HttpClient.post("/announcement/save",  blank);
 
         return mapToAnnouncement(any);
     }

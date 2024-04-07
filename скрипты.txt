@@ -12,7 +12,7 @@ CREATE TABLE users(
     CreatedUserId uuid NOT NULL,
     ModifiedUserId uuid ,
     CreatedDateTimeUtc timestamp NOT NULL,
-    ModifiedDateTimeUtc timestamp 
+    ModifiedDateTimeUtc timestamp,
     IsRemoved bool NOT NULL
 );
 

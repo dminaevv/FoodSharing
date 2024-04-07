@@ -23,9 +23,8 @@ public class AnnouncementController : BaseController
         return ReactApp();
     }
 
-    public record UploadPhotosRequest(AnnouncementBlank blank, IFormFile[] uploadPhotos);
     [HttpPost("/announcement/save")]
-    public Result SaveAnnouncement(UploadPhotosRequest uploadPhotos)
+    public Result SaveAnnouncement([FromBody] AnnouncementBlank Blank)
     {
         return Result.Success();
     }
@@ -34,7 +33,7 @@ public class AnnouncementController : BaseController
     [HttpPost("/announcement/get")]
     public Announcement GetAnnouncement([FromBody] GetAnnouncementRequest request)
     {
-        Announcement? announcement =  _announcementService.GetAnnouncement(request.Id);
+        Announcement? announcement = _announcementService.GetAnnouncement(request.Id);
         if (announcement is null) throw new Exception($"Не удалось найти Announcement с id {request.Id}");
 
         return announcement;
@@ -69,7 +68,7 @@ public class AnnouncementController : BaseController
     [HttpPost("/announcement/remove")]
     public Result RemoveAnnouncement([FromBody] RemoveAnnouncementRequest request)
     {
-       return _announcementService.RemoveAnnouncement(request.Id, SystemUser.Id);
+        return _announcementService.RemoveAnnouncement(request.Id, SystemUser.Id);
     }
 
 

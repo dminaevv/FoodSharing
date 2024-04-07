@@ -3,13 +3,14 @@ namespace FoodSharing.Site.Models.Announcements;
 
 public partial class AnnouncementBlank
 {
-    public Guid? Id   { get; set; }
-    public String? Name   { get; set; }
-    public Guid? OwnerUserId  { get; set; }
-    public String? Description   { get; set; }
-    public Guid? CategoryId   { get; set; }
-    public Int32? GramsWeight   { get; set; }
-    public String[]? ImagesUrls   { get; set; }
+    public Guid? Id { get; set; }
+    public String? Name { get; set; }
+    public Guid? OwnerUserId { get; set; }
+    public String? Description { get; set; }
+    public Guid? CategoryId { get; set; }
+    public Int32? GramsWeight { get; set; }
+    public String[]? ImagesUrls { get; set; }
+    public String[]? UploadPhotosBase64 { get; set; }
 }
 
 public partial class AnnouncementBlank
@@ -21,11 +22,11 @@ public partial class AnnouncementBlank
         public Guid OwnerUserId { get; }
         public String Description { get; }
         public Guid CategoryId { get; }
-        public Int32 GramsWeight { get;  }
+        public Int32 GramsWeight { get; }
         public String[] ImagesUrls { get; }
 
         public Validated(
-            Guid id, String name, Guid ownerUserId, String description, 
+            Guid id, String name, Guid ownerUserId, String description,
             Guid categoryId, Int32 gramsWeight, String[] imagesUrls
         )
         {

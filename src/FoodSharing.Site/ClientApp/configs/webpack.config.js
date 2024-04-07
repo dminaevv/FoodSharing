@@ -50,11 +50,6 @@ module.exports = env => {
                     use: ['style-loader', 'css-loader']
                 },
                 {
-                    enforce: 'pre',
-                    test: /\.js$/,
-                    use: ['source-map-loader']
-                },
-                {
                     test: /\.(png|jpe?g)$/,
                     use: [
                         {
@@ -64,6 +59,11 @@ module.exports = env => {
                             },
                         },
                     ],
+                }, 
+                {
+                    enforce: 'pre',
+                    test: /\.js$/,
+                    use: ['source-map-loader']
                 }
             ]
         },

@@ -7,17 +7,18 @@ export class AnnouncementBlank {
         public description: string | null,
         public categoryId: string | null,
         public gramsWeight: number | null,
-        public imagesUrls: string[]
+        public imagesUrls: string[], 
+        public uploadPhotosBase64: string[]
     ) { }
 
     public static Empty() {
-        return new AnnouncementBlank(null, null, null, null, null, []);
+        return new AnnouncementBlank(null, null, null, null, null, [], []);
     }
 }
 
 export function mapToAnnouncementBlank(announcement: Announcement) {
     return new AnnouncementBlank(
         announcement.id, announcement.name, announcement.description,
-        announcement.categoryId, announcement.gramsWeight, announcement.imagesUrls
+        announcement.categoryId, announcement.gramsWeight, announcement.imagesUrls, []
     );
 }
