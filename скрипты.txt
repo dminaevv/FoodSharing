@@ -1,6 +1,11 @@
 CREATE DATABASE IF NOT EXISTS foodsharing; 
 CREATE ROLE foodsharing_admin WITH PASSWORD '9rjJ2dT87SAqNybC2ZKY' SUPERUSER;
 
+CREATE TABLE configurationsettings (
+	key varchar(100) PRIMARY KEY,
+	value text NOT NULL
+);
+
 CREATE TABLE users(
     Id uuid PRIMARY KEY,
     Email varchar NOT NULL,

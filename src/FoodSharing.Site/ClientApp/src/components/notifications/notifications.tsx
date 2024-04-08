@@ -9,7 +9,7 @@ export function Notifications() {
             hideProgressBar={true}
             newestOnTop={false}
             closeOnClick
-            theme="colored"
+            theme="light"
         />
     )
 }

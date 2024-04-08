@@ -76,6 +76,7 @@ export function AnnouncementPage() {
                                                         <Grid item xs={1.5} key={index}>
                                                             <img
                                                                 src={url}
+                                                                alt='Изображение'
                                                                 onClick={() => setSelectedImageUrl(url)}
                                                                 style={{ outline: selectedImageUrl == url ? '2px solid #1976d2' : "", width: "100%", height: "100%", objectFit: 'cover' }}
                                                             />

@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
-namespace Typography.Startup;
+using Microsoft.AspNetCore.Diagnostics;
+
+namespace FoodSharing.Site;
 
 public static class ExceptionHandler
 {

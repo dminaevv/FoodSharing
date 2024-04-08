@@ -34,7 +34,7 @@ public class AuthController : BaseController
         return ReactApp();
     }
 
-    public record LoginRequest(string Email, string Password);
+    public record LoginRequest(String Email, String Password);
 
     [AllowAnonymous]
     [HttpPost("login")]
@@ -51,8 +51,8 @@ public class AuthController : BaseController
     [HttpGet("logout")]
     public async Task<IActionResult> LogOut()
     {
-        string? token = ReadCookie(CookieNames.SystemUserToken);
-        if (string.IsNullOrWhiteSpace(token)) return Redirect("/");
+        String? token = ReadCookie(CookieNames.SystemUserToken);
+        if (String.IsNullOrWhiteSpace(token)) return Redirect("/");
 
         _usersService.LogOut(token);
         DeleteCookie(CookieNames.SystemUserToken);
@@ -60,7 +60,7 @@ public class AuthController : BaseController
         return Redirect("/");
     }
 
-    public record RegisterRequest(string? Email, string? Password);
+    public record RegisterRequest(String? Email, String? Password);
 
     [AllowAnonymous]
     [HttpPost("register")]

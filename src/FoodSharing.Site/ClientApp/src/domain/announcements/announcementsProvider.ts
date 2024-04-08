@@ -1,6 +1,6 @@
 import { HttpClient } from "../../tools/httpClient";
 import { PagedResult } from "../../tools/results/pagedResult";
-import { mapToResult } from "../../tools/results/result";
+import { Result, mapToResult } from "../../tools/results/result";
 import { Announcement, mapToAnnouncement } from "./announcement";
 import { AnnouncementBlank } from "./announcementBlank";
 import { AnnouncementCategory, mapToAnnouncementCategory } from "./announcementCategory";
@@ -8,10 +8,10 @@ import { AnnouncementDetailInfo, mapToAnnouncementDetailInfo } from "./announcem
 import { AnnouncementShortInfo, mapToAnnouncementShortInfo } from "./announcementShortInfo";
 
 export class AnnouncementsProvider {
-    public static async save(blank: AnnouncementBlank): Promise<Announcement> {
-        const any = await HttpClient.post("/announcement/save",  blank);
+    public static async save(blank: AnnouncementBlank): Promise<Result> {
+        const any = await HttpClient.formData("/announcement/save", blank);
 
-        return mapToAnnouncement(any);
+        return mapToResult(any);
     }
 
     public static async get(id: string): Promise<Announcement> {

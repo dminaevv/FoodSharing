@@ -23,10 +23,11 @@ public class AnnouncementController : BaseController
         return ReactApp();
     }
 
+    public record AnnouncementBlankRequest(AnnouncementBlank Blank);
     [HttpPost("/announcement/save")]
-    public Result SaveAnnouncement([FromBody] AnnouncementBlank Blank)
+    public Result SaveAnnouncement([FromForm] AnnouncementBlank blank)
     {
-        return Result.Success();
+        return _announcementService.SaveAnnouncement(blank, SystemUser.User); 
     }
 
     public record GetAnnouncementRequest(Guid Id);

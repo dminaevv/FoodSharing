@@ -22,6 +22,26 @@ export class HttpClient {
         return HttpClient.handleResponse(response);
     }
 
+    public static async formData(url: string, any: any) {
+        const response = await axios.post(url, this.getFormData(any));
+
+        return HttpClient.handleResponse(response);
+    }
+
+    public static getFormData = (object: Record<string, any>): FormData => {
+        const formData = new FormData();
+
+        Object.entries(object).forEach(([key, val]) => {
+            if (Array.isArray(val)) {
+                val.forEach(v => formData.append(key, v));
+            } else {
+                formData.append(key, val);
+            }
+        });
+
+        return formData;
+    };
+
     private static async handleResponse(response: AxiosResponse) {
         const { addErrorNotification } = useNotifications();
 

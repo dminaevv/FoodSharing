@@ -1,6 +1,8 @@
 ﻿using FoodSharing.Site.Models.Announcements;
+using FoodSharing.Site.Models.Files;
 using FoodSharing.Site.Models.Users;
 using FoodSharing.Site.Services.Announcements.Repositories;
+using FoodSharing.Site.Services.Files;
 using FoodSharing.Site.Services.Users;
 using FoodSharing.Site.Tools.Extensions;
 using FoodSharing.Site.Tools.Types;
@@ -11,21 +13,37 @@ public class AnnouncementService : IAnnouncementService
 {
     private readonly IAnnouncementRepository _announcementRepository;
     private readonly IUsersService _usersService;
+    private readonly IFileService _fileService;
 
-    public AnnouncementService(IAnnouncementRepository announcementRepository, IUsersService usersService)
+    public AnnouncementService(IAnnouncementRepository announcementRepository, IUsersService usersService, IFileService fileService)
     {
         _announcementRepository = announcementRepository;
         _usersService = usersService;
+        _fileService = fileService;
     }
 
-    public Result SaveAnnouncement(AnnouncementBlank blank, Guid userId)
+    public Result SaveAnnouncement(AnnouncementBlank blank, User requestedUser)
     {
         PreprocessAnnouncementBlank(blank);
 
         Result validateAnnouncementBlankResult = ValidateAnnouncementBlank(blank, out AnnouncementBlank.Validated validated);
         if(!validateAnnouncementBlankResult.IsSuccess) return Result.Fail(validateAnnouncementBlankResult.Errors);
 
-        _announcementRepository.SaveAnnouncement(validated, userId);
+        if (!validated.UploadPhotos.IsEmpty())
+        {
+            CFile[] photoFiles = validated.UploadPhotos.Select(photo =>
+            {
+                String extension = Path.GetExtension(photo.FileName);
+                String photoName = $"{Guid.NewGuid()}-{Guid.NewGuid()}{extension}";
+
+                return new CFile(photoName, photo.ToBytes());
+            }).ToArray();
+
+            String[] photoUrls = _fileService.SaveAnnouncementPhotos(photoFiles);
+            validated.ImagesUrls.AddRange(photoUrls);
+        } 
+       
+        _announcementRepository.SaveAnnouncement(validated, requestedUser.Id);
 
         return Result.Success();
     }
@@ -44,18 +62,33 @@ public class AnnouncementService : IAnnouncementService
 
         if (blank.Id is not { } id) throw new Exception("Announcement Id null при сохранении");
 
-        if (blank.Name.IsNullOrWhitespace()) return Result.Fail("Укажите название объявления"); 
-        if (blank.OwnerUserId is not {} ownerUserId) throw new Exception("Не указан OwnerUserId при сохранении Announcement"); 
-        if (blank.Description.IsNullOrWhitespace()) return Result.Fail("Заполните описание"); 
-        if (blank.CategoryId is not {} categoryId) return Result.Fail("Укажите категорию для объявления"); 
-        if (blank.GramsWeight is not {} weight) return Result.Fail("Укажите вес"); 
-        if(weight <= 0) return Result.Fail("Укажите корректное количество");
+        if (blank.Name.IsNullOrWhitespace()) return Result.Fail("Укажите название объявления");
+        if (blank.OwnerUserId is not { } ownerUserId)
+            throw new Exception("Не указан OwnerUserId при сохранении Announcement");
+        if (blank.Description.IsNullOrWhitespace()) return Result.Fail("Заполните описание");
+        if (blank.CategoryId is not { } categoryId) return Result.Fail("Укажите категорию для объявления");
+        if (blank.GramsWeight is not { } weight) return Result.Fail("Укажите вес");
+        if (weight <= 0) return Result.Fail("Укажите корректное количество");
 
-        if (blank.ImagesUrls.IsNullOrEmpty()) return Result.Fail("Прикрепите хотя бы одно фото");
+        if (blank.ImagesUrls.IsNullOrEmpty() && blank.UploadPhotos.IsNullOrEmpty())
+            return Result.Fail("Прикрепите хотя бы одно фото");
+
+        Int32 maxFileSizeInMb = 5; 
+        Int64 maxFileSizeInByte = maxFileSizeInMb * 1024 * 1024;
+
+        if (blank.UploadPhotos is not null)
+        {
+            if (blank.UploadPhotos.Any(photo => photo.Length >= maxFileSizeInByte))
+                return Result.Fail($"Максимальный размер фото - {maxFileSizeInMb}");
+
+            String[] allowedImageTypes = { "image/jpeg", "image/png", "image/jpg" };
+            if (blank.UploadPhotos.Any(photo =>!allowedImageTypes.Contains(photo.ContentType)))
+                return Result.Fail("Вы загрузили недопустимый формат фото");
+        }
 
         validated = new AnnouncementBlank.Validated(
-            id, blank.Name, ownerUserId, blank.Description, 
-            categoryId, weight, blank.ImagesUrls!
+                id, blank.Name, ownerUserId, blank.Description,
+                categoryId, weight, blank.ImagesUrls!, blank.UploadPhotos ?? Array.Empty<IFormFile>()
         );
 
         return Result.Success();

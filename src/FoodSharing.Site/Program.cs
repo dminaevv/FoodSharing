@@ -2,7 +2,7 @@ using FoodSharing.Site.Infrastructure;
 using FoodSharing.Site.Services;
 using Microsoft.AspNetCore.Http.Features;
 using System.Text.Json;
-using Typography.Startup;
+using FoodSharing.Site;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

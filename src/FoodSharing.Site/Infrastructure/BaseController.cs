@@ -9,7 +9,7 @@ public class BaseController : Controller
 
     public ViewResult ReactApp()
     {
-        return View("ReactApp", new ReactApp("ReactApp", SystemUser));
+        return View("ReactApp", new ReactApp("ReactApp", SystemUser, ));
     }
 
     protected void WriteCookie(String key, String value, DateTime expires, Boolean httpOnly, Boolean secure)

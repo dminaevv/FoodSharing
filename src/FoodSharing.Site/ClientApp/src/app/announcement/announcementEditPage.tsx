@@ -1,29 +1,34 @@
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { BlockUi } from "../../components/blockUi/blockUi";
 import { CSelect } from "../../components/cSelect";
 import { AnnouncementBlank, mapToAnnouncementBlank } from "../../domain/announcements/announcementBlank";
 import { AnnouncementCategory } from "../../domain/announcements/announcementCategory";
 import { AnnouncementsProvider } from "../../domain/announcements/announcementsProvider";
+import { useNotifications } from "../../hooks/useNotifications";
+import { useSystemUser } from "../../hooks/useSystemUser";
+import { ProfileLinks } from "../../tools/constants/links";
 import Page from "../infrastructure/page";
 import { AnnouncementPhotoGrid } from "./announcementPhotoGrid";
-import { BeachAccess } from "@mui/icons-material";
 
 export function AnnouncementEditPage() {
     const { id } = useParams();
-    const [announcementBlank, setAnnouncementBlank] = useState<AnnouncementBlank>(AnnouncementBlank.Empty());
-    const [uploadPhotos, setUploadPhotos] = useState<File[]>([]);
+    const navigate = useNavigate();
+    const systemUser = useSystemUser();
 
+    const [announcementBlank, setAnnouncementBlank] = useState<AnnouncementBlank>(AnnouncementBlank.Empty(systemUser!.id));
+    const [uploadPhotos, setUploadPhotos] = useState<File[]>([]);
     const [categories, setCategories] = useState<AnnouncementCategory[]>([]);
+
+    const { addErrorNotification, addSuccessNotification } = useNotifications();
 
     useEffect(() => {
         loadPhoto();
     }, [uploadPhotos])
 
-    async function loadPhoto(){
-        const base64 = await Promise.all(uploadPhotos.map(photo => convertFileToBase64(photo)))
-        setAnnouncementBlank(prev => ({...prev, uploadPhotosBase64: base64}))
+    async function loadPhoto() {
+        setAnnouncementBlank(prev => ({ ...prev, uploadPhotos }))
     }
 
     useEffect(() => {
@@ -52,19 +57,13 @@ export function AnnouncementEditPage() {
 
     function saveAnnouncement() {
         BlockUi.block(async () => {
-            await AnnouncementsProvider.save(announcementBlank);
+            const result = await AnnouncementsProvider.save(announcementBlank);
+            if (!result.isSuccess) return addErrorNotification(result.errorsString);
+
+            addSuccessNotification("Объявление успешно добавлено");
+            navigate(ProfileLinks.main)
         })
     }
-
-    async function convertFileToBase64(file: File): Promise<string> {
-        return new Promise((resolve, _) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result!.toString());
-            reader.readAsDataURL(file);
-        });
-    }
-
-
 
     function changeCategory(category: AnnouncementCategory | null) {
         const categoryId = category == null ? null : category.id;
@@ -88,54 +87,52 @@ export function AnnouncementEditPage() {
         <Page>
             <Typography variant='h4'>{id == null ? "Создание объявления" : "Редактирование объявления"}</Typography>
             <Box mt={2} maxWidth="600px">
-                <form onSubmit={saveAnnouncement}>
-                    <Stack gap={1}>
-                        <TextField
-                            label="Название"
-                            size="small"
-                            value={announcementBlank.name ?? ""}
-                            onChange={event => setAnnouncementBlank(prev => ({ ...prev, name: event.target.value }))}
-                        />
-
-                        <TextField
-                            label="Описание"
-                            size="small"
-                            multiline
-                            minRows={2}
-                            maxRows={8}
-                            value={announcementBlank.description ?? ""}
-                            onChange={event => setAnnouncementBlank(prev => ({ ...prev, description: event.target.value }))}
-                        />
-                        <CSelect
-                            label="Категория"
-                            value={categories.find(c => c.id == announcementBlank.categoryId) ?? null}
-                            getOptionLabel={option => option.name}
-                            getOptionValue={option => option.id}
-                            options={categories}
-                            clearable
-                            onChange={changeCategory}
-                        />
-
-                        <TextField
-                            label="Вес (в граммах)"
-                            type="number"
-                            size="small"
-                            value={announcementBlank.gramsWeight ?? ""}
-                            onChange={event => changeWeight(event.target.value)}
-                        />
-                    </Stack>
-
-                    <AnnouncementPhotoGrid
-                        photoUrls={announcementBlank.imagesUrls}
-                        setAnnouncementBlank={setAnnouncementBlank}
-                        uploadPhotos={uploadPhotos}
-                        setUploadPhotos={setUploadPhotos}
+                <Stack gap={1}>
+                    <TextField
+                        label="Название"
+                        size="small"
+                        value={announcementBlank.name ?? ""}
+                        onChange={event => setAnnouncementBlank(prev => ({ ...prev, name: event.target.value }))}
                     />
 
-                    <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-                        Сохранить
-                    </Button>
-                </form>
+                    <TextField
+                        label="Описание"
+                        size="small"
+                        multiline
+                        minRows={2}
+                        maxRows={8}
+                        value={announcementBlank.description ?? ""}
+                        onChange={event => setAnnouncementBlank(prev => ({ ...prev, description: event.target.value }))}
+                    />
+                    <CSelect
+                        label="Категория"
+                        value={categories.find(c => c.id == announcementBlank.categoryId) ?? null}
+                        getOptionLabel={option => option.name}
+                        getOptionValue={option => option.id}
+                        options={categories}
+                        clearable
+                        onChange={changeCategory}
+                    />
+
+                    <TextField
+                        label="Вес (в граммах)"
+                        type="number"
+                        size="small"
+                        value={announcementBlank.gramsWeight ?? ""}
+                        onChange={event => changeWeight(event.target.value)}
+                    />
+                </Stack>
+
+                <AnnouncementPhotoGrid
+                    photoUrls={announcementBlank.imagesUrls}
+                    setAnnouncementBlank={setAnnouncementBlank}
+                    uploadPhotos={uploadPhotos}
+                    setUploadPhotos={setUploadPhotos}
+                />
+
+                <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={saveAnnouncement}>
+                    Сохранить
+                </Button>
             </Box>
         </Page>
     )

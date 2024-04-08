@@ -10,7 +10,6 @@ namespace FoodSharing.Site.Services.Announcements.Repositories;
 public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
 {
     private readonly IMainConnector _mainConnector;
-
     public AnnouncementRepository(IMainConnector mainConnector)
     {
         _mainConnector = mainConnector;
@@ -28,7 +27,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
         )
         VALUES
         (
-            @p_id,  @p_name, @p_ownerUserId, @p_description,  @p_categoryId, @p_gramsWeight
+            @p_id,  @p_name, @p_ownerUserId, @p_description,  @p_categoryId, @p_gramsWeight,
             @p_imagesUrls, @p_userId, @p_dateTimeUtcNow, false
 
         )ON CONFLICT (id)
@@ -52,8 +51,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             new("p_gramsWeight", blank.GramsWeight),
             new("p_imagesUrls", blank.ImagesUrls),
             new("p_userId", userId),
-            new("p_dateTimeUtcNow", DateTime.UtcNow),
-
+            new("p_dateTimeUtcNow", DateTime.UtcNow)
         };
 
         _mainConnector.ExecuteNonQuery(expression, parameters);

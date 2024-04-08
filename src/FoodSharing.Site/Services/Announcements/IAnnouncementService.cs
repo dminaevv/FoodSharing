@@ -8,7 +8,7 @@ public interface IAnnouncementService
 {
     #region Announcement
 
-    Result SaveAnnouncement(AnnouncementBlank blank, Guid userId);
+    Result SaveAnnouncement(AnnouncementBlank blank, User requestedUser);
     Announcement? GetAnnouncement(Guid announcementId);
     AnnouncementDetailInfo GetAnnouncementInfo(Guid announcementId, Guid requestedUserId);
     Announcement[] GetAnnouncements(Guid userId);

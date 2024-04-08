@@ -25,13 +25,20 @@ export function AnnouncementPhotoGrid(props: IProps) {
         if (event.target.files) {
             const selectedPhotos = Array.from(event.target.files);
             const maxPhotoCount = 10;
+            const maxPhotoSizeMb = 5;
+            const maxPhotoSizeByte = maxPhotoSizeMb * 1024 * 1024;
 
             const availableQuantityToAdd = maxPhotoCount - props.uploadPhotos.length;
-            if (availableQuantityToAdd == 0) return addErrorNotification(`Максимальное количество изображений - ${maxPhotoCount}`);
+            if (availableQuantityToAdd == 0) return addErrorNotification(`Максимальное количество фото - ${maxPhotoCount}`);
 
-            const availablePhoto = selectedPhotos.length <= availableQuantityToAdd
+            let availablePhoto = selectedPhotos.length <= availableQuantityToAdd
                 ? selectedPhotos
-                : selectedPhotos.slice(0, availableQuantityToAdd)
+                : selectedPhotos.slice(0, availableQuantityToAdd);
+
+            if (availablePhoto.some(p => p.size >= maxPhotoSizeByte)) {
+                addErrorNotification(`Максимальный размер фото - ${maxPhotoSizeMb}МБ`);
+                availablePhoto = availablePhoto.filter(a => a.size < maxPhotoSizeByte)
+            }
 
             props.setUploadPhotos(prev => [...prev, ...availablePhoto]);
         }

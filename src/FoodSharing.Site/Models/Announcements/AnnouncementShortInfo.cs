@@ -9,7 +9,7 @@ public class AnnouncementShortInfo
     public DateTime CreatedAt { get; }
     public Boolean IsFavorite { get; }
 
-    public AnnouncementShortInfo(Announcement announcement, bool isFavorite)
+    public AnnouncementShortInfo(Announcement announcement, Boolean isFavorite)
     {
         Id = announcement.Id;
         Name = announcement.Name;
