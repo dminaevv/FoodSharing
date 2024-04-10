@@ -37,7 +37,7 @@ export function AnnouncementCard(props: IProps) {
             flexDirection: 'column',
             justifyContent: "flex-start"
         }}
-            elevation={3}
+            elevation={1}
         >
             <CardMedia
                 component="img"

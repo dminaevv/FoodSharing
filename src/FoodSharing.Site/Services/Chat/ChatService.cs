@@ -1,112 +1,85 @@
-﻿//using FoodSharing.Site.Services.Chat.Repositories;
-//using FoodSharing.Site.Services.Users;
+﻿using FoodSharing.Site.Models.Chats;
+using FoodSharing.Site.Services.Chat.Repositories;
+using FoodSharing.Site.Tools.Types;
 
-//namespace FoodSharing.Site.Services.Chat;
+namespace FoodSharing.Site.Services.Chat;
 
-//public class ChatService : IChatService
-//{
-//    private readonly IChatRepository _chatRepository;
-//    private IUsersService _usersService;
+public class ChatService : IChatService
+{
+    private readonly IChatRepository _chatRepository;
 
-//    public ChatService(IChatRepository chatRepository, IUsersService usersService)
-//    {
-//        _chatRepository = chatRepository;
-//        _usersService = usersService;
-//    }
+    public record UserConnection(String ConnectionId, Guid ChatId, Guid UserId);
 
-//    public Task Send(Message model)
-//    {
-//        return _chatRepository.Send(model);
-//    }
+    private readonly List<UserConnection> _userConnections = new();
 
-//    public async Task<List<MessageView>> GetMessages(Guid fromuserid, Guid touserid)
-//    {
-//        List<Message> messages = await _chatRepository.GetMessages(fromuserid, touserid);
-//        if (messages.GramsWeight == 0) return new List<MessageView>();
+    public ChatService(IChatRepository chatRepository)
+    {
+        _chatRepository = chatRepository;
+    }
 
-//        return messages.Select(x =>
-//        {
-//            Task<String> toUserEmail = _usersService.GetUserEmailById(x.ToUserId);
-//            Task<String> fromUserEmail = _usersService.GetUserEmailById(x.FromUserId);
+    #region UserConnection
 
-//            return new MessageView(x.Id, x.FromUserId, fromUserEmail.Result, x.ToUserId, toUserEmail.Result, x.Content, x.CreatedAt);
-//        }).ToList();
-//    }
+    public void SaveConnection(UserConnection connection)
+    {
+        _userConnections.Add(connection);
+    }
 
-//    public async Task<MessagesHistoryView> GetMessagesHistory(Guid userId, String email)
-//    {
-//        MessagesHistoryView messegesHistory = new MessagesHistoryView();
+    public UserConnection[] GetConnections()
+    {
+        return _userConnections.ToArray();
+    }
 
-//        messegesHistory.FromUserId = await _usersService.GetUserIdByEmail(email);
-//        messegesHistory.ToUserId = userId;
+    public UserConnection[] GetUserConnections(Guid chatId)
+    {
+        return _userConnections
+            .Where(c => c.ChatId == chatId)
+            .ToArray();
+    }
 
-//        messegesHistory.FromUserAvatar = await _usersService.GetAvatar(messegesHistory.FromUserId);
-//        messegesHistory.ToUserAvatar = await _usersService.GetAvatar(messegesHistory.ToUserId);
+    public void RemoveConnection(String connectionId, Guid userId, Guid dialogId)
+    {
+        UserConnection? deletedItem = _userConnections.FirstOrDefault(c =>
+            c.ConnectionId == connectionId
+            && c.UserId == userId
+            && c.ChatId == dialogId
+        );
+        if (deletedItem is null) return;
 
-//        messegesHistory.FromUserEmail = email;
-//        messegesHistory.ToUserEmail = await _usersService.GetUserEmailById(userId);
+        _userConnections.Remove(deletedItem);
+    }
 
-//        messegesHistory.Messages = (await GetMessages(messegesHistory.FromUserId, messegesHistory.ToUserId)).OrderBy(x => x.CreatedAt).ToList();
+    #endregion
 
-//        return messegesHistory;
-//    }
+    #region Chats
 
-//    public async Task<Dialog> GetDialog(Guid fromuserid, Guid touserid)
-//    {
-//        List<Message> messages = await _chatRepository.GetMessages(fromuserid, touserid);
+    public Result SaveChat(Models.Chats.Chat chat)
+    {
+        _chatRepository.SaveChat(chat);
 
-//        Message message = messages.OrderBy(x => x.CreatedAt).Last();
+        return Result.Success();
+    }
 
-//        String time = await TimeConverter.GetTime(message.CreatedAt);
+    public Models.Chats.Chat? GetChat(Guid chatId)
+    {
+        return _chatRepository.GetChat(chatId);
+    }
 
-//        String toUserEmail = await _usersService.GetUserEmailById(message.ToUserId);
-//        String fromUserEmail = await _usersService.GetUserEmailById(message.FromUserId);
+    #endregion Chats
 
-//        Byte[] toUserAvatar = await _usersService.GetAvatar(message.ToUserId);
+    #region Messages
 
-//        Byte[] fromUserAvatar = await _usersService.GetAvatar(message.FromUserId);
+    public Result SaveMessage(Message message)
+    {
+        _chatRepository.SaveMessage(message);
+        return Result.Success();
+    }
 
-//        Dialog dialog = new Dialog(message.Id, message.FromUserId, fromUserEmail, fromUserAvatar, message.ToUserId, toUserEmail, toUserAvatar, message.Content, message.CreatedAt, time);
+    public Message[] GetMessages(Guid chatId)
+    {
+        return _chatRepository.GetMessages(chatId);
+    }
 
-//        if (dialog is null)
-//            return new Dialog();
-//        else
-//            return dialog;
-//    }
+    #endregion
+}
 
-//    public async Task<AllDialogsView> GetTalkers(Guid userid)
-//    {
-//        List<Guid> userids = await GetTalkersId(userid);
-//        String email = await _usersService.GetUserEmailById(userid);
 
-//        AllDialogsView allDialogs = new AllDialogsView();
-
-//        foreach (Guid user in userids)
-//        {
-//            Dialog dialog = await GetDialog(user, userid);
-//            if (allDialogs.Dialog is null)
-//                allDialogs.Dialog = new List<Dialog>() { dialog };
-//            else
-//                allDialogs.Dialog.Add(dialog);
-                
-//        }
-//        allDialogs.Dialog = allDialogs.Dialog.OrderByDescending(x => x.CreatedAt).ToList();
-
-//        return allDialogs;
-//    }
-
-//    public async Task<List<Guid>> GetTalkersId(Guid userid)
-//    {
-//        List<Guid> toTalkers = await _chatRepository.GetToTalkers(userid);
-//        List<Guid> fromTalkers = await _chatRepository.GetFromTalkers(userid);
-
-//        fromTalkers.AddRange(toTalkers);
-
-//        return fromTalkers.Distinct().ToList();
-//    }
-
-//}
-
-///* 
-// Status : Visuble, nonVisible, deleted, 
-// */

@@ -1,46 +1,28 @@
-﻿//using FoodSharing.Site.Services.Chat;
-//using FoodSharing.Site.Services.Users;
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Mvc;
+﻿using FoodSharing.Site.Infrastructure;
+using FoodSharing.Site.Services.Chat;
+using Microsoft.AspNetCore.Mvc;
 
-//namespace FoodSharing.Site.Controllers;
+namespace FoodSharing.Site.Controllers.Chat;
 
-//[Authorize]
-//public class ChatController : Controller
-//{
-//    private IChatService _chatService;
-//    private IUsersService _usersService;
+public class ChatController: BaseController
+{
+    private readonly IChatService _chatService;
 
-//    public ChatController(IChatService chatService, IUsersService usersService)
-//    {
-//        _chatService = chatService;
-//        _usersService = usersService;
-//    }
+    public ChatController(IChatService chatService)
+    {
+        _chatService = chatService;
+    }
 
-//    public IActionResult Index()
-//    {
-//        return View();
-//    }
+    [HttpGet("chats")]
+    [HttpGet("chat/{userId}")]
+    public IActionResult Index()
+    {
+        return ReactApp();
+    }
 
-//    [HttpGet]
-//    public async Task<IActionResult> ChatMessage(Guid userId)
-//    {
-//        if (userId == Guid.Empty) return View();
-
-//        MessagesHistoryView messegesHistory = await _chatService.GetMessagesHistory(userId, User.Identity.Name);
-
-//        return View(messegesHistory);
-//    }
-
-//    public async Task<IActionResult> ChatUsers()
-//    {           
-//        Guid UserId = await _usersService.GetUserIdByEmail(User.Identity.Name);
-
-//        AllDialogsView messages = await _chatService.GetTalkers(UserId);
-//        messages.User = User.Identity.Name;
-
-//        return View(messages);
-//    }
-
-
-//}
+    [HttpGet("chat/get")]
+    public Models.Chats.Chat? Get([FromQuery] Guid chatId)
+    {
+        return _chatService.GetChat(chatId);
+    }
+}

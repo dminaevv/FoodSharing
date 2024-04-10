@@ -1,15 +1,19 @@
-﻿//namespace FoodSharing.Site.Services.Chat.Repositories;
+﻿using FoodSharing.Site.Models.Chats;
 
-//public interface IChatRepository
-//{
-//    Task<List<Message>> GetMessages(Guid fromuserid, Guid touserid);
+namespace FoodSharing.Site.Services.Chat.Repositories;
 
-//    Task Send(Message model);
+public interface IChatRepository
+{
+    #region Chats
 
-//    Task<List<Guid>> GetTalkers(Guid userid);
+    void SaveChat(Site.Models.Chats.Chat chat);
+    Site.Models.Chats.Chat? GetChat(Guid chatId);
 
-//    Task<List<Message>> GetAllMessages(Guid fromuserid);
+    #endregion Chats
 
-//    Task<List<Guid>> GetToTalkers(Guid userid);
-//    Task<List<Guid>> GetFromTalkers(Guid userid);
-//}
+    #region Messages
+    void SaveMessage(Message message);
+    Message[] GetMessages(Guid dialogId);
+
+    #endregion Messages
+}

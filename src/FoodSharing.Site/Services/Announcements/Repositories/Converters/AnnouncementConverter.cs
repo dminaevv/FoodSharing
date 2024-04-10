@@ -5,11 +5,13 @@ namespace FoodSharing.Site.Services.Announcements.Repositories.Converters;
 
 public static class AnnouncementConverter
 {
-    public static Announcement ToAnnouncement(this AnnouncementDB db)
+    public static Announcement ToAnnouncement(this AnnouncementDB db, String fileStorageHost)
     {
+        String[] imagesUrls = db.ImagesUrls.Select(url => fileStorageHost + url).ToArray();
+
         return new Announcement(
             db.Id, db.Name, db.OwnerUserId, db.Description,
-            db.CategoryId, db.GramsWeight, db.ImagesUrls, db.CreatedDateTimeUtc
+            db.CategoryId, db.GramsWeight, imagesUrls, db.CreatedDateTimeUtc
         ); 
     }
 

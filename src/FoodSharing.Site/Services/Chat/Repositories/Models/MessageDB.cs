@@ -4,10 +4,9 @@ public class MessageDB
 {
     public Guid Id  { get; set; }
     public Guid DialogId { get; set; }
-    public Guid FromUserId  { get; set; }
-    public Guid ToUserId  { get; set; }
     public String Content  { get; set; }
-    public DateTimeOffset CreatedDateTimeUtc  { get; set; }
-    public DateTimeOffset? ModifiedDateTimeUtc  { get; set; }
+    public Guid CreatedUserId { get; set; }
+    public DateTime CreatedDateTimeUtc  { get; set; }
+    public DateTime? ModifiedDateTimeUtc  { get; set; }
     public Boolean IsRemoved  { get; set; }
 }

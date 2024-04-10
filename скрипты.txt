@@ -42,24 +42,23 @@ CREATE TABLE announcementcategories(
     IconUrl varchar NOT NULL
 );
 
-CREATE TABLE messages(
-    Id uuid PRIMARY KEY,
-    DialogId uuid NOT NULL,
-    FromUserId uuid NOT NULL,
-    ToUserId uuid NOT NULL,
-    Content varchar NOT NULL,
-    CreatedDateTimeUtc timestamp NOT NULL,
-    ModifiedDateTimeUtc timestamp,
-    IsRemoved bool NOT NULL
+CREATE TABLE chats(
+	id uuid PRIMARY KEY,
+	memberids _uuid NOT NULL,
+	announcementid uuid null, 
+	createddatetimeutc timestamp NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	isremoved bool NOT NULL
 );
 
-CREATE TABLE dialogs (
-    Id uuid PRIMARY KEY,
-    FromUserId uuid NOT NULL,
-    ToUserId uuid NOT NULL,
-    CreatedDateTimeUtc timestamp NOT NULL,
-    ModifiedDateTimeUtc timestamp,
-    IsRemoved bool NOT NULL
+CREATE TABLE messages (
+	id uuid PRIMARY KEY,
+	chatid uuid NOT NULL,
+	content varchar NOT NULL,
+	createduserid uuid NOT NULL,
+	createddatetimeutc timestamp NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	isremoved bool NOT NULL
 );
 
 CREATE TABLE favoriteannouncements (

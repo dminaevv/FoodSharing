@@ -4,15 +4,19 @@ using FoodSharing.Site.Services.Announcements.Repositories.Models;
 using FoodSharing.Site.Tools.Database;
 using FoodSharing.Site.Tools.Types;
 using Npgsql;
+using IConfiguration = FoodSharing.Site.Models.Configurations.IConfiguration;
 
 namespace FoodSharing.Site.Services.Announcements.Repositories;
 
 public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
 {
     private readonly IMainConnector _mainConnector;
-    public AnnouncementRepository(IMainConnector mainConnector)
+    private readonly IConfiguration _configuration;
+
+    public AnnouncementRepository(IMainConnector mainConnector, IConfiguration configuration)
     {
         _mainConnector = mainConnector;
+        _configuration = configuration;
     }
 
     #region Announcement
@@ -66,7 +70,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             new("p_id", announcementId),
         };
 
-        return _mainConnector.Get<AnnouncementDB?>(expression, parameters)?.ToAnnouncement();
+        return _mainConnector.Get<AnnouncementDB?>(expression, parameters)?.ToAnnouncement(_configuration.FileStorage_Host);
     }
 
     public Announcement[] GetAnnouncements(Guid userId)
@@ -78,7 +82,9 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             new("p_ownerUserId", userId),
         };
 
-        return _mainConnector.GetList<AnnouncementDB>(expression, parameters).Select(a => a.ToAnnouncement()).ToArray();
+        return _mainConnector.GetList<AnnouncementDB>(expression, parameters)
+            .Select(a => a.ToAnnouncement(_configuration.FileStorage_Host))
+            .ToArray();
     }
 
     public PagedResult<Announcement> GetAnnouncements(Guid? userId, Int32 page, Int32 pageSize)
@@ -112,7 +118,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
         Page<AnnouncementDB> pageResult = _mainConnector.GetPage<AnnouncementDB>(expression, parameters);
         
         Int64 totalRows = pageResult.TotalRows;
-        Announcement[] announcements = pageResult.Values.Select(a => a.ToAnnouncement()).ToArray();
+        Announcement[] announcements = pageResult.Values.Select(a => a.ToAnnouncement(_configuration.FileStorage_Host)).ToArray();
 
         return new PagedResult<Announcement>(announcements, totalRows); 
     }
@@ -172,7 +178,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             new("p_announcementId", announcementId),
         };
 
-        return _mainConnector.Get<AnnouncementDB>(expression, parameters)?.ToAnnouncement();
+        return _mainConnector.Get<AnnouncementDB>(expression, parameters)?.ToAnnouncement(_configuration.FileStorage_Host);
     }
 
     public Announcement[] GetFavoriteAnnouncements(Guid userId)
@@ -188,7 +194,9 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             new("p_userId", userId),
         };
 
-        return _mainConnector.GetList<AnnouncementDB>(expression, parameters).Select(a => a.ToAnnouncement()).ToArray();
+        return _mainConnector.GetList<AnnouncementDB>(expression, parameters)
+            .Select(a => a.ToAnnouncement(_configuration.FileStorage_Host))
+            .ToArray();
     }
 
     public void RemoveFavoriteAnnouncement(Guid announcementId, Guid userId)

@@ -6,6 +6,7 @@ using FoodSharing.Site.Services.Files;
 using FoodSharing.Site.Services.Users;
 using FoodSharing.Site.Tools.Extensions;
 using FoodSharing.Site.Tools.Types;
+using IConfiguration = FoodSharing.Site.Models.Configurations.IConfiguration;
 
 namespace FoodSharing.Site.Services.Announcements;
 
@@ -14,12 +15,17 @@ public class AnnouncementService : IAnnouncementService
     private readonly IAnnouncementRepository _announcementRepository;
     private readonly IUsersService _usersService;
     private readonly IFileService _fileService;
+    private readonly IConfiguration _configuration;
 
-    public AnnouncementService(IAnnouncementRepository announcementRepository, IUsersService usersService, IFileService fileService)
+    public AnnouncementService(
+        IAnnouncementRepository announcementRepository, IUsersService usersService,
+        IFileService fileService, IConfiguration configuration
+    )
     {
         _announcementRepository = announcementRepository;
         _usersService = usersService;
         _fileService = fileService;
+        _configuration = configuration;
     }
 
     public Result SaveAnnouncement(AnnouncementBlank blank, User requestedUser)
@@ -53,7 +59,7 @@ public class AnnouncementService : IAnnouncementService
         blank.Id ??= Guid.NewGuid();
         blank.Name = blank.Name?.Trim();
         blank.Description = blank.Description?.Trim();
-        blank.ImagesUrls ??= Array.Empty<String>();
+        blank.ImagesUrls = blank.ImagesUrls?.Select(url => url.Replace(_configuration.FileStorage_Host, "")).ToArray() ?? Array.Empty<String>();
     }
 
     private Result ValidateAnnouncementBlank(AnnouncementBlank blank, out AnnouncementBlank.Validated validated)

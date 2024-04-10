@@ -1,91 +1,111 @@
-﻿//using FoodSharing.Site.Services.Chat.Repositories.Converters;
+﻿using FoodSharing.Site.Models.Chats;
+using FoodSharing.Site.Services.Chat.Repositories.Converters;
+using FoodSharing.Site.Services.Chat.Repositories.Models;
+using FoodSharing.Site.Tools.Database;
+using Npgsql;
 
-//namespace FoodSharing.Site.Services.Chat.Repositories;
+namespace FoodSharing.Site.Services.Chat.Repositories;
 
-//public class ChatRepository : IChatRepository
-//{
-//    private DbConnection _dbConnection;
+public class ChatRepository : IChatRepository
+{
+    private readonly IMainConnector _mainConnector;
 
-//    public ChatRepository(IConfiguration config)
-//    {
-//        _dbConnection = new DbConnection(config.GetConnectionString("DefaultConnection"));
-//    }
+    public ChatRepository(IMainConnector mainConnector)
+    {
+        _mainConnector = mainConnector;
+    }
 
-//    public Task Send (Message model)
-//    {
-//        String expression = @"INSERT INTO messages (id, fromuserid, touserid, content, createdat) 
-//								VALUES (@id, @fromuserid, @touserid, @content, @createdat)";
+    #region Chats
 
-//        NpgsqlParameter[] parameters = new[]
-//        {
-//            new NpgsqlParameter(nameof(model.Id), model.Id),
-//            new NpgsqlParameter(nameof(model.FromUserId), model.FromUserId),
-//            new NpgsqlParameter(nameof(model.ToUserId), model.ToUserId),
-//            new NpgsqlParameter(nameof(model.Content), model.Content),
-//            new NpgsqlParameter(nameof(model.CreatedAt), model.CreatedAt),
-//        };
-//        return _dbConnection.Add(expression, parameters);
-//    }
+    public void SaveChat(Site.Models.Chats.Chat chat)
+    {
+        String expression = @"
+        INSERT INTO chats
+        (
+            id, memberids, announcementid, createddatetimeutc,
+            modifieddatetimeutc, isremoved
+        )
+        VALUES
+        (
+            @p_id, @p_memberIds, @p_dateTimeUtcNow, 
+            null, false 
+        )
+         ON CONFLICT (id)
+         DO UPDATE SET
+         memberids = @p_memberIds,
+         modifieddatetimeutc = @p_dateTimeUtcNow";
 
-//    public Task<List<Message>> GetMessages(Guid fromuserid, Guid touserid)
-//    {
-//        String expression = @"SELECT * FROM messages WHERE (fromuserid = @fromuserid AND touserid = @touserid) OR (fromuserid = @touserid AND touserid = @fromuserid) ";
+        DateTime utcNow = DateTime.UtcNow;
+        NpgsqlParameter[] parameters =
+        {
+            new("p_id", chat.Id),
+            new("p_memberIds", chat.MemberIds),
+            new("p_announcementId", chat.AnnouncementId),
+            new("p_dateTimeUtcNow", utcNow)
+        };
 
-//        NpgsqlParameter[] parameters = new[]
-//        {
-//            new NpgsqlParameter(nameof(fromuserid), fromuserid),
-//            new NpgsqlParameter(nameof(touserid), touserid),
-//        };
-//        return _dbConnection.GetList(expression, ChatConverter.MapToMessages, parameters);
-//    }
+        _mainConnector.ExecuteNonQuery(expression, parameters);
 
-//    public Task<List<Message>> GetAllMessages(Guid fromuserid)
-//    {
-//        String expression = @"SELECT * FROM messages WHERE (fromuserid = @fromuserid OR touserid = @fromuserid) ";
+    }
 
-//        NpgsqlParameter[] parameters = new[]
-//        {
-//            new NpgsqlParameter(nameof(fromuserid), fromuserid),
-//        };
-//        return _dbConnection.GetList(expression, ChatConverter.MapToMessages, parameters);
-//    }
+    public Site.Models.Chats.Chat? GetChat(Guid chatId)
+    {
+        String expression = @"SELECT * FROM chats WHERE id = @p_chatId";
+        NpgsqlParameter[] parameters =
+        {
+            new("p_chatId", chatId)
+        };
 
-//    public Task<List<Guid>> GetTalkers(Guid userid)
-//    {
-//        String expression = @"SELECT touserid FROM messages WHERE ( fromuserid = @userid OR touserid = @userid ) GROUP BY touserid HAVING touserid <> @userid ";
+        return _mainConnector.Get<ChatDB?>(expression, parameters)?.ToChat();
+    }
 
-//        NpgsqlParameter[] parameters = new[]
-//        {
-//            new NpgsqlParameter(nameof(userid), userid),
-//        };
+    #endregion Chats
 
-//        return _dbConnection.GetList(expression, ChatConverter.MapToGuid, parameters);
-//    }
+    #region Messages
 
-//    public Task<List<Guid>> GetToTalkers(Guid userid)
-//    {
-//        String expression = @"SELECT touserid FROM messages WHERE ( fromuserid = @userid OR touserid = @userid ) GROUP BY touserid HAVING touserid <> @userid ";
+    public void SaveMessage(Message message)
+    {
+        String expression = @"
+        INSERT INTO messages
+        (
+            id, dialogid, ""content"", createduserid, 
+            createddatetimeutc, isremoved   
+        )
+        VALUES(
+             @p_id, @p_dialogId, @p_content, @p_createdUserId,
+             @p_createdDateTimeUtc, false
+        )
+         ON CONFLICT (id)
+         DO UPDATE SET
+         content = @p_content,
+         modifieddatetimeutc = @p_dateTimeUtcNow";
 
-//        NpgsqlParameter[] parameters = new[]
-//        {
-//            new NpgsqlParameter(nameof(userid), userid),		
-//        };
+        DateTime utcNow = DateTime.UtcNow;
+        NpgsqlParameter[] parameters =
+        {
+             new("p_id", message.Id),
+             new("p_dialogId", message.ChatId),
+             new("p_content", message.Content),
+             new("p_createdUserId", message.CreatedUserId),
+             new("p_createdDateTimeUtc", message.CreatedDateTimeUtc),
+             new("p_dateTimeUtcNow", utcNow)
 
-//        return _dbConnection.GetList(expression, ChatConverter.MapToGuid, parameters);
-//    }
+        };
 
-//    public Task<List<Guid>> GetFromTalkers(Guid userid)
-//    {
-//        String expression = @"SELECT fromuserid FROM messages WHERE ( fromuserid = @userid OR touserid = @userid ) GROUP BY fromuserid HAVING fromuserid <> @userid ";
+        _mainConnector.ExecuteNonQuery(expression, parameters);
+    }
 
-//        NpgsqlParameter[] parameters = new[]
-//        {
-//            new NpgsqlParameter(nameof(userid), userid),
-//        };
+    public Message[] GetMessages(Guid dialogId)
+    {
+        String expression = @"SELECT * FROM messages WHERE chatId = @p_chatId ORDER BY createddatetimeutc DESC";
+        NpgsqlParameter[] parameters =
+        {
+            new("p_chatId", dialogId)
+        };
 
-//        return _dbConnection.GetList(expression, ChatConverter.MapFromGuid, parameters);
-//    }
+        return _mainConnector.GetList<MessageDB>(expression, parameters).Select(message => message.ToMessage()).ToArray();
+    }
 
+    #endregion Messages
 
-
-//}
+}

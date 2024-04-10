@@ -3,6 +3,7 @@ using FoodSharing.Site.Services;
 using Microsoft.AspNetCore.Http.Features;
 using System.Text.Json;
 using FoodSharing.Site;
+using FoodSharing.Site.Hubs;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddControllersWithViews().AddJsonOptions(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
+builder.Services.AddSignalR();
 builder.Services.AddResponseCompression();
 
 WebApplication app = builder.Build();
@@ -33,6 +35,7 @@ app.UseStaticFiles();
 app.UseResponseCompression();
 app.UseCors();
 app.UseRouting();
+app.MapHub<ChatHub>("/chat");
 app.UseMiddleware<SiteMiddleware>();
 app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
 app.Run();

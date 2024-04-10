@@ -65,9 +65,14 @@ export function AnnouncementPage() {
                                             }
                                         </Button>
                                     </Box>
-                                    <Stack gap={1}>
-                                        <Box width="600px" height="500px">
-                                            <img src={selectedImageUrl ?? ""} style={{ width: "100%", height: "100%", objectFit: 'contain' }} />
+                                    <Stack gap={1} width="600px">
+                                        <Box height="500px" position='relative' display='flex' alignItems='center' overflow='hidden'>
+                                            <Box sx={{ zIndex: 10, width: '100%', height: "100%" }}>
+                                                <img src={selectedImageUrl ?? ""} style={{ width: "100%", height: "100%", objectFit: 'contain' }} />
+                                            </Box>
+                                            <Box sx={{ position: 'absolute', left: 0, top: 0, zIndex: 1, width: "100%", height: "100%" }}>
+                                                <img src={selectedImageUrl ?? ""} style={{ width: "100%", height: "100%", objectFit: 'cover', filter: "blur(20px)" }} />
+                                            </Box>
                                         </Box>
                                         <Box>
                                             <Grid container direction='row' sx={{ overflow: 'hidden' }} spacing={1}>

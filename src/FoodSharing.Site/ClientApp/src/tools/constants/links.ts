@@ -33,6 +33,12 @@ export class AnnouncementLinks {
     };
 }
 
+
+export class ChatLinks {
+    static main = '/chats';
+    static chat = '/chat/:chatId';
+}
+
 export class UsersLinks {
     static user = '/user/:id';
 
