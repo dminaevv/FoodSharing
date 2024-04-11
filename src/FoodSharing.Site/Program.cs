@@ -33,8 +33,13 @@ app.UseExceptionsHandler();
 app.UseStatusCodePagesWithRedirects("/Error/{0}");
 app.UseStaticFiles();
 app.UseResponseCompression();
-app.UseCors();
 app.UseRouting();
+//app.UseCors(options =>
+//{
+//    options.AllowAnyOrigin()
+//        .AllowAnyMethod()
+//        .AllowAnyHeader();
+//});
 app.MapHub<ChatHub>("/chat");
 app.UseMiddleware<SiteMiddleware>();
 app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());

@@ -1,4 +1,5 @@
 ﻿using FoodSharing.Site.Infrastructure;
+using FoodSharing.Site.Models.Chats;
 using FoodSharing.Site.Services.Chat;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,9 +21,15 @@ public class ChatController: BaseController
         return ReactApp();
     }
 
-    [HttpGet("chat/get")]
-    public Models.Chats.Chat? Get([FromQuery] Guid chatId)
+    [HttpGet("chat/getByAnnouncementId")]
+    public Object Get([FromQuery] Guid announcementId)
     {
-        return _chatService.GetChat(chatId);
+        var result =  _chatService.GetChatByAnnouncementId(announcementId, SystemUser.Id);
+
+        return new
+        {
+            chat = result.chat,
+            messages = result.messages
+        };
     }
 }

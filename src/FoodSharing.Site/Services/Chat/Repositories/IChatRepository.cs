@@ -8,6 +8,7 @@ public interface IChatRepository
 
     void SaveChat(Site.Models.Chats.Chat chat);
     Site.Models.Chats.Chat? GetChat(Guid chatId);
+    Site.Models.Chats.Chat? GetChatByAnnouncementId(Guid chatId, Guid requestedUserId);
 
     #endregion Chats
 

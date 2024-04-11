@@ -36,7 +36,11 @@ export class AnnouncementLinks {
 
 export class ChatLinks {
     static main = '/chats';
-    static chat = '/chat/:chatId';
+    static chat = '/chat/:announcementId';
+
+    static toAnnouncementChat(id: string) {
+        return `/chat/${id}`;
+    };
 }
 
 export class UsersLinks {

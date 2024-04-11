@@ -3,16 +3,17 @@ import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import { Avatar, Box, Button, Grid, Stack, Typography } from '@mui/material';
 import { Map, Placemark, SearchControl, YMaps } from '@pbe/react-yandex-maps';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { BlockUi } from '../../components/blockUi/blockUi';
 import { Link } from '../../components/link';
 import { AnnouncementDetailInfo } from '../../domain/announcements/announcementInfo';
 import { AnnouncementsProvider } from '../../domain/announcements/announcementsProvider';
-import { UsersLinks } from '../../tools/constants/links';
+import { ChatLinks, UsersLinks } from '../../tools/constants/links';
 import Page from '../infrastructure/page';
 
 export function AnnouncementPage() {
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
     const [announcementInfo, setAnnouncementInfo] = useState<AnnouncementDetailInfo | null>(null);
@@ -134,7 +135,7 @@ export function AnnouncementPage() {
                                         </Stack>
                                         <Avatar alt="Avatar" sx={{ width: 50, height: 50 }} src={announcementInfo.owner.avatarUrl ?? 'https://www.abc.net.au/news/image/8314104-1x1-940x940.jpg'} />
                                     </Stack>
-                                    <Button variant='outlined' fullWidth sx={{ mt: 2 }}>
+                                    <Button variant='outlined' fullWidth sx={{ mt: 2 }} onClick={() => navigate(ChatLinks.toAnnouncementChat(announcementInfo.id))}>
                                         Написать
                                     </Button>
                                 </Stack>

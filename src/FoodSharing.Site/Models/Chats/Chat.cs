@@ -12,4 +12,9 @@ public class Chat
         MemberIds = memberIds;
         AnnouncementId = announcementId;
     }
-}
+
+    public static Chat Create(Guid id, Guid? announcementId, params Guid[] membersIds)
+    {
+        return new Chat(id, membersIds, announcementId); 
+    }
+} 

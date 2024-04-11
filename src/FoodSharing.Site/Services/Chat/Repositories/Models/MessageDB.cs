@@ -3,7 +3,7 @@
 public class MessageDB
 {
     public Guid Id  { get; set; }
-    public Guid DialogId { get; set; }
+    public Guid ChatId { get; set; }
     public String Content  { get; set; }
     public Guid CreatedUserId { get; set; }
     public DateTime CreatedDateTimeUtc  { get; set; }

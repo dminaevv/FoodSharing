@@ -1,14 +1,14 @@
 export class MessageBlank {
     constructor(
         public id: string | null,
-        public dialogId: string | null,
+        public chatId: string | null,
         public content: string | null,
         public createdUserId: string | null,
         public createdDateTimeUtc: Date | null,
     ) { }
 
-    public static empty(dialogId: string, senderId: string) {
-        return new MessageBlank(null, dialogId, null, senderId, null)
+    public static empty() {
+        return new MessageBlank(null, null, null, null, null)
     }
 }
 

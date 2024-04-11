@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 
 export function Container(props: PropsWithChildren) {
     return (
-        <Box sx={{ width: "100%", height: "100%", display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ maxHeight: '100vh', display: 'flex', justifyContent: 'center', overflow: 'auto' }}>
             <Box sx={{ width: '1300px' }}>
                 {props.children}
             </Box>

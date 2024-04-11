@@ -27,7 +27,7 @@ public class ChatRepository : IChatRepository
         )
         VALUES
         (
-            @p_id, @p_memberIds, @p_dateTimeUtcNow, 
+            @p_id, @p_memberIds, @p_announcementId, @p_dateTimeUtcNow, 
             null, false 
         )
          ON CONFLICT (id)
@@ -50,10 +50,22 @@ public class ChatRepository : IChatRepository
 
     public Site.Models.Chats.Chat? GetChat(Guid chatId)
     {
-        String expression = @"SELECT * FROM chats WHERE id = @p_chatId";
+        String expression = @"SELECT * FROM chats WHERE id = @p_chatId AND isremoved = false";
         NpgsqlParameter[] parameters =
         {
             new("p_chatId", chatId)
+        };
+
+        return _mainConnector.Get<ChatDB?>(expression, parameters)?.ToChat();
+    }
+
+    public Site.Models.Chats.Chat? GetChatByAnnouncementId(Guid announcementId, Guid requestedUserId)
+    {
+        String expression = @"SELECT * FROM chats WHERE announcementId = @p_announcementId AND @p_requestedUserId = ANY(memberids)";
+        NpgsqlParameter[] parameters =
+        {
+            new("p_announcementId", announcementId), 
+            new("p_requestedUserId", requestedUserId) 
         };
 
         return _mainConnector.Get<ChatDB?>(expression, parameters)?.ToChat();
@@ -68,11 +80,11 @@ public class ChatRepository : IChatRepository
         String expression = @"
         INSERT INTO messages
         (
-            id, dialogid, ""content"", createduserid, 
+            id, chatid, ""content"", createduserid, 
             createddatetimeutc, isremoved   
         )
         VALUES(
-             @p_id, @p_dialogId, @p_content, @p_createdUserId,
+             @p_id, @p_chatId, @p_content, @p_createdUserId,
              @p_createdDateTimeUtc, false
         )
          ON CONFLICT (id)
@@ -84,7 +96,7 @@ public class ChatRepository : IChatRepository
         NpgsqlParameter[] parameters =
         {
              new("p_id", message.Id),
-             new("p_dialogId", message.ChatId),
+             new("p_chatId", message.ChatId),
              new("p_content", message.Content),
              new("p_createdUserId", message.CreatedUserId),
              new("p_createdDateTimeUtc", message.CreatedDateTimeUtc),
@@ -97,7 +109,7 @@ public class ChatRepository : IChatRepository
 
     public Message[] GetMessages(Guid dialogId)
     {
-        String expression = @"SELECT * FROM messages WHERE chatId = @p_chatId ORDER BY createddatetimeutc DESC";
+        String expression = @"SELECT * FROM messages WHERE chatId = @p_chatId ORDER BY createddatetimeutc";
         NpgsqlParameter[] parameters =
         {
             new("p_chatId", dialogId)

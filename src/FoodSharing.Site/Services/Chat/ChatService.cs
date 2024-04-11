@@ -64,6 +64,15 @@ public class ChatService : IChatService
         return _chatRepository.GetChat(chatId);
     }
 
+    public (Models.Chats.Chat? chat, Message[] messages) GetChatByAnnouncementId(Guid announcementId, Guid requestedUserId)
+    {
+        Models.Chats.Chat? chat = _chatRepository.GetChatByAnnouncementId(announcementId, requestedUserId);
+        if (chat is null) return (chat, new Message[0]);
+
+        Message[] messages = GetMessages(chat.Id); 
+        return (chat, messages);
+    }
+
     #endregion Chats
 
     #region Messages

@@ -19,6 +19,7 @@ public interface IChatService
 
     Result SaveChat(Models.Chats.Chat  chat);
     Models.Chats.Chat? GetChat(Guid chatId);
+    (Models.Chats.Chat? chat, Message[] messages) GetChatByAnnouncementId(Guid chatId, Guid requestedUserId);
 
     #endregion Chats
 

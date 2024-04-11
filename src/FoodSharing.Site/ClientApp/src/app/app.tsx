@@ -8,6 +8,7 @@ import { Notifications } from '../components/notifications/notifications';
 import '../tools/extensions/enumUtils';
 import '../tools/extensions/numberUtils';
 import '../tools/extensions/stringConstructor';
+import './app.scss';
 import { Container } from './container';
 import { MainRouter } from './mainRouter';
 
