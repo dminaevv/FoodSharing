@@ -1,5 +1,5 @@
 import * as signalR from '@microsoft/signalr';
-import { Box, Button, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, Grid, Stack, TextField, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BlockUi } from '../../components/blockUi/blockUi';
@@ -10,23 +10,28 @@ import { Message, mapToMessage } from '../../domain/messages/message';
 import { MessageBlank } from '../../domain/messages/messageBlank';
 import { useSystemUser } from '../../hooks/useSystemUser';
 import { Uuid } from '../../tools/uuid';
+import { User } from '../../domain/users/user';
+import { Link } from '../../components/link';
+import { UsersLinks } from '../../tools/constants/links';
 
 
 export function ChatPage() {
     const systemUser = useSystemUser();
-    const { announcementId } = useParams();
 
-    const [chatId, setChatId] = useState<string | null>(null)
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [messageBlank, setMessageBlank] = useState<MessageBlank>(MessageBlank.empty());
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
+    const { announcementId } = useParams();
     const [announcement, setAnnouncement] = useState<Announcement | null>(null);
+
+    const [chatId, setChatId] = useState<string | null>(null);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [messageBlank, setMessageBlank] = useState<MessageBlank>(MessageBlank.empty());
+    const [members, setMembers] = useState<User[]>([]);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        loadAnnouncement()
+        loadAnnouncement();
         loadChat();
     }, [systemUser?.id])
 
@@ -46,7 +51,8 @@ export function ChatPage() {
 
             if (result.chat != null) {
                 setChatId(result.chat.id);
-                setMessages(result.messages)
+                setMessages(result.messages);
+                setMembers(result.members);
             }
             else {
                 setChatId(Uuid.create());
@@ -64,7 +70,8 @@ export function ChatPage() {
     }
 
     function scrollToBottom() {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        messagesEndRef.current?.scrollIntoView();
     };
 
     function startConnection() {
@@ -73,7 +80,6 @@ export function ChatPage() {
             .build();
 
         connection.on('NewMessage', (anyMessage: any) => {
-            console.log(anyMessage)
             const message = mapToMessage(anyMessage);
             setMessages(prevMessages => [...prevMessages, message]);
         });
@@ -113,8 +119,8 @@ export function ChatPage() {
     return (
         <Grid container direction='column' wrap='nowrap' height="100vh" overflow='hidden' gap={2}>
             <Grid item xs={2}>
-                <Typography variant="h5">ЧАТ</Typography>
-                {announcement != null &&
+                {
+                    announcement != null &&
                     <Stack direction='row' gap={2} height="70px">
                         <Box sx={{ width: "60px" }}>
                             <img src={announcement.imagesUrls[0]} style={{ width: "100%", height: "100%", objectFit: 'contain' }} />
@@ -129,12 +135,26 @@ export function ChatPage() {
                         ?
                         <Grid container direction='column' gap={1}>
                             {
-                                messages.map((message) => (
-                                    <Grid item xs key={message.id}>
-                                        <Typography variant="subtitle2" style={{ color: '#808080' }}>{message.createdDateTimeUtc.toLocaleTimeString()}</Typography>
-                                        <Typography style={{ whiteSpace: 'pre-wrap' }}>{message.content}</Typography>
-                                    </Grid>
-                                ))
+                                messages.map((message) => {
+                                    const member = members.find(m => m.id == message.createdUserId)!;
+
+                                    return (
+                                        <Grid item xs key={message.id}>
+                                            <Stack direction="row" alignItems="flex-start" gap={1}>
+                                                <Avatar alt="Avatar" sx={{ width: 40, height: 40 }} src={member.avatarUrl ?? 'https://www.abc.net.au/news/image/8314104-1x1-940x940.jpg'} />
+                                                <Stack>
+                                                    <Stack direction="row" alignItems="center" gap={1}>
+                                                        <Link text={member.firstName ?? member.email} href={UsersLinks.toUser(member.id)} />
+                                                        <Typography variant="subtitle2" style={{ color: '#808080' }}>
+                                                            {message.createdDateTimeUtc.toLocaleTimeString()}
+                                                        </Typography>
+                                                    </Stack>
+                                                    <Typography style={{ whiteSpace: 'pre-wrap' }}>{message.content}</Typography>
+                                                </Stack>
+                                            </Stack>
+                                        </Grid>
+                                    )
+                                })
                             }
                             <div ref={messagesEndRef} />
                         </Grid>

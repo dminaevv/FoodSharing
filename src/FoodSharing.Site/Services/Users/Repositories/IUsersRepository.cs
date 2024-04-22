@@ -11,6 +11,7 @@ public interface IUsersRepository
     User? GetUserByEmail(String email);
     User? GetUser(String email, String passwordHash);
     User? GetUser(Guid userId);
+    User? GetUserByAnnouncement(Guid announcementId);
     User[] GetUsers(Guid[] ids);
 
     #endregion Users

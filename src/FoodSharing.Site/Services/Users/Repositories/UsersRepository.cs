@@ -52,7 +52,7 @@ public class UsersRepository : IUsersRepository
             new("p_lastName", validatedBlank.LastName),
             new("p_phone", validatedBlank.Phone),
             new("p_avatarUrl", validatedBlank.AvatarUrl),
-            new("p_dateTimeUtcNow", DateTime.UtcNow), 
+            new("p_dateTimeUtcNow", DateTime.UtcNow),
             new("p_userId", userId)
         };
 
@@ -122,6 +122,22 @@ public class UsersRepository : IUsersRepository
         return _mainConnector.Get<UserDB?>(expression, parameters)?.ToUser();
     }
 
+    public User? GetUserByAnnouncement(Guid announcementId)
+    {
+        String expression = @"
+            SELECT *
+            FROM users
+            WHERE id = (SELECT owneruserid FROM announcements WHERE id = @p_announcementId);
+            ";
+
+        NpgsqlParameter[] parameters =
+        {
+            new("p_announcementId", announcementId),
+        };
+
+        return _mainConnector.Get<UserDB?>(expression, parameters)?.ToUser();
+    }
+
     public User[] GetUsers(Guid[] ids)
     {
         String expression = @"SELECT * FROM users WHERE id = ANY(@p_userIds)";
@@ -160,7 +176,7 @@ public class UsersRepository : IUsersRepository
             new("p_expirationDateTimeUtc", token.ExpirationDateTimeUtc),
             new("p_createdDateTimeUtc", DateTime.UtcNow)
         };
-        
+
         _mainConnector.ExecuteNonQuery(expression, parameters);
     }
 

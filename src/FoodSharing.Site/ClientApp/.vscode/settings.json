@@ -1,3 +1,6 @@
+
 {
+    "beautify.onSave": true,
+    "editor.formatOnSave": true,
     "cSpell.language": "en, ru"
 }
