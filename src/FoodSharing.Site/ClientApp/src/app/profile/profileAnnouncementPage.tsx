@@ -9,11 +9,14 @@ import { BlockUi } from "../../components/blockUi/blockUi";
 import { Link } from '../../components/link';
 import { Announcement } from "../../domain/announcements/announcement";
 import { AnnouncementsProvider } from "../../domain/announcements/announcementsProvider";
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
 import { AnnouncementLinks } from '../../tools/constants/links';
 
 export function ProfileAnnouncementPage() {
     const navigate = useNavigate();
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+
+    const confirm = useConfirmDialog();
 
     useEffect(() => {
         loadUserAnnouncement();
@@ -26,9 +29,12 @@ export function ProfileAnnouncementPage() {
         })
     }
 
-    function removeAnnouncement(id: string) {
+    async function removeAnnouncement(id: string) {
+        const confirmResult = await confirm("Вы уверены, что хотите удалить данное объявление?")
+        if (!confirmResult) return;
+
         BlockUi.block(async () => {
-            const a = await AnnouncementsProvider.remove(id);
+            await AnnouncementsProvider.remove(id);
             loadUserAnnouncement();
         })
     }

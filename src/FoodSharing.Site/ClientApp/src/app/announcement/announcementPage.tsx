@@ -1,7 +1,6 @@
 import LikeIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import { Avatar, Box, Button, Grid, Stack, Typography } from '@mui/material';
-import { Map, Placemark, SearchControl, YMaps } from '@pbe/react-yandex-maps';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BlockUi } from '../../components/blockUi/blockUi';
@@ -95,7 +94,7 @@ export function AnnouncementPage() {
                                     <Grid item>
                                         <Stack gap={2}>
                                             <Box>
-                                                <Typography variant='h5' mb={1} fontWeight='bold'>Адрес</Typography>
+                                                {/* <Typography variant='h5' mb={1} fontWeight='bold'>Адрес</Typography>
                                                 <YMaps>
                                                     <Map
                                                         defaultState={{ center: [55.75, 37.57], zoom: 9 }}
@@ -105,8 +104,7 @@ export function AnnouncementPage() {
                                                         <Placemark geometry={[55.75, 37.57]} />
                                                         <SearchControl options={{ float: 'right' }} />
                                                     </Map>
-                                                </YMaps>
-
+                                                </YMaps> */}
                                             </Box>
                                             <Box>
                                                 <Typography variant='h5' mb={1} fontWeight='bold'>Описание</Typography>

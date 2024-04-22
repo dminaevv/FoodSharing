@@ -4,6 +4,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import ReactDOM from 'react-dom/client';
 import { BlockUi } from '../components/blockUi/blockUi';
+import { Confirm } from '../components/confirm/confirm';
 import { Notifications } from '../components/notifications/notifications';
 import '../tools/extensions/enumUtils';
 import '../tools/extensions/numberUtils';
@@ -20,6 +21,7 @@ root.render(
     <>
         <Container>
             <BlockUi>
+                <Confirm />
                 <Notifications />
                 <MainRouter />
             </BlockUi>
