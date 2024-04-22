@@ -9,9 +9,10 @@ public interface IUsersService
 
     Result SaveUser(UserBlank userBlank, Guid userId);
     Result RegisterUser(String? email, String? password);
-    User? GetUser(Guid userId); 
+    User? GetUser(Guid userId);
     User? GetUserByEmail(String email);
     User? GetUserByToken(String token);
+    User? GetUserByAnnouncement(Guid announcementId);
     User[] GetUsers(Guid[] ids);
 
     UserInfo GetUserInfo(Guid userId);

@@ -27,7 +27,7 @@ CREATE TABLE announcements(
     OwnerUserId uuid NOT NULL,
     Description varchar NOT NULL,
     CategoryId uuid NOT NULL,
-    Weight float8 NOT NULL,
+    gramsweight float8 NOT NULL,
     ImagesUrls _varchar NOT NULL,
     CreatedUserId uuid NOT NULL,
     ModifiedUserId uuid,

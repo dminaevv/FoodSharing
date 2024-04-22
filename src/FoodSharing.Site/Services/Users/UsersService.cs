@@ -66,12 +66,12 @@ public class UsersService : IUsersService
         Result validateEmailResult = ValidateEmail(email);
         if (!validateEmailResult.IsSuccess) return Result.Fail(validateEmailResult.Errors);
 
-        User? existUser = GetUserByEmail(email); 
-        if(existUser is not null) return Result.Fail("Пользователь с такой почтой уже зарегистрирован");
+        User? existUser = GetUserByEmail(email);
+        if (existUser is not null) return Result.Fail("Пользователь с такой почтой уже зарегистрирован");
 
         String passwordHash = GetPasswordHash(password);
 
-        Guid newUserId = Guid.NewGuid(); 
+        Guid newUserId = Guid.NewGuid();
         _usersRepository.RegisterUser(newUserId, email, passwordHash);
 
         return Result.Success();
@@ -118,6 +118,11 @@ public class UsersService : IUsersService
         return GetUser(userToken.UserId);
     }
 
+    public User? GetUserByAnnouncement(Guid announcementId)
+    {
+        return _usersRepository.GetUserByAnnouncement(announcementId);
+    }
+
     public User[] GetUsers(Guid[] ids)
     {
         return _usersRepository.GetUsers(ids);
@@ -129,9 +134,9 @@ public class UsersService : IUsersService
         if (user is null) throw new Exception("Пользотваель null при получении GetUserInfo");
 
         return new UserInfo(
-            user.Id, user.Email, user.FirstName, 
+            user.Id, user.Email, user.FirstName,
             user.LastName, user.Phone, user.AvatarUrl, user.RegistrationDate
-        ); 
+        );
     }
 
     #endregion Users
