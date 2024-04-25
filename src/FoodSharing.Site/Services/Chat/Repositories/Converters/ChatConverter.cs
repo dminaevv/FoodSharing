@@ -12,6 +12,6 @@ public static class ChatConverter
 
     public static Site.Models.Chats.Chat ToChat(this ChatDB db)
     {
-        return new Site.Models.Chats.Chat(db.Id, db.MemberIds, db.AnnouncementId);
+        return new Site.Models.Chats.Chat(db.Id, db.MemberIds, db.AnnouncementId, db.LastMessageId);
     }
 }

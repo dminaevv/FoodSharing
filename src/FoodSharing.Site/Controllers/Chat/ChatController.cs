@@ -1,4 +1,7 @@
 ﻿using FoodSharing.Site.Infrastructure;
+using FoodSharing.Site.Models.Announcements;
+using FoodSharing.Site.Models.Chats;
+using FoodSharing.Site.Models.Users;
 using FoodSharing.Site.Services.Chat;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,16 +23,44 @@ public class ChatController : BaseController
         return ReactApp();
     }
 
-    [HttpGet("chat/getByAnnouncementId")]
-    public Object Get([FromQuery] Guid announcementId)
+    [HttpGet("chat/get")]
+    public Object Get([FromQuery] Guid chatId)
     {
-        var result = _chatService.GetChatByAnnouncementId(announcementId, SystemUser.User);
+        (Models.Chats.Chat? chat, Message[] messages, User[] members) = _chatService.GetChat(chatId, SystemUser.User);
 
         return new
         {
-            chat = result.chat,
-            messages = result.messages,
-            members = result.members
+            chat = chat,
+            messages = messages,
+            members = members
+        };
+    }
+
+
+    [HttpGet("chat/getByAnnouncementId")]
+    public Object GetByAnnouncement([FromQuery] Guid announcementId)
+    {
+        (Models.Chats.Chat? chat, Message[] messages, User[] members) = _chatService.GetChatByAnnouncementId(announcementId, SystemUser.User);
+
+        return new
+        {
+            chat = chat,
+            messages = messages,
+            members = members
+        };
+    }
+
+    [HttpGet("chat/get-list")]
+    public Object GetList()
+    {
+        (Models.Chats.Chat[] chats, Message[] messages, User[] members, Announcement[] announcements) = _chatService.GetChats(SystemUser.Id);
+
+        return new
+        {
+            chats = chats,
+            messages = messages,
+            members = members,
+            announcements = announcements
         };
     }
 }

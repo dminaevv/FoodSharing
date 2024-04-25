@@ -6,7 +6,7 @@ import { Box, Button, Grid, IconButton, Stack, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { BlockUi } from "../../components/blockUi/blockUi";
-import { Link } from '../../components/link';
+import { CLink } from '../../components/link';
 import { Announcement } from "../../domain/announcements/announcement";
 import { AnnouncementsProvider } from "../../domain/announcements/announcementsProvider";
 import { useConfirmDialog } from '../../hooks/useConfirmDialog';
@@ -54,7 +54,7 @@ export function ProfileAnnouncementPage() {
                             </Grid>
                             <Grid item xs={4}>
                                 <Stack>
-                                    <Link href={AnnouncementLinks.toAnnouncement(announcement.id)} text={announcement.name} sx={{ mb: 1 }} />
+                                    <CLink href={AnnouncementLinks.toAnnouncement(announcement.id)} text={announcement.name} sx={{ mb: 1 }} />
                                     <Typography variant="body2" color="text.secondary" sx={{
                                         overflow: 'hidden',
                                         textOverflow: 'ellipsis',

@@ -4,6 +4,7 @@ using FoodSharing.Site.Models.Users;
 using FoodSharing.Site.Services.Announcements.Repositories;
 using FoodSharing.Site.Services.Files;
 using FoodSharing.Site.Services.Users;
+using FoodSharing.Site.Services.Users.Repositories.Models;
 using FoodSharing.Site.Tools.Extensions;
 using FoodSharing.Site.Tools.Types;
 using IConfiguration = FoodSharing.Site.Models.Configurations.IConfiguration;
@@ -118,6 +119,11 @@ public class AnnouncementService : IAnnouncementService
     public Announcement[] GetAnnouncements(Guid userId)
     {
         return _announcementRepository.GetAnnouncements(userId); 
+    }
+
+    public Announcement[] GetAnnouncements(Guid[] announcementIds)
+    {
+        return _announcementRepository.GetAnnouncements(announcementIds);
     }
 
     public PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo(Guid? userId, Int32 page, Int32 pageSize)

@@ -4,10 +4,10 @@ import { Avatar, Box, Button, Grid, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BlockUi } from '../../components/blockUi/blockUi';
-import { Link } from '../../components/link';
+import { CLink } from '../../components/link';
 import { AnnouncementDetailInfo } from '../../domain/announcements/announcementInfo';
 import { AnnouncementsProvider } from '../../domain/announcements/announcementsProvider';
-import { ChatLinks, UsersLinks } from '../../tools/constants/links';
+import { ProfileLinks, UsersLinks } from '../../tools/constants/links';
 import Page from '../infrastructure/page';
 
 export function AnnouncementPage() {
@@ -122,7 +122,7 @@ export function AnnouncementPage() {
                                 <Stack>
                                     <Stack gap={1} direction='row' justifyContent='space-between'>
                                         <Stack>
-                                            <Link text={announcementInfo.owner.getFullName ?? "Пользователь"} href={UsersLinks.toUser(announcementInfo.owner.id)} />
+                                            <CLink text={announcementInfo.owner.getFullName ?? "Пользователь"} href={UsersLinks.toUser(announcementInfo.owner.id)} />
                                             <Typography variant="body2" color="text.secondary" gutterBottom>
                                                 0,0 - 0 отзывов
                                             </Typography>
@@ -133,7 +133,7 @@ export function AnnouncementPage() {
                                         </Stack>
                                         <Avatar alt="Avatar" sx={{ width: 50, height: 50 }} src={announcementInfo.owner.avatarUrl ?? 'https://www.abc.net.au/news/image/8314104-1x1-940x940.jpg'} />
                                     </Stack>
-                                    <Button variant='outlined' fullWidth sx={{ mt: 2 }} onClick={() => navigate(ChatLinks.toAnnouncementChat(announcementInfo.id))}>
+                                    <Button variant='outlined' fullWidth sx={{ mt: 2 }} onClick={() => navigate(ProfileLinks.toAnnouncementChat(announcementInfo.id))}>
                                         Написать
                                     </Button>
                                 </Stack>

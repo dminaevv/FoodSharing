@@ -23,16 +23,17 @@ public class ChatRepository : IChatRepository
         INSERT INTO chats
         (
             id, memberids, announcementid, createddatetimeutc,
-            modifieddatetimeutc, isremoved
+            lastmessageid, modifieddatetimeutc, isremoved
         )
         VALUES
         (
             @p_id, @p_memberIds, @p_announcementId, @p_dateTimeUtcNow, 
-            null, false 
+             @p_lastMessageId, null, false 
         )
          ON CONFLICT (id)
          DO UPDATE SET
          memberids = @p_memberIds,
+         lastmessageid = @p_lastMessageId,
          modifieddatetimeutc = @p_dateTimeUtcNow";
 
         DateTime utcNow = DateTime.UtcNow;
@@ -41,7 +42,8 @@ public class ChatRepository : IChatRepository
             new("p_id", chat.Id),
             new("p_memberIds", chat.MemberIds),
             new("p_announcementId", chat.AnnouncementId),
-            new("p_dateTimeUtcNow", utcNow)
+            new("p_dateTimeUtcNow", utcNow),
+            new("p_lastMessageId", chat.LastMessageId),
         };
 
         _mainConnector.ExecuteNonQuery(expression, parameters);
@@ -57,6 +59,17 @@ public class ChatRepository : IChatRepository
         };
 
         return _mainConnector.Get<ChatDB?>(expression, parameters)?.ToChat();
+    }
+
+    public Site.Models.Chats.Chat[] GetChats(Guid userId)
+    {
+        String expression = @"SELECT * FROM chats WHERE @p_userId = ANY(memberids)";
+        NpgsqlParameter[] parameters =
+        {
+            new("p_userId", userId)
+        };
+
+        return _mainConnector.GetList<ChatDB>(expression, parameters).Select(c => c.ToChat()).ToArray();
     }
 
     public Site.Models.Chats.Chat? GetChatByAnnouncementId(Guid announcementId, Guid requestedUserId)
@@ -105,6 +118,15 @@ public class ChatRepository : IChatRepository
         };
 
         _mainConnector.ExecuteNonQuery(expression, parameters);
+
+        String updateChatExpression = @"UPDATE chats SET lastmessageid = @p_messageId WHERE id = @p_chatId";
+        NpgsqlParameter[] updateChatExpressionParameters =
+        {
+            new("p_messageId", message.Id),
+            new("p_chatId", message.ChatId),
+        };
+
+        _mainConnector.ExecuteNonQuery(updateChatExpression, updateChatExpressionParameters);
     }
 
     public Message[] GetMessages(Guid dialogId)
@@ -113,6 +135,17 @@ public class ChatRepository : IChatRepository
         NpgsqlParameter[] parameters =
         {
             new("p_chatId", dialogId)
+        };
+
+        return _mainConnector.GetList<MessageDB>(expression, parameters).Select(message => message.ToMessage()).ToArray();
+    }
+
+    public Message[] GetMessages(Guid[] messageIds)
+    {
+        String expression = @"SELECT * FROM messages WHERE id = ANY(@p_messageIds) ORDER BY createddatetimeutc";
+        NpgsqlParameter[] parameters =
+        {
+            new("p_messageIds", messageIds)
         };
 
         return _mainConnector.GetList<MessageDB>(expression, parameters).Select(message => message.ToMessage()).ToArray();

@@ -9,7 +9,7 @@ interface IProps {
 export default function Page(props: IProps & PropsWithChildren) {
     return (
         <Box display='flex' flexDirection='column' height="100%" width="100%" sx={{ ...props.sx }} >
-            <Header />
+            <Header sx={{ mt: 2 }} />
             <Box>
                 {props.children}
             </Box>

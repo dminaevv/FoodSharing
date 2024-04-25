@@ -1,17 +1,21 @@
-import { Avatar, Box, Button, Grid, Stack, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, Grid, Stack, SxProps, TextField, Theme, Typography } from '@mui/material';
 import { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../content/img/logo.jpeg';
 import { useSystemUser } from '../hooks/useSystemUser';
 import { AuthLinks, InfrastructureLinks, ProfileLinks } from '../tools/constants/links';
 
-export function Header(props: PropsWithChildren) {
+interface IProps {
+    sx?: SxProps<Theme>
+}
+
+export function Header(props: IProps & PropsWithChildren) {
     const systemUser = useSystemUser();
 
     const navigate = useNavigate();
 
     return (
-        <>
+        <Box sx={props.sx}>
             <Grid container spacing={3} sx={{ mb: { xs: 2, sm: 4 } }}>
                 <Grid item xs={0} sm={1} md={3} sx={{ display: { xs: 'none', sm: 'flex' }, cursor: 'pointer' }} alignItems='center' onClick={() => navigate(InfrastructureLinks.home)}>
                     <Stack gap={1} direction='row' alignItems='center'>
@@ -44,7 +48,7 @@ export function Header(props: PropsWithChildren) {
                     {
                         systemUser != null
                             ?
-                            <Box alignItems='center' sx={{ display: 'flex', cursor: "pointer" }} onClick={() => navigate(ProfileLinks.main)}>
+                            <Box alignItems='center' sx={{ display: 'flex', cursor: "pointer" }} onClick={() => navigate(ProfileLinks.announcements)}>
                                 <Avatar src={systemUser.user.avatarUrl ?? ""} />
                                 <Box height="100%" ml={1} sx={{ display: { sm: "none", md: 'flex' }, flexDirection: "column", justifyContent: 'center' }}>
                                     <Typography lineHeight={1}>  {systemUser.user.getFullName ?? systemUser.email}</Typography>
@@ -57,6 +61,6 @@ export function Header(props: PropsWithChildren) {
             <Box>
                 {props.children}
             </Box>
-        </>
+        </Box>
     )
 }

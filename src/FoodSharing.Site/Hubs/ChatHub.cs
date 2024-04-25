@@ -38,7 +38,10 @@ public class ChatHub: Hub
            User? user = _usersService.GetUser(announcement.OwnerUserId);
            if (user is null) throw new Exception("");
 
-            Chat chat = Chat.Create(request.Message.ChatId, request.AnnouncementId, user.Id, request.Message.CreatedUserId);
+           Chat chat = Chat.Create(
+               request.Message.ChatId, request.AnnouncementId, request.Message.Id, user.Id,
+               request.Message.CreatedUserId
+           );
             _chatService.SaveChat(chat);
         }
 

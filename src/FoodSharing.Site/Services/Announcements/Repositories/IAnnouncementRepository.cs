@@ -10,6 +10,7 @@ public interface IAnnouncementRepository
     void SaveAnnouncement(AnnouncementBlank.Validated blank, Guid userId);
     Announcement? GetAnnouncement(Guid announcementId);
     Announcement[] GetAnnouncements(Guid userId);
+    Announcement[] GetAnnouncements(Guid[] announcementIds);
     PagedResult<Announcement> GetAnnouncements(Guid? userId, Int32 page, Int32 pageSize);
     void RemoveAnnouncement(Guid announcementId, Guid userId);
 

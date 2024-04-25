@@ -1,5 +1,8 @@
-﻿using FoodSharing.Site.Models.Chats;
+﻿using FoodSharing.Site.Models.Announcements;
+using FoodSharing.Site.Models.Chats;
 using FoodSharing.Site.Models.Users;
+using FoodSharing.Site.Services.Announcements;
+using FoodSharing.Site.Services.Announcements.Repositories.Models;
 using FoodSharing.Site.Services.Chat.Repositories;
 using FoodSharing.Site.Services.Users;
 using FoodSharing.Site.Tools.Types;
@@ -10,15 +13,17 @@ public class ChatService : IChatService
 {
     private readonly IChatRepository _chatRepository;
     private readonly IUsersService _usersService;
+    private readonly IAnnouncementService _announcementService;
 
     public record UserConnection(String ConnectionId, Guid ChatId, Guid UserId);
 
     private readonly List<UserConnection> _userConnections = new();
 
-    public ChatService(IChatRepository chatRepository, IUsersService usersService)
+    public ChatService(IChatRepository chatRepository, IUsersService usersService, IAnnouncementService announcementService)
     {
         _chatRepository = chatRepository;
         _usersService = usersService;
+        _announcementService = announcementService;
     }
 
     #region UserConnection
@@ -68,6 +73,33 @@ public class ChatService : IChatService
         return _chatRepository.GetChat(chatId);
     }
 
+    public (Models.Chats.Chat[], Message[], User[], Announcement[]) GetChats(Guid userId)
+    {
+        Models.Chats.Chat[] chats =  _chatRepository.GetChats(userId);
+
+        Guid[] lastMessageIds = chats.Select(c => c.LastMessageId).ToArray();
+        Message[] lasMessages = GetMessages(lastMessageIds);
+
+        Guid[] chatMembers = chats.SelectMany(c => c.MemberIds).ToArray();
+        User[] users = _usersService.GetUsers(chatMembers);
+
+       Guid[] announcementIds = chats.Where(c => c.AnnouncementId is not null).Select(c => c.AnnouncementId!.Value).ToArray();
+       Announcement[] announcements = _announcementService.GetAnnouncements(announcementIds);
+
+        return (chats, lasMessages, users, announcements);
+    }
+
+    public (Models.Chats.Chat? chat, Message[] messages, User[] members) GetChat(Guid chatId, User requestedUser)
+    {
+        Models.Chats.Chat? chat = _chatRepository.GetChat(chatId);
+        if (chat is null) throw new Exception($"Не удалось найти чат с id {chatId}");
+
+        User[] members = _usersService.GetUsers(chat.MemberIds);
+        Message[] messages = GetMessages(chat.Id);
+
+        return (chat, messages, members.ToArray());
+    }
+
     public (Models.Chats.Chat? chat, Message[] messages, User[] members) GetChatByAnnouncementId(Guid announcementId, User requestedUser)
     {
         User? ownerAnnouncement = _usersService.GetUserByAnnouncement(announcementId);
@@ -100,6 +132,11 @@ public class ChatService : IChatService
     public Message[] GetMessages(Guid chatId)
     {
         return _chatRepository.GetMessages(chatId);
+    }
+
+    public Message[] GetMessages(Guid[] messageIds)
+    {
+        return _chatRepository.GetMessages(messageIds);
     }
 
     #endregion

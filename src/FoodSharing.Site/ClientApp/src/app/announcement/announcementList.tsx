@@ -29,7 +29,7 @@ export function AnnouncementList(props: IProps) {
     }
 
     return (
-        <Box display='grid' gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))" gap={2} alignContent='center'>
+        <Box display='grid' gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))" gap={2} alignContent='center' sx={{ p: 2 }}>
             {
                 announcements.map(announcement =>
                     <Box key={announcement.id}>

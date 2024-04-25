@@ -17,6 +17,19 @@ export class AuthLinks {
 
 export class ProfileLinks {
     static main = '/profile';
+    static announcements = '/profile/announcements';
+    static chats = '/profile/chats';
+    static feedbacks = '/profile/feedbacks';
+    static favorites = '/profile/favorites';
+    static settings = '/profile/settings';
+
+    static toChat(id: string) {
+        return `/profile/chat/${id}`;
+    }
+
+    static toAnnouncementChat(announcementId: string) {
+        return `/profile/chat/announcement/${announcementId}`;
+    }
 }
 
 export class AnnouncementLinks {
@@ -33,15 +46,6 @@ export class AnnouncementLinks {
     };
 }
 
-
-export class ChatLinks {
-    static main = '/chats';
-    static chat = '/chat/:announcementId';
-
-    static toAnnouncementChat(id: string) {
-        return `/chat/${id}`;
-    };
-}
 
 export class UsersLinks {
     static user = '/user/:id';

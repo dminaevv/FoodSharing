@@ -2,7 +2,7 @@ import LikeIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteTwoToneIcon from '@mui/icons-material/FavoriteTwoTone';
 import { Box, Card, CardContent, CardMedia, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
 import { useState } from 'react';
-import { Link } from '../../components/link';
+import { CLink } from '../../components/link';
 import { AnnouncementShortInfo } from '../../domain/announcements/announcementShortInfo';
 import { AnnouncementsProvider } from '../../domain/announcements/announcementsProvider';
 import { AnnouncementLinks } from '../../tools/constants/links';
@@ -47,7 +47,7 @@ export function AnnouncementCard(props: IProps) {
             />
             <CardContent sx={{ height: "30%", pb: 1, pt: 1 }}>
                 <Box display='flex' alignItems='flex-end' justifyContent='space-between'>
-                    <Link text={props.announcement.name} href={AnnouncementLinks.toAnnouncement(props.announcement.id)} sx={{
+                    <CLink text={props.announcement.name} href={AnnouncementLinks.toAnnouncement(props.announcement.id)} sx={{
                         lineHeight: 1, overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',

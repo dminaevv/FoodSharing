@@ -12,6 +12,7 @@ public interface IAnnouncementService
     Announcement? GetAnnouncement(Guid announcementId);
     AnnouncementDetailInfo GetAnnouncementInfo(Guid announcementId, Guid requestedUserId);
     Announcement[] GetAnnouncements(Guid userId);
+    Announcement[] GetAnnouncements(Guid[] announcementIds);
     PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo(Guid? userId, Int32 page, Int32 pageSize);
     Result RemoveAnnouncement(Guid announcementId, Guid userId);
 

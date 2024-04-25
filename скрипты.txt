@@ -46,6 +46,7 @@ CREATE TABLE chats(
 	id uuid PRIMARY KEY,
 	memberids _uuid NOT NULL,
 	announcementid uuid null, 
+	lastmessageid uuid NOT NULL,
 	createddatetimeutc timestamp NOT NULL,
 	modifieddatetimeutc timestamp NULL,
 	isremoved bool NOT NULL

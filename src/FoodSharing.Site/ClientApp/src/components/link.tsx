@@ -6,7 +6,7 @@ interface IProps {
     sx?: SxProps<Theme>
 }
 
-export function Link(props: IProps) {
+export function CLink(props: IProps) {
     return (
         <Typography component={'a'} href={props.href} sx={{
             textDecoration: 'none',

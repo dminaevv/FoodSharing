@@ -1,4 +1,5 @@
-﻿using FoodSharing.Site.Models.Chats;
+﻿using FoodSharing.Site.Models.Announcements;
+using FoodSharing.Site.Models.Chats;
 using FoodSharing.Site.Models.Users;
 using FoodSharing.Site.Tools.Types;
 using static FoodSharing.Site.Services.Chat.ChatService;
@@ -20,7 +21,9 @@ public interface IChatService
 
     Result SaveChat(Models.Chats.Chat chat);
     Models.Chats.Chat? GetChat(Guid chatId);
-    (Models.Chats.Chat? chat, Message[] messages, User[] members) GetChatByAnnouncementId(Guid chatId, User requestedUser);
+    (Models.Chats.Chat[], Message[], User[] members, Announcement[]) GetChats(Guid userId);
+    (Models.Chats.Chat? chat, Message[] messages, User[] members) GetChat(Guid chatId, User requestedUser);
+    (Models.Chats.Chat? chat, Message[] messages, User[] members) GetChatByAnnouncementId(Guid announcementId, User requestedUser);
 
     #endregion Chats
 

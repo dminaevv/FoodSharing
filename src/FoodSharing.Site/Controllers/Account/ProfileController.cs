@@ -14,6 +14,12 @@ public class ProfileController : BaseController
     }
 
     [HttpGet("profile")]
+    [HttpGet("profile/chats")]
+    [HttpGet("profile/announcements")]
+    [HttpGet("profile/chat/{chatId}")]
+    [HttpGet("profile/feedbacks")]
+    [HttpGet("profile/favourites")]
+    [HttpGet("profile/settings")]
     public IActionResult Index()
     {
         return ReactApp();

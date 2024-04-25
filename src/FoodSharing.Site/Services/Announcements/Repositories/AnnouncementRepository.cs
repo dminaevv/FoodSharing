@@ -87,6 +87,20 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             .ToArray();
     }
 
+    public Announcement[] GetAnnouncements(Guid[] announcementIds)
+    {
+        String expression = @"SELECT * FROM announcements WHERE id = ANY(@p_announcementIds)";
+
+        NpgsqlParameter[] parameters =
+        {
+            new("p_announcementIds", announcementIds),
+        };
+
+        return _mainConnector.GetList<AnnouncementDB>(expression, parameters)
+            .Select(a => a.ToAnnouncement(_configuration.FileStorage_Host))
+            .ToArray();
+    }
+
     public PagedResult<Announcement> GetAnnouncements(Guid? userId, Int32 page, Int32 pageSize)
     {
         (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize); 
