@@ -60,8 +60,8 @@ export function AnnouncementEditPage() {
             const result = await AnnouncementsProvider.save(announcementBlank);
             if (!result.isSuccess) return addErrorNotification(result.errorsString);
 
-            addSuccessNotification("Объявление успешно добавлено");
-            navigate(ProfileLinks.main)
+            addSuccessNotification("Объявление успешно сохранено");
+            navigate(ProfileLinks.announcements)
         })
     }
 

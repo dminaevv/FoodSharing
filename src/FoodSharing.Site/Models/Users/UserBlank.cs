@@ -10,6 +10,7 @@ public partial class UserBlank
     public String? FirstName { get; set; }
     public String? LastName { get; set; }
     public String? Phone { get; set; }
+    public IFormFile? AvatarFile { get; set; }
     public String? AvatarUrl { get; set; }
 }
 
@@ -17,17 +18,18 @@ public partial class UserBlank
 {
     public class Validated
     {
-        public Guid Id { get; set; }
-        public String Email { get; set; }
-        public String PasswordHash { get; set; }
-        public String? FirstName { get; set; }
-        public String? LastName { get; set; }
-        public String? Phone { get; set; }
-        public String? AvatarUrl { get; set; }
+        public Guid Id { get; }
+        public String Email { get; }
+        public String PasswordHash { get; }
+        public String? FirstName { get; }
+        public String? LastName { get; }
+        public String? Phone { get; }
+        public IFormFile? AvatarFile { get; }
+        public String? AvatarUrl { get; }
 
         public Validated(
             Guid id, String email, String passwordHash, String? firstName,
-             String? lastName, String? phone, String? avatarUrl
+            String? lastName, String? phone, IFormFile? avatarFile, String? avatarUrl
         )
         {
             Id = id;
@@ -36,6 +38,7 @@ public partial class UserBlank
             FirstName = firstName;
             LastName = lastName;
             Phone = phone;
+            AvatarFile = avatarFile;
             AvatarUrl = avatarUrl;
         }
     }

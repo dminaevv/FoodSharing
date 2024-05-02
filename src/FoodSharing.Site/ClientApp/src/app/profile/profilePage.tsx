@@ -1,6 +1,6 @@
 import { Box, Divider, Grid, Typography } from '@mui/material';
-import React, { useState } from 'react';
-import { Link, Route, Routes, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, Route, Routes } from 'react-router-dom';
 import { useSystemUser } from '../../hooks/useSystemUser';
 import { NeverUnreachable } from '../../tools/errors/neverUnreachable';
 import { enumToArrayNumber } from '../../tools/extensions/enumUtils';
@@ -11,7 +11,7 @@ import { FeedbacksPage } from './feedbacksPage';
 import { ProfileAnnouncementPage } from './profileAnnouncementPage';
 import { ProfileChatListPage } from './profileChatListPage';
 import { ProfileChatPage } from './profileChatPage';
-import { SettingsPage } from './settingsPage';
+import { SettingsPage } from './profileSettingsPage';
 
 enum PageType {
     Announcement,
@@ -23,11 +23,17 @@ enum PageType {
 }
 
 export function ProfilePage() {
-    const [selectedPage, setSelectedPage] = useState<PageType>(PageType.Announcement);
+    const [selectedPage, setSelectedPage] = useState<PageType | null>(null);
     const systemUser = useSystemUser();
     const user = systemUser?.user!;
 
-    const location = useLocation();
+
+    useEffect(() => {
+        const pathname = location.pathname;
+        const pageType = getPageTypeByPathname(pathname) ?? null;
+        setSelectedPage(pageType);
+
+    }, [location.pathname]);
 
     function getPageTypeDisplayName(pageType: PageType) {
         switch (pageType) {
@@ -55,6 +61,17 @@ export function ProfilePage() {
         }
     }
 
+    function getPageTypeByPathname(pathname: string) {
+        switch (pathname) {
+            case "/profile/announcements": return PageType.Announcement;
+            case "/profile/chats": return PageType.Chats;
+            case "/profile/chat": return PageType.Chat;
+            case "/profile/feedbacks": return PageType.Feedbacks;
+            case "/profile/favorites": return PageType.Favourites;
+            case "/profile/settings": return PageType.Settings;
+        }
+    }
+
     function IsDisplayedPageType(pageType: PageType) {
         switch (pageType) {
             case PageType.Announcement: return true;
@@ -67,10 +84,6 @@ export function ProfilePage() {
             default: throw new NeverUnreachable(pageType)
         }
     }
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        // Обработка загрузки нового аватара
-    };
 
     return (
         <Page sx={{ overflow: "hidden" }}>
@@ -96,7 +109,7 @@ export function ProfilePage() {
                         }
                     </Box>
                 </Grid>
-                <Grid item xs={9}>
+                <Grid item xs={9} sx={{ p: 2 }}>
                     <Routes>
                         <Route path="/announcements" element={<ProfileAnnouncementPage />} />
                         <Route path="/chats" element={<ProfileChatListPage />} />

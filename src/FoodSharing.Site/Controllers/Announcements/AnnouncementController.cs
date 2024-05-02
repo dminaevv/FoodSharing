@@ -56,13 +56,13 @@ public class AnnouncementController : BaseController
     [HttpGet("/announcement/get-user")]
     public PagedResult<AnnouncementShortInfo> GetUserAnnouncementsPageInfo([FromQuery] Guid userId, [FromQuery] Int32 page, [FromQuery] Int32 pageSize)
     {
-        return _announcementService.GetAnnouncementsPageInfo(userId, page, pageSize);
+        return _announcementService.GetAnnouncementsPageInfo(userId, page, pageSize, SystemUser.Id);
     }
 
     [HttpGet("/announcement/get-page")]
     public PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo([FromQuery] Int32 page, [FromQuery] Int32 pageSize)
     {
-        return _announcementService.GetAnnouncementsPageInfo(SystemUser.Id, page, pageSize);
+        return _announcementService.GetAnnouncementsPageInfo(userId: null, page, pageSize, SystemUser.Id);
     }
 
     public record RemoveAnnouncementRequest(Guid Id);

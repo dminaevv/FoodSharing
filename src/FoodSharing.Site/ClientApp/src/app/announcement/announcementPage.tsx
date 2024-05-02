@@ -1,21 +1,27 @@
+import EditIcon from '@mui/icons-material/Edit';
 import LikeIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
-import { Avatar, Box, Button, Grid, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Button, Grid, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BlockUi } from '../../components/blockUi/blockUi';
 import { CLink } from '../../components/link';
 import { AnnouncementDetailInfo } from '../../domain/announcements/announcementInfo';
 import { AnnouncementsProvider } from '../../domain/announcements/announcementsProvider';
-import { ProfileLinks, UsersLinks } from '../../tools/constants/links';
+import { useSystemUser } from '../../hooks/useSystemUser';
+import { AnnouncementLinks, ProfileLinks, UsersLinks } from '../../tools/constants/links';
 import Page from '../infrastructure/page';
+
 
 export function AnnouncementPage() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const systemUser = useSystemUser();
 
     const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
     const [announcementInfo, setAnnouncementInfo] = useState<AnnouncementDetailInfo | null>(null);
+
+    const isUserAnnouncement = systemUser?.id == announcementInfo?.owner.id;
 
     useEffect(() => {
         loadAnnouncement();
@@ -53,17 +59,26 @@ export function AnnouncementPage() {
                         <Grid container spacing={2}>
                             <Grid item xs={8}>
                                 <Stack gap={2}>
-                                    <Box>
+                                    <Stack direction='row'>
                                         <Typography variant="h4" fontWeight='bold'>{announcementInfo.name}</Typography>
-                                    </Box>
+                                        {
+                                            isUserAnnouncement &&
+                                            <IconButton onClick={() => navigate(AnnouncementLinks.toEdit(announcementInfo.id))}><EditIcon /></IconButton>
+                                        }
+
+                                    </Stack>
                                     <Box >
-                                        <Button size="small" startIcon={announcementInfo.isFavorite ? <FavoriteRoundedIcon /> : <LikeIcon />} variant="outlined" onClick={toggleFavorite}>
-                                            {
-                                                announcementInfo.isFavorite
-                                                    ? "В избранном"
-                                                    : "Добавить в избранное"
-                                            }
-                                        </Button>
+                                        {
+                                            !isUserAnnouncement &&
+                                            <Button size="small" startIcon={announcementInfo.isFavorite ? <FavoriteRoundedIcon /> : <LikeIcon />} variant="outlined" onClick={toggleFavorite}>
+                                                {
+                                                    announcementInfo.isFavorite
+                                                        ? "В избранном"
+                                                        : "Добавить в избранное"
+                                                }
+                                            </Button>
+                                        }
+
                                     </Box>
                                     <Stack gap={1} width="600px">
                                         <Box height="500px" position='relative' display='flex' alignItems='center' overflow='hidden'>
@@ -133,9 +148,12 @@ export function AnnouncementPage() {
                                         </Stack>
                                         <Avatar alt="Avatar" sx={{ width: 50, height: 50 }} src={announcementInfo.owner.avatarUrl ?? 'https://www.abc.net.au/news/image/8314104-1x1-940x940.jpg'} />
                                     </Stack>
-                                    <Button variant='outlined' fullWidth sx={{ mt: 2 }} onClick={() => navigate(ProfileLinks.toAnnouncementChat(announcementInfo.id))}>
-                                        Написать
-                                    </Button>
+                                    {
+                                        !isUserAnnouncement &&
+                                        <Button variant='outlined' fullWidth sx={{ mt: 2 }} onClick={() => navigate(ProfileLinks.toAnnouncementChat(announcementInfo.id))}>
+                                            Написать
+                                        </Button>
+                                    }
                                 </Stack>
                             </Grid>
                         </Grid>

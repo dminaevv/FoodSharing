@@ -3,16 +3,19 @@ using FoodSharing.Site.Services.Users.Repositories.Converters;
 using FoodSharing.Site.Services.Users.Repositories.Models;
 using FoodSharing.Site.Tools.Database;
 using Npgsql;
+using IConfiguration = FoodSharing.Site.Models.Configurations.IConfiguration;
 
 namespace FoodSharing.Site.Services.Users.Repositories;
 
 public class UsersRepository : IUsersRepository
 {
     private readonly IMainConnector _mainConnector;
+    private readonly IConfiguration _configuration;
 
-    public UsersRepository(IMainConnector mainConnector)
+    public UsersRepository(IMainConnector mainConnector, IConfiguration configuration)
     {
         _mainConnector = mainConnector;
+        _configuration = configuration;
     }
 
     #region Users
@@ -29,7 +32,7 @@ public class UsersRepository : IUsersRepository
         VALUES
         (
             @p_id,  @p_email, @p_passwordHash, @p_firstName, 
-            @p_lastName, @p_address, @p_phone, @p_avatarUrl, 
+            @p_lastName, @p_phone, @p_avatarUrl, 
             @p_userId, null,  @p_dateTimeUtcNow, null, false
 
         )ON CONFLICT (id)
@@ -94,7 +97,7 @@ public class UsersRepository : IUsersRepository
             new("p_email", email),
         };
 
-        return _mainConnector.Get<UserDB?>(expression, parameters)?.ToUser();
+        return _mainConnector.Get<UserDB?>(expression, parameters)?.ToUser(_configuration.FileStorage_Host);
     }
 
     public User? GetUser(String email, String passwordHash)
@@ -107,7 +110,7 @@ public class UsersRepository : IUsersRepository
             new("p_passwordHash", passwordHash)
         };
 
-        return _mainConnector.Get<UserDB?>(expression, parameters)?.ToUser();
+        return _mainConnector.Get<UserDB?>(expression, parameters)?.ToUser(_configuration.FileStorage_Host);
     }
 
     public User? GetUser(Guid userId)
@@ -119,7 +122,7 @@ public class UsersRepository : IUsersRepository
             new("p_userId", userId),
         };
 
-        return _mainConnector.Get<UserDB?>(expression, parameters)?.ToUser();
+        return _mainConnector.Get<UserDB?>(expression, parameters)?.ToUser(_configuration.FileStorage_Host);
     }
 
     public User? GetUserByAnnouncement(Guid announcementId)
@@ -135,7 +138,7 @@ public class UsersRepository : IUsersRepository
             new("p_announcementId", announcementId),
         };
 
-        return _mainConnector.Get<UserDB?>(expression, parameters)?.ToUser();
+        return _mainConnector.Get<UserDB?>(expression, parameters)?.ToUser(_configuration.FileStorage_Host);
     }
 
     public User[] GetUsers(Guid[] ids)
@@ -147,7 +150,7 @@ public class UsersRepository : IUsersRepository
             new NpgsqlParameter("p_userIds", ids),
         };
 
-        return _mainConnector.GetList<UserDB>(expression, parameters).Select(u => u.ToUser()).ToArray();
+        return _mainConnector.GetList<UserDB>(expression, parameters).Select(u => u.ToUser(_configuration.FileStorage_Host)).ToArray();
     }
 
     #endregion Users

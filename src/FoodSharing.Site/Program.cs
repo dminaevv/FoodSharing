@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.Http.Features;
 using System.Text.Json;
 using FoodSharing.Site;
 using FoodSharing.Site.Hubs;
+using static System.Int32;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Initialize(builder.Environment.EnvironmentName);
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.ValueLengthLimit = Int32.MaxValue;
-    options.BufferBodyLengthLimit = Int32.MaxValue;
-    options.KeyLengthLimit = Int32.MaxValue;
+    options.ValueLengthLimit = MaxValue;
+    options.BufferBodyLengthLimit = MaxValue;
+    options.KeyLengthLimit = MaxValue;
     options.MultipartBodyLengthLimit = Int64.MaxValue;
 });
 builder.Services.AddControllersWithViews().AddJsonOptions(options =>

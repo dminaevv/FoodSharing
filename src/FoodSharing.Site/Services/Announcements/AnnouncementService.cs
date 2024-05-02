@@ -126,10 +126,11 @@ public class AnnouncementService : IAnnouncementService
         return _announcementRepository.GetAnnouncements(announcementIds);
     }
 
-    public PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo(Guid? userId, Int32 page, Int32 pageSize)
+    public PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo(Guid? userId, Int32 page, Int32 pageSize, Guid? requestedUserId)
     {
-        PagedResult<Announcement> announcements = _announcementRepository.GetAnnouncements(userId: null, page, pageSize);
-        Announcement[] favoriteAnnouncements = userId is { } id
+        PagedResult<Announcement> announcements = _announcementRepository.GetAnnouncements(userId, page, pageSize);
+        
+        Announcement[] favoriteAnnouncements = requestedUserId is { } id
             ? _announcementRepository.GetFavoriteAnnouncements(id)
             : new Announcement[0];
 

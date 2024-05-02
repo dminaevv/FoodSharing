@@ -16,16 +16,17 @@ public class FileService: IFileService
         _hostingEnvironment = hostingEnvironment;
     }
 
-    private String SavePhoto(CFile  photo, String directory)
+    private String SavePhoto(CFile photo, String directory)
     {
-        String filePath = Path.Combine(directory, photo.Name);
-
-        String uploadFolder = Path.Combine(_hostingEnvironment.WebRootPath, filePath);
+        String uploadFolder = Path.Combine(_hostingEnvironment.WebRootPath, directory);
         if (!Directory.Exists(uploadFolder)) Directory.CreateDirectory(uploadFolder);
 
-        File.WriteAllBytesAsync(uploadFolder, photo.Bytes);
+        String filePath = Path.Combine(uploadFolder, photo.Name);
+        String shortFilePath = Path.Combine(directory, photo.Name);
+        
+        File.WriteAllBytes(filePath, photo.Bytes);
 
-        return filePath;
+        return shortFilePath;
     }
 
     private String[] SavePhotos(CFile[] photos, String directory)
@@ -38,7 +39,7 @@ public class FileService: IFileService
             String filePath = Path.Combine(uploadFolder, photo.Name);
             String shortFilePath = Path.Combine(directory, photo.Name);
 
-            File.WriteAllBytesAsync(filePath, photo.Bytes);
+            File.WriteAllBytes(filePath, photo.Bytes);
 
             return shortFilePath;
 
@@ -52,8 +53,20 @@ public class FileService: IFileService
         return SavePhoto(photo, AnnouncementPhotoDirectory); 
     }
 
+    public String SaveProfilePhoto(CFile photo)
+    {
+        return SavePhoto(photo, UsersPhotoDirectory);
+    }
+
     public String[] SaveAnnouncementPhotos(CFile[] photos)
     {
         return SavePhotos(photos, AnnouncementPhotoDirectory);
+    }
+
+    public void DeleteProfilePhoto(String photoUrl)
+    {
+        String filePath = Path.Combine(_hostingEnvironment.WebRootPath, photoUrl);
+
+        if(File.Exists(filePath)) File.Delete(filePath);
     }
 }

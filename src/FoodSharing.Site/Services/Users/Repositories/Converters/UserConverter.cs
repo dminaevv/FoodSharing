@@ -5,11 +5,13 @@ namespace FoodSharing.Site.Services.Users.Repositories.Converters;
 
 public static class UserConverter
 {
-    public static User ToUser(this UserDB db)
+    public static User ToUser(this UserDB db, String fileStorageHost)
     {
+        String? avatarUrl = db.AvatarUrl is not null ? fileStorageHost + db.AvatarUrl : null; 
+
         return new User(
             db.Id, db.Email, db.PasswordHash, db.FirstName, db.LastName,
-            db.Phone, db.AvatarUrl, db.CreatedDateTimeUtc
+            db.Phone, avatarUrl, db.CreatedDateTimeUtc
         ); 
     }
 

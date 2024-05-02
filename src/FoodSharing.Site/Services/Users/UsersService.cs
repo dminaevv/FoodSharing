@@ -1,20 +1,29 @@
-﻿using FoodSharing.Site.Models.Users;
+﻿using System.Data;
+using FoodSharing.Site.Models.Users;
 using FoodSharing.Site.Services.Users.Repositories;
 using FoodSharing.Site.Tools.Extensions;
 using FoodSharing.Site.Tools.Types;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using FoodSharing.Site.Services.Files;
+using FoodSharing.Site.Models.Files;
+using System.Numerics;
+using IConfiguration = FoodSharing.Site.Models.Configurations.IConfiguration;
 
 namespace FoodSharing.Site.Services.Users;
 
 public class UsersService : IUsersService
 {
     private readonly IUsersRepository _usersRepository;
+    private readonly IFileService _fileService;
+    private readonly Models.Configurations.IConfiguration _configuration;
 
-    public UsersService(IUsersRepository usersRepository)
+    public UsersService(IUsersRepository usersRepository, IFileService fileService, IConfiguration configuration)
     {
         _usersRepository = usersRepository;
+        _fileService = fileService;
+        _configuration = configuration;
     }
 
     #region Users
@@ -22,6 +31,8 @@ public class UsersService : IUsersService
     public Result SaveUser(UserBlank userBlank, Guid userId)
     {
         userBlank.Id ??= Guid.NewGuid();
+        userBlank.Phone = userBlank.Phone?.Trim().Replace(" ", "").Replace("+", "");
+        userBlank.AvatarUrl = userBlank.AvatarUrl?.Replace(_configuration.FileStorage_Host, "");
 
         Result validateUserResult = ValidateUserBlank(userBlank, out UserBlank.Validated validated);
         if (!validateUserResult.IsSuccess) return Result.Fail(validateUserResult.Errors);
@@ -46,13 +57,22 @@ public class UsersService : IUsersService
         Result validateEmailResult = ValidateEmail(blank.Email);
         if (!validateEmailResult.IsSuccess) return Result.Fail(validateEmailResult.Errors);
 
-
         String passwordHash = (isCreation || blank.IsPasswordWasChanged)
             ? GetPasswordHash(blank.Password!)
             : existUser?.PasswordHash!;
 
+        if (blank.AvatarFile is { } avatarFile)
+        {
+            String extension = Path.GetExtension(avatarFile.FileName);
+            String photoName = $"{Guid.NewGuid()}-{Guid.NewGuid()}{extension}";
+            CFile photo = new(photoName, avatarFile.ToBytes());
+
+            if (existUser?.AvatarUrl != null) _fileService.DeleteProfilePhoto(existUser.AvatarUrl.Replace(_configuration.FileStorage_Host, ""));
+            blank.AvatarUrl = _fileService.SaveProfilePhoto(photo);
+        }
+
         validated = new(
-            id, blank.Email, passwordHash, blank.FirstName, blank.LastName, blank.Phone, blank.AvatarUrl
+            id, blank.Email, passwordHash, blank.FirstName, blank.LastName, blank.Phone, blank.AvatarFile, blank.AvatarUrl
         );
 
         return Result.Success();

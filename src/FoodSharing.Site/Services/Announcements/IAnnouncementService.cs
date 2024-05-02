@@ -13,7 +13,7 @@ public interface IAnnouncementService
     AnnouncementDetailInfo GetAnnouncementInfo(Guid announcementId, Guid requestedUserId);
     Announcement[] GetAnnouncements(Guid userId);
     Announcement[] GetAnnouncements(Guid[] announcementIds);
-    PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo(Guid? userId, Int32 page, Int32 pageSize);
+    PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo(Guid? userId, Int32 page, Int32 pageSize, Guid? requestedUserId);
     Result RemoveAnnouncement(Guid announcementId, Guid userId);
 
     #endregion

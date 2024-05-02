@@ -127,11 +127,11 @@ export function ProfileChatPage() {
     return (
         <Grid height="80vh" wrap='nowrap' overflow='hidden' gap={2} position="relative">
             <Box height={"100%"} >
-                {announcement != null &&
+                {
+                    announcement != null &&
                     <Paper sx={{
                         zIndex: 10,
-                        marginX: 1,
-                        width: "100%",
+                        margin: 0.5,
                         borderRadius: "10px",
                         boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)"
                     }}>
@@ -152,12 +152,12 @@ export function ProfileChatPage() {
                     </Paper>
 
                 }
-                <Grid container width="100%" height={"90%"} direction='column' zIndex={5} wrap='nowrap'>
-                    <Grid item xs={10} sx={{ position: 'relative' }}>
-                        <Stack direction='column' gap={1} sx={{ height: "100%", overflowY: "auto", px: 2, position: 'absolute', bottom: 0 }}>
+                <Grid container width="100%" height={"90%"} direction='column' zIndex={5} wrap='nowrap' sx={{ p: 2 }}>
+                    <Grid item xs={10} sx={{ overflowY: "hidden" }}>
+                        <Stack direction='column' gap={1} sx={{ width: '100%', height: "100%", overflowY: "auto" }}>
                             {
-                                messages.length > 0 ? (
-                                    messages.slice().map((message, index) => {
+                                messages.length > 0
+                                    ? messages.slice().map((message, index) => {
                                         const member = members.find(m => m.id === message.createdUserId)!;
                                         return (
                                             <Box key={index} >
@@ -177,9 +177,7 @@ export function ProfileChatPage() {
 
                                         )
                                     })
-                                ) : (
-                                    <Typography>Сообщений нет. Напишите первое</Typography>
-                                )
+                                    : <Stack sx={{ width: "100%", height: "100%" }} alignItems='center' justifyContent='center'><Typography>Сообщений нет. Напишите первое</Typography></Stack>
                             }
                             <div ref={messagesEndRef} />
                         </Stack>
