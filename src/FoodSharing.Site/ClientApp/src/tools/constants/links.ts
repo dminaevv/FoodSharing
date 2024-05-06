@@ -3,7 +3,6 @@ export class InfrastructureLinks {
     static forbidden = '/Error/403';
     static notFound = '/Error/404';
     static unknown = '/Error/:error';
-
     static statusCode(status: number): string {
         return `/Error/${status}`;
     }
@@ -36,6 +35,11 @@ export class AnnouncementLinks {
     static announcement = '/announcement/:id';
     static create = '/announcement/add';
     static edit = '/announcement/edit/:id';
+    static search = '/announcements/search/:searchText';
+
+    static toSearch(searchText: string) {
+        return `/announcements/search/${searchText}`;
+    }
 
     static toEdit(id: string) {
         return `/announcement/edit/${id}`;

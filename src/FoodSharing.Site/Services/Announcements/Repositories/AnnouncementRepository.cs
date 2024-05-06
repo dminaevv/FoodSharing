@@ -101,6 +101,37 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             .ToArray();
     }
 
+    public PagedResult<Announcement> Search(String searchText, Int32 page, Int32 pageSize)
+    {
+        (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize);
+
+        String expression = @"
+            SELECT COUNT(*) OVER() AS totalRows, sub.*
+            FROM (
+                SELECT *
+                FROM announcements
+                WHERE name % @searchText OR description % @searchText
+                AND isremoved = false
+                ORDER BY createddatetimeutc
+                OFFSET @offset
+                LIMIT @limit
+            ) AS sub;";
+
+        NpgsqlParameter[] parameters =
+        {
+            new("searchText", searchText),
+            new("offset", offset),
+            new("limit", limit)
+        };
+
+        Page<AnnouncementDB> pageResult = _mainConnector.GetPage<AnnouncementDB>(expression, parameters);
+
+        Int64 totalRows = pageResult.TotalRows;
+        Announcement[] announcements = pageResult.Values.Select(a => a.ToAnnouncement(_configuration.FileStorage_Host)).ToArray();
+
+        return new PagedResult<Announcement>(announcements, totalRows);
+    }
+
     public PagedResult<Announcement> GetAnnouncements(Guid? userId, Int32 page, Int32 pageSize)
     {
         (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize); 

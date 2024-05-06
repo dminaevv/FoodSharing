@@ -1,9 +1,9 @@
 import { Avatar, Box, Button, Grid, Stack, SxProps, TextField, Theme, Typography } from '@mui/material';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../content/img/logo.jpeg';
 import { useSystemUser } from '../hooks/useSystemUser';
-import { AuthLinks, InfrastructureLinks, ProfileLinks } from '../tools/constants/links';
+import { AnnouncementLinks, AuthLinks, InfrastructureLinks, ProfileLinks } from '../tools/constants/links';
 
 interface IProps {
     sx?: SxProps<Theme>
@@ -11,8 +11,18 @@ interface IProps {
 
 export function Header(props: IProps & PropsWithChildren) {
     const systemUser = useSystemUser();
-
     const navigate = useNavigate();
+
+    const [searchText, setSearchText] = useState<string | null>();
+
+    function search() {
+        if (String.isNullOrEmpty(searchText)) {
+            navigate(InfrastructureLinks.home)
+            return;
+        };
+
+        navigate(AnnouncementLinks.toSearch(searchText))
+    }
 
     return (
         <Box sx={props.sx}>
@@ -36,8 +46,10 @@ export function Header(props: IProps & PropsWithChildren) {
                             InputProps={{
                                 disableUnderline: true
                             }}
+                            value={searchText ?? ""}
+                            onChange={event => setSearchText(event.target.value)}
                         />
-                        <Button sx={{ color: "white", height: "100%", width: "20%", borderRadius: '10px' }}>
+                        <Button sx={{ color: "white", height: "100%", width: "20%", borderRadius: '10px' }} onClick={search}>
                             Найти
                         </Button>
                     </Box>

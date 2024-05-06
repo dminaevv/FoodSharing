@@ -101,6 +101,24 @@ public class AnnouncementService : IAnnouncementService
         return Result.Success();
     }
 
+    public PagedResult<AnnouncementShortInfo> Search(String searchText, Int32 page, Int32 pageSize, Guid? requestedUserId)
+    {
+        PagedResult<Announcement> announcements = _announcementRepository.Search(searchText, page, pageSize);
+        Announcement[] favoriteAnnouncements = requestedUserId is { } id
+            ? _announcementRepository.GetFavoriteAnnouncements(id)
+            : Array.Empty<Announcement>();
+
+        AnnouncementShortInfo[] announcementInfo = announcements.Values
+            .Select(announcement =>
+            {
+                Boolean isFavorite = favoriteAnnouncements.Any(a => announcement.Id == a.Id);
+                return new AnnouncementShortInfo(announcement, isFavorite);
+            })
+            .ToArray();
+
+        return new PagedResult<AnnouncementShortInfo>(announcementInfo, announcements.TotalRows);
+    }
+
     public Announcement? GetAnnouncement(Guid announcementId)
     {
         return _announcementRepository.GetAnnouncement(announcementId); 
@@ -132,7 +150,7 @@ public class AnnouncementService : IAnnouncementService
         
         Announcement[] favoriteAnnouncements = requestedUserId is { } id
             ? _announcementRepository.GetFavoriteAnnouncements(id)
-            : new Announcement[0];
+            : Array.Empty<Announcement>();
 
         AnnouncementShortInfo[] announcementInfo = announcements.Values
             .Select(announcement =>
@@ -155,9 +173,9 @@ public class AnnouncementService : IAnnouncementService
     public void ToggleFavoriteAnnouncement(Guid announcementId, Guid userId)
     {
         Announcement? favoriteAnnouncement = GetFavoriteAnnouncement(announcementId, userId);
-        Boolean IsFavorite = favoriteAnnouncement is not null;
+        Boolean isFavorite = favoriteAnnouncement is not null;
 
-        if (IsFavorite)
+        if (isFavorite)
         {
             RemoveFavoriteAnnouncement(announcementId, userId);
         }

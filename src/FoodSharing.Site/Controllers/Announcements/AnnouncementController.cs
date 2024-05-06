@@ -18,6 +18,7 @@ public class AnnouncementController : BaseController
     [HttpGet("/announcement/{id}")]
     [HttpGet("/announcement/add")]
     [HttpGet("/announcement/edit/{id}")]
+    [HttpGet("/announcements/search/{searchText}")]
     public IActionResult Index()
     {
         return ReactApp();
@@ -28,6 +29,12 @@ public class AnnouncementController : BaseController
     public Result SaveAnnouncement([FromForm] AnnouncementBlank blank)
     {
         return _announcementService.SaveAnnouncement(blank, SystemUser.User); 
+    }
+
+    [HttpGet("/announcement/search")]
+    public PagedResult<AnnouncementShortInfo> Search([FromQuery] String searchText, [FromQuery] Int32 page, [FromQuery] Int32 pageSize)
+    {
+        return _announcementService.Search(searchText, page, pageSize, SystemUser.Id);
     }
 
     public record GetAnnouncementRequest(Guid Id);
