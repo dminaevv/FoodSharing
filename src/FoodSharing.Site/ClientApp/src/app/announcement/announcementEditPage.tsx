@@ -85,54 +85,56 @@ export function AnnouncementEditPage() {
 
     return (
         <Page>
-            <Typography variant='h4'>{id == null ? "Создание объявления" : "Редактирование объявления"}</Typography>
-            <Box mt={2} maxWidth="600px">
-                <Stack gap={1}>
-                    <TextField
-                        label="Название"
-                        size="small"
-                        value={announcementBlank.name ?? ""}
-                        onChange={event => setAnnouncementBlank(prev => ({ ...prev, name: event.target.value }))}
+            <Box sx={{ px: 2, pt: 1 }}>
+                <Typography variant='h4'>{id == null ? "Создание объявления" : "Редактирование объявления"}</Typography>
+                <Box mt={2} maxWidth="600px">
+                    <Stack gap={1}>
+                        <TextField
+                            label="Название"
+                            size="small"
+                            value={announcementBlank.name ?? ""}
+                            onChange={event => setAnnouncementBlank(prev => ({ ...prev, name: event.target.value }))}
+                        />
+
+                        <TextField
+                            label="Описание"
+                            size="small"
+                            multiline
+                            minRows={2}
+                            maxRows={8}
+                            value={announcementBlank.description ?? ""}
+                            onChange={event => setAnnouncementBlank(prev => ({ ...prev, description: event.target.value }))}
+                        />
+                        <CSelect
+                            label="Категория"
+                            value={categories.find(c => c.id == announcementBlank.categoryId) ?? null}
+                            getOptionLabel={option => option.name}
+                            getOptionValue={option => option.id}
+                            options={categories}
+                            clearable
+                            onChange={changeCategory}
+                        />
+
+                        <TextField
+                            label="Вес (в граммах)"
+                            type="number"
+                            size="small"
+                            value={announcementBlank.gramsWeight ?? ""}
+                            onChange={event => changeWeight(event.target.value)}
+                        />
+                    </Stack>
+
+                    <AnnouncementPhotoGrid
+                        photoUrls={announcementBlank.imagesUrls}
+                        setAnnouncementBlank={setAnnouncementBlank}
+                        uploadPhotos={uploadPhotos}
+                        setUploadPhotos={setUploadPhotos}
                     />
 
-                    <TextField
-                        label="Описание"
-                        size="small"
-                        multiline
-                        minRows={2}
-                        maxRows={8}
-                        value={announcementBlank.description ?? ""}
-                        onChange={event => setAnnouncementBlank(prev => ({ ...prev, description: event.target.value }))}
-                    />
-                    <CSelect
-                        label="Категория"
-                        value={categories.find(c => c.id == announcementBlank.categoryId) ?? null}
-                        getOptionLabel={option => option.name}
-                        getOptionValue={option => option.id}
-                        options={categories}
-                        clearable
-                        onChange={changeCategory}
-                    />
-
-                    <TextField
-                        label="Вес (в граммах)"
-                        type="number"
-                        size="small"
-                        value={announcementBlank.gramsWeight ?? ""}
-                        onChange={event => changeWeight(event.target.value)}
-                    />
-                </Stack>
-
-                <AnnouncementPhotoGrid
-                    photoUrls={announcementBlank.imagesUrls}
-                    setAnnouncementBlank={setAnnouncementBlank}
-                    uploadPhotos={uploadPhotos}
-                    setUploadPhotos={setUploadPhotos}
-                />
-
-                <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={saveAnnouncement}>
-                    Сохранить
-                </Button>
+                    <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={saveAnnouncement}>
+                        Сохранить
+                    </Button>
+                </Box>
             </Box>
         </Page>
     )

@@ -86,9 +86,9 @@ export function ProfilePage() {
     }
 
     return (
-        <Page sx={{ overflow: "hidden" }}>
-            <Grid container height="100%">
-                <Grid item xs={3}>
+        <Page>
+            <Grid container>
+                <Grid item xs={3} sx={{ display: { xs: 'none', md: 'block' }, p: 2 }}>
                     <UserShortInfoCard user={user} />
                     <Divider />
                     <Box mt={2}>
@@ -109,7 +109,7 @@ export function ProfilePage() {
                         }
                     </Box>
                 </Grid>
-                <Grid item xs={9} sx={{ p: 2 }}>
+                <Grid item xs={12} md={9} sx={{ p: 2, height: '100%' }}>
                     <Routes>
                         <Route path="/announcements" element={<ProfileAnnouncementPage />} />
                         <Route path="/chats" element={<ProfileChatListPage />} />

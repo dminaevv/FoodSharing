@@ -44,9 +44,7 @@
     "webpack-cli": "^5.1.4"
   },
   "scripts": {
-    "build_local": "webpack --config configs/webpack.config.local.js --progress",
-    "build_opt_local": "webpack --config configs/webpack.config.opt_local.js --progress",
-    "build_prod": "webpack --config configs/webpack.config.prod.js --progress"
+    "build_opt_local": "webpack --config configs/webpack.config.opt_local.js --progress"
   },
   "eslintConfig": {
     "extends": [

@@ -21,10 +21,9 @@ export function FavoritesPage() {
 
     return (
         <Box>
-            <Typography variant="h4" my={2} sx={{ fontWeight: 'bold' }}>Избранное</Typography>
-            <Box mt={2}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', my: { xs: 0, md: 2 } }}>Избранное</Typography>
+            <Box mt={2} >
                 <AnnouncementList announcements={favoriteAnnouncements} />
-
             </Box>
         </Box>
     )

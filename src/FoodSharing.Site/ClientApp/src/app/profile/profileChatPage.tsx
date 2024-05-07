@@ -1,5 +1,5 @@
 import * as signalR from '@microsoft/signalr';
-import { Avatar, Box, Button, Grid, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, Paper, Stack, TextField, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BlockUi } from '../../components/blockUi/blockUi';
@@ -125,19 +125,17 @@ export function ProfileChatPage() {
     };
 
     return (
-        <Grid height="80vh" wrap='nowrap' overflow='hidden' gap={2} position="relative">
-            <Box height={"100%"} >
-                {
-                    announcement != null &&
-                    <Paper sx={{
-                        zIndex: 10,
-                        margin: 0.5,
-                        borderRadius: "10px",
-                        boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)"
-                    }}>
-                        <Stack direction='row' gap={2} p={1} height="100%">
+        <Stack direction="column" gap={1.5} overflow='hidden' width="100%" maxHeight="85vh" >
+            {
+                announcement != null &&
+                <Stack sx={{
+                    margin: 0.2,
+                    borderRadius: "10px",
+                }}>
+                    <Paper sx={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)", height: '100%' }}>
+                        <Stack direction='row' gap={2} p={1}>
                             <Box sx={{ width: "60px" }}>
-                                <img src={announcement.imagesUrls[0]} style={{ width: "100%", height: "100%", objectFit: 'contain' }} />
+                                <img src={announcement.imagesUrls[0]} style={{ width: "100%", objectFit: 'contain' }} alt="announcement" />
                             </Box>
                             <Stack>
                                 <CLink text={announcement.name} href={AnnouncementLinks.toAnnouncement(announcement.id)} sx={{
@@ -150,56 +148,51 @@ export function ProfileChatPage() {
                             </Stack>
                         </Stack>
                     </Paper>
-
-                }
-                <Grid container width="100%" height={"90%"} direction='column' zIndex={5} wrap='nowrap' sx={{ p: 2 }}>
-                    <Grid item xs={10} sx={{ overflowY: "hidden" }}>
-                        <Stack direction='column' gap={1} sx={{ width: '100%', height: "100%", overflowY: "auto" }}>
-                            {
-                                messages.length > 0
-                                    ? messages.slice().map((message, index) => {
-                                        const member = members.find(m => m.id === message.createdUserId)!;
-                                        return (
-                                            <Box key={index} >
-                                                <Stack direction="row" alignItems="flex-start" gap={1} >
-                                                    <Avatar alt="Avatar" sx={{ width: 40, height: 40 }} src={member.avatarUrl ?? 'https://www.abc.net.au/news/image/8314104-1x1-940x940.jpg'} />
-                                                    <Stack>
-                                                        <Stack direction="row" alignItems="center" gap={1}>
-                                                            <CLink text={member.firstName ?? member.email} href={UsersLinks.toUser(member.id)} />
-                                                            <Typography variant="subtitle2" style={{ color: '#808080' }}>
-                                                                {message.createdDateTimeUtc.toLocaleTimeString()}
-                                                            </Typography>
-                                                        </Stack>
-                                                        <Typography style={{ whiteSpace: 'pre-wrap' }}>{message.content}</Typography>
-                                                    </Stack>
-                                                </Stack>
-                                            </Box>
-
-                                        )
-                                    })
-                                    : <Stack sx={{ width: "100%", height: "100%" }} alignItems='center' justifyContent='center'><Typography>Сообщений нет. Напишите первое</Typography></Stack>
-                            }
-                            <div ref={messagesEndRef} />
-                        </Stack>
-                    </Grid>
-                    <Grid item xs={2}>
-                        <TextField
-                            label="Сообщение"
-                            variant="outlined"
-                            fullWidth
-                            value={messageBlank.content ?? ''}
-                            onKeyDown={onKeyDown}
-                            multiline
-                            maxRows={10}
-                            onChange={(e) => setMessageBlank(prev => ({ ...prev, content: e.target.value }))}
-                            style={{ marginBottom: '10px' }}
-                        />
-                        <Button variant="contained" onClick={onSendMessage}>
-                            Отправить
-                        </Button>
-                    </Grid>
-                </Grid>
-            </Box>
-        </Grid>
+                </Stack>
+            }
+            <Stack direction='column' gap={1.5} sx={{ height: "100%", width: '100%', overflow: 'hidden', maxHeight: '100%' }}>
+                <Stack direction='column' gap={1} sx={{ width: '100%', flex: '1 1 auto', overflowY: "auto", }}>
+                    {messages.length > 0
+                        ? messages.map((message, index) => {
+                            const member = members.find(m => m.id === message.createdUserId)!;
+                            return (
+                                <Box key={index} >
+                                    <Stack direction="row" alignItems="flex-start" gap={1} >
+                                        <Avatar alt="Avatar" sx={{ width: 40, height: 40 }} src={member.avatarUrl ?? 'https://www.abc.net.au/news/image/8314104-1x1-940x940.jpg'} />
+                                        <Stack>
+                                            <Stack direction="row" alignItems="center" gap={1}>
+                                                <CLink text={member.firstName ?? member.email} href={UsersLinks.toUser(member.id)} />
+                                                <Typography variant="subtitle2" style={{ color: '#808080' }}>
+                                                    {message.createdDateTimeUtc.toLocaleTimeString()}
+                                                </Typography>
+                                            </Stack>
+                                            <Typography style={{ whiteSpace: 'pre-wrap' }}>{message.content}</Typography>
+                                        </Stack>
+                                    </Stack>
+                                </Box>
+                            )
+                        })
+                        : <Stack sx={{ width: "100%", height: "100%" }} alignItems='center' justifyContent='center'><Typography>Сообщений нет. Напишите первое</Typography></Stack>
+                    }
+                    <div ref={messagesEndRef} />
+                </Stack>
+                <Stack>
+                    <TextField
+                        label="Сообщение"
+                        variant="outlined"
+                        fullWidth
+                        value={messageBlank.content ?? ''}
+                        onKeyDown={onKeyDown}
+                        multiline
+                        maxRows={10}
+                        onChange={(e) => setMessageBlank(prev => ({ ...prev, content: e.target.value }))}
+                        style={{ marginBottom: '10px' }}
+                    />
+                    <Button variant="contained" onClick={onSendMessage}>
+                        Отправить
+                    </Button>
+                </Stack>
+            </Stack>
+        </Stack>
     )
 }

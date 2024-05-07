@@ -1,15 +1,17 @@
+import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BlockUi } from "../../components/blockUi/blockUi";
 import { AnnouncementShortInfo } from "../../domain/announcements/announcementShortInfo";
 import { AnnouncementsProvider } from "../../domain/announcements/announcementsProvider";
 import { AnnouncementList } from "../announcement/announcementList";
+import { Header } from "../header";
 import Page from "../infrastructure/page";
 
 export function HomePage() {
     const { searchText } = useParams();
 
-    const [announcements, setAnnouncements] = useState<AnnouncementShortInfo[]>([]);
+    const [searchAnnouncements, setAnnouncements] = useState<AnnouncementShortInfo[]>([]);
     const [allAnnouncements, setAllAnnouncements] = useState<AnnouncementShortInfo[]>([]);
 
     useEffect(() => {
@@ -20,13 +22,13 @@ export function HomePage() {
         search();
     }, [searchText])
 
+    const isSearchMode = searchText != null;
 
     function search() {
         if (String.isNullOrEmpty(searchText)) {
             setAnnouncements([])
             return;
         };
-        console.log(searchText);
         BlockUi.block(async () => {
             const announcements = await AnnouncementsProvider.search(searchText, 1, 50);
             setAnnouncements(announcements.values);
@@ -42,9 +44,30 @@ export function HomePage() {
 
     return (
         <Page>
-            <AnnouncementList
-                announcements={announcements.length == 0 ? allAnnouncements : announcements}
-            />
+            <Box sx={{ px: 2 }}>
+                <Header sx={{ mt: 2, display: { xs: 'block', md: 'none' } }} />
+                {
+                    isSearchMode &&
+                    <>
+                        {
+                            searchAnnouncements.length != 0 &&
+                            <AnnouncementList
+                                announcements={searchAnnouncements}
+                            />
+                        }
+                        <Typography sx={{ fontStyle: 'italic', color: 'gray', mx: 2, my: 4 }}>
+                            {
+                                searchAnnouncements.length == 0
+                                    ? "К сожалению, ничего не удалось найти по вашему запросу. Но есть другие объявления: "
+                                    : "Так же посмотрите другие объявления, возможно, именно это вам необходимо"
+                            }
+                        </Typography>
+                    </>
+                }
+                <AnnouncementList
+                    announcements={allAnnouncements.filter(a => !searchAnnouncements.some(an => an.id == a.id))}
+                />
+            </Box>
         </Page>
     )
 }

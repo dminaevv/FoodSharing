@@ -41,14 +41,14 @@ export function ProfileAnnouncementPage() {
 
     return (
         <Box>
-            <Stack direction='row' alignItems='center' gap={1}>
-                <Typography variant="h4" my={2} sx={{ fontWeight: 'bold' }}>Мои объявления</Typography>
+            <Stack direction='row' alignItems='center'>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', my: { xs: 0, md: 2 } }}>Мои объявления</Typography>
                 <IconButton onClick={() => navigate(AnnouncementLinks.create)}><ControlPointIcon /></IconButton>
             </Stack>
-            <Grid container direction='column' wrap='nowrap' spacing={2} width="100%">
+            <Grid container direction='column' wrap='nowrap' spacing={2} width="100%" mt={1}>
                 {
                     announcements.map(announcement =>
-                        <Grid key={announcement.id} item xs container columnSpacing={2} wrap="nowrap" sx={{ height: " 170px" }}>
+                        <Grid key={announcement.id} item xs container columnSpacing={{ xs: 0, md: 2 }} rowSpacing={2} wrap="nowrap" direction={{ xs: 'column', md: 'row' }} sx={{ height: " 170px" }}>
                             <Grid item xs={3}>
                                 <img src={announcement.imagesUrls[0]} width="100%" height={"100%"} style={{ objectFit: "cover", borderRadius: 10 }} />
                             </Grid>
@@ -64,7 +64,7 @@ export function ProfileAnnouncementPage() {
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid item xs={3}>
+                            <Grid item xs={3} >
                                 <Stack >
                                     <Stack direction='row' gap={1} alignItems='center'>
                                         <VisibilityIcon sx={{ fontSize: 15 }} />

@@ -1,6 +1,6 @@
 import { Avatar, Box, Button, Grid, Stack, SxProps, TextField, Theme, Typography } from '@mui/material';
 import { PropsWithChildren, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import logo from '../content/img/logo.jpeg';
 import { useSystemUser } from '../hooks/useSystemUser';
 import { AnnouncementLinks, AuthLinks, InfrastructureLinks, ProfileLinks } from '../tools/constants/links';
@@ -10,23 +10,32 @@ interface IProps {
 }
 
 export function Header(props: IProps & PropsWithChildren) {
+    const { searchText } = useParams();
+
     const systemUser = useSystemUser();
     const navigate = useNavigate();
 
-    const [searchText, setSearchText] = useState<string | null>();
+    const [searchQuery, setSearchQuery] = useState<string | null>(searchText ?? null);
 
     function search() {
-        if (String.isNullOrEmpty(searchText)) {
+        if (String.isNullOrEmpty(searchQuery)) {
             navigate(InfrastructureLinks.home)
             return;
         };
 
-        navigate(AnnouncementLinks.toSearch(searchText))
+        navigate(AnnouncementLinks.toSearch(searchQuery))
     }
+
+    function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+        if (event.key === 'Enter') {
+            search();
+        }
+    }
+
 
     return (
         <Box sx={props.sx}>
-            <Grid container spacing={3} sx={{ mb: { xs: 2, sm: 4 } }}>
+            <Grid container spacing={3} sx={{ mb: { xs: 2, sm: 2 } }}>
                 <Grid item xs={0} sm={1} md={3} sx={{ display: { xs: 'none', sm: 'flex' }, cursor: 'pointer' }} alignItems='center' onClick={() => navigate(InfrastructureLinks.home)}>
                     <Stack gap={1} direction='row' alignItems='center'>
                         <img src={logo} width='50px' />
@@ -46,8 +55,9 @@ export function Header(props: IProps & PropsWithChildren) {
                             InputProps={{
                                 disableUnderline: true
                             }}
-                            value={searchText ?? ""}
-                            onChange={event => setSearchText(event.target.value)}
+                            value={searchQuery ?? ""}
+                            onChange={event => setSearchQuery(event.target.value)}
+                            onKeyDown={handleKeyDown}
                         />
                         <Button sx={{ color: "white", height: "100%", width: "20%", borderRadius: '10px' }} onClick={search}>
                             Найти

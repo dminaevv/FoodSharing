@@ -1,7 +1,7 @@
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { Avatar, Box, Button, Stack, TextField, Typography } from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { BlockUi } from "../../components/blockUi/blockUi";
 import { UserBlank, mapToUserBlank } from "../../domain/users/userBlank";
 import { UserProvider } from "../../domain/users/userProvider";
@@ -12,10 +12,6 @@ export function SettingsPage() {
     const systemUser = useSystemUser();
 
     const [userBlank, setUserBlank] = useState<UserBlank>(mapToUserBlank(systemUser!.user))
-
-    useEffect(() => {
-        console.log(userBlank);
-    }, [userBlank])
 
     const { addErrorNotification, addSuccessNotification } = useNotifications();
 
@@ -62,10 +58,10 @@ export function SettingsPage() {
     return (
         <Box>
             <Stack direction='row' alignItems='center' gap={1}>
-                <Typography variant="h4" my={2} sx={{ fontWeight: 'bold' }}>Настойки</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', my: { xs: 0, md: 2 } }}>Настойки</Typography>
             </Stack>
             <Box mt={2} maxWidth="600px">
-                <Stack gap={2} direction={'row'}>
+                <Stack gap={2} direction={{ xs: 'column-reverse', md: 'row' }}>
                     <Stack gap={2} sx={{ width: "100%" }}>
                         <TextField
                             label="Почта"
@@ -73,7 +69,6 @@ export function SettingsPage() {
                             value={userBlank.email ?? ""}
                             onChange={event => setUserBlank(prev => ({ ...prev, email: event.target.value }))}
                         />
-
                         <TextField
                             label="Имя"
                             size="small"
@@ -86,7 +81,6 @@ export function SettingsPage() {
                             value={userBlank.lastName ?? ""}
                             onChange={event => setUserBlank(prev => ({ ...prev, lastName: event.target.value }))}
                         />
-
                         <MuiTelInput
                             label="Номер телефона"
                             onlyCountries={['RU']}
@@ -94,7 +88,7 @@ export function SettingsPage() {
                             size="small"
                             placeholder="Введите номер телефона"
                             value={userBlank.phone ?? undefined}
-                            onChange={phone => { setUserBlank(prev => ({ ...prev, phone })); console.log(phone) }}
+                            onChange={phone => setUserBlank(prev => ({ ...prev, phone }))}
                             inputProps={{
                                 maxLength: 16
                             }}
@@ -106,7 +100,7 @@ export function SettingsPage() {
                             sx={{ width: 200, height: 200, cursor: 'pointer' }}
                             src={userBlank.avatarUrl ?? 'https://www.abc.net.au/news/image/8314104-1x1-940x940.jpg'}
                         />
-                        <Box sx={{ width: 200, height: 200, cursor: 'pointer', position: 'absolute', right: 0, top: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => openFileDialog()}>
+                        <Box sx={{ width: 200, height: 200, cursor: 'pointer', position: 'absolute', left: 0, top: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => openFileDialog()}>
                             <PhotoCameraIcon sx={{ color: 'white' }} />
                         </Box>
                     </Box>
