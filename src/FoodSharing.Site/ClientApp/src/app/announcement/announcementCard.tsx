@@ -1,6 +1,7 @@
 import LikeIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteTwoToneIcon from '@mui/icons-material/FavoriteTwoTone';
-import { Box, Card, CardContent, CardMedia, IconButton, Tooltip, Typography, Zoom } from '@mui/material';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import { Box, Card, CardContent, CardMedia, IconButton, Stack, Tooltip, Typography, Zoom } from '@mui/material';
 import { useState } from 'react';
 import { CLink } from '../../components/link';
 import { AnnouncementShortInfo } from '../../domain/announcements/announcementShortInfo';
@@ -43,10 +44,21 @@ export function AnnouncementCard(props: IProps) {
                 component="img"
                 alt="Изображение"
                 height="100%"
+                sx={{
+                    width: '100%',
+                    aspectRatio: '4/3',
+                    objectFit: 'cover',
+                }}
                 image={props.announcement.mainImgUrl}
             />
-            <CardContent sx={{ height: "30%", pb: 1, pt: 1 }}>
-                <Box display='flex' alignItems='flex-end' justifyContent='space-between'>
+            <CardContent sx={{
+                pt: 1,
+                "&:last-child": {
+                    paddingBottom: 1,
+                    px: 1
+                }
+            }}>
+                <Box display='flex' alignItems='flex-end' justifyContent='space-between' p={0}>
                     <CLink text={props.announcement.name} href={AnnouncementLinks.toAnnouncement(props.announcement.id)} sx={{
                         lineHeight: 1, overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -80,6 +92,15 @@ export function AnnouncementCard(props: IProps) {
                 }}>
                     {props.announcement.description}
                 </Typography>
+
+                <Stack direction="row" alignItems="center" spacing={1} mt={1.5}>
+                    <LocationOnOutlinedIcon sx={{ fontSize: 18 }} />
+                    <Typography variant="body2" color="text.secondary" sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                    }}>{props.announcement.address}</Typography>
+                </Stack>
             </CardContent >
         </Card >
     )

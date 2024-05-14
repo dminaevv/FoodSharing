@@ -8,18 +8,19 @@ export class AnnouncementBlank {
         public description: string | null,
         public categoryId: string | null,
         public gramsWeight: number | null,
+        public address: string | null,
         public imagesUrls: string[],
         public uploadPhotos: File[]
     ) { }
 
     public static Empty(userId: string) {
-        return new AnnouncementBlank(null, null, userId, null, null, null, [], []);
+        return new AnnouncementBlank(null, null, userId, null, null, null, "", [], []);
     }
 }
 
 export function mapToAnnouncementBlank(announcement: Announcement) {
     return new AnnouncementBlank(
         announcement.id, announcement.name, announcement.ownerUserId, announcement.description,
-        announcement.categoryId, announcement.gramsWeight, announcement.imagesUrls, []
+        announcement.categoryId, announcement.gramsWeight, announcement.address, announcement.imagesUrls, []
     );
 }

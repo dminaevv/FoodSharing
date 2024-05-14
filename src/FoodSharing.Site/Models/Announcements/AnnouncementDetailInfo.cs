@@ -9,6 +9,7 @@ public class AnnouncementDetailInfo
     public String Description { get; }
     public AnnouncementCategory Category { get; }
     public String GramsWeight { get; }
+    public String Address { get; }
     public String[] ImagesUrls { get; }
     public DateTime CreatedAt { get; }
     public User Owner { get;  }
@@ -23,6 +24,7 @@ public class AnnouncementDetailInfo
         Description = announcement.Description;
         Category = category;
         GramsWeight = announcement.GramsWeight;
+        Address = announcement.Address;     
         ImagesUrls = announcement.ImagesUrls;
         CreatedAt = announcement.CreatedAt;
         Owner = owner;

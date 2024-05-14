@@ -34,13 +34,13 @@ export function UserPage() {
     return (
         <Page>
             {userInfo != null
-                ? <Box>
-                    <Grid container>
+                ? <Box p={2}>
+                    <Grid container direction={{ xs: 'column', md: 'row' }}>
                         <Grid item xs={3}>
                             <UserShortInfoCard user={userInfo} />
                         </Grid>
                         <Grid item xs={9}>
-                            <Typography variant="h4" my={2} sx={{ fontWeight: 'bold' }}>Объявления пользователя</Typography>
+                            <Typography variant="h4" my={2} sx={{ fontWeight: 'bold' }}>Продукты пользователя</Typography>
                             <AnnouncementList
                                 announcements={announcements}
                             />

@@ -6,6 +6,7 @@ export class Announcement {
         public description: string,
         public categoryId: string,
         public gramsWeight: number,
+        public address: string,
         public imagesUrls: string[]
     ) { }
 }
@@ -18,6 +19,7 @@ export function mapToAnnouncement(data: any) {
         data.description,
         data.categoryId,
         data.gramsWeight,
+        data.address,
         data.imagesUrls
     )
 }

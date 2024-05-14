@@ -20,20 +20,22 @@ export default function Page(props: IProps & PropsWithChildren) {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
-        <Box display='flex' flexDirection='column' height="100%" width="100%" sx={{ ...props.sx }} >
+        <Box display='flex' flexDirection='column' height="100vh" width="100%" sx={{ ...props.sx }}>
             <Header sx={{ mx: 2, mt: 2, display: { xs: 'none', md: 'block' } }} />
             <Box sx={{ height: "100%" }}>
                 {props.children}
             </Box>
             {
                 isMobile &&
-                <BottomNavigation>
-                    <BottomNavigationAction label="Поиск" icon={<SearchIcon />} onClick={() => navigate(InfrastructureLinks.home)} />
-                    <BottomNavigationAction label="Избранное" icon={<FavoriteIcon />} onClick={() => navigate(ProfileLinks.favorites)} />
-                    <BottomNavigationAction label="Профиль" icon={<ProfileIcon />} onClick={() => navigate(ProfileLinks.settings)} />
-                    <BottomNavigationAction label="Объявления" icon={<AnnouncementIcon />} onClick={() => navigate(ProfileLinks.announcements)} />
-                    <BottomNavigationAction label="Сообщения" icon={<MessageIcon />} onClick={() => navigate(ProfileLinks.chats)} />
-                </BottomNavigation>
+                <Box>
+                    <BottomNavigation >
+                        <BottomNavigationAction label="Поиск" icon={<SearchIcon />} onClick={() => navigate(InfrastructureLinks.home)} />
+                        <BottomNavigationAction label="Избранное" icon={<FavoriteIcon />} onClick={() => navigate(ProfileLinks.favorites)} />
+                        <BottomNavigationAction label="Профиль" icon={<ProfileIcon />} onClick={() => navigate(ProfileLinks.settings)} />
+                        <BottomNavigationAction label="Продукты" icon={<AnnouncementIcon />} onClick={() => navigate(ProfileLinks.announcements)} />
+                        <BottomNavigationAction label="Сообщения" icon={<MessageIcon />} onClick={() => navigate(ProfileLinks.chats)} />
+                    </BottomNavigation>
+                </Box>
             }
         </Box>
     )

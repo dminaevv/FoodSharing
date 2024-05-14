@@ -83,6 +83,8 @@ export function ProfileChatPage() {
     };
 
     function startConnection() {
+        if (chatIdState == null) return;
+
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`/chat?chatId=${chatIdState}`)
             .build();

@@ -17,6 +17,7 @@ export function MainRouter() {
                 <Routes>
                     <Route path={InfrastructureLinks.home} element={<HomePage />} />
                     <Route path={AnnouncementLinks.search} element={<HomePage />} />
+                    <Route path={AnnouncementLinks.searchCategory} element={<HomePage />} />
 
                     <Route path={AuthLinks.login} element={<LoginPage />} />
                     <Route path={AuthLinks.register} element={<RegisterPage />} />

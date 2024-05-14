@@ -21,18 +21,37 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
 
     #region Announcement
 
+    public void SaveView(AnnouncementView announcementView)
+    {
+        String expression = @"
+        INSERT INTO announcementviews (announcementid, userviewerid, viewingdatetimeutc)
+        VALUES (@p_announcementId, @p_userViewerId, @p_viewingDateTimeUtc)
+        ON CONFLICT (announcementid, userviewerid) 
+        DO UPDATE SET
+        viewingdatetimeutc = @p_viewingDateTimeUtc";
+
+        NpgsqlParameter[] parameters =
+        {
+            new("p_announcementId", announcementView.AnnouncementId),
+            new("p_userViewerId", announcementView.UserViewerId),
+            new("p_viewingDateTimeUtc", announcementView.ViewingDateTimeUtc),
+        };
+
+        _mainConnector.ExecuteNonQuery(expression, parameters);
+    }
+
     public void SaveAnnouncement(AnnouncementBlank.Validated blank, Guid userId)
     {
         String expression = @"
         INSERT INTO announcements
         (
-            id, ""name"", owneruserid, description, categoryid, gramsweight,
+            id, ""name"", owneruserid, description, categoryid, gramsweight, address, 
             imagesurls, createduserid, createddatetimeutc,isremoved
         )
         VALUES
         (
             @p_id,  @p_name, @p_ownerUserId, @p_description,  @p_categoryId, @p_gramsWeight,
-            @p_imagesUrls, @p_userId, @p_dateTimeUtcNow, false
+            @p_address, @p_imagesUrls, @p_userId, @p_dateTimeUtcNow, false
 
         )ON CONFLICT (id)
          DO UPDATE SET
@@ -41,6 +60,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
          description = @p_description,
          categoryid = @p_categoryId,
          gramsweight = @p_gramsWeight,
+         address = @p_address,
          imagesurls = @p_imagesUrls,
          modifieduserid = @p_userId,
          modifieddatetimeutc = @p_dateTimeUtcNow";
@@ -53,6 +73,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             new("p_description", blank.Description),
             new("p_categoryId", blank.CategoryId),
             new("p_gramsWeight", blank.GramsWeight),
+            new("p_address", blank.Address),
             new("p_imagesUrls", blank.ImagesUrls),
             new("p_userId", userId),
             new("p_dateTimeUtcNow", DateTime.UtcNow)
@@ -134,7 +155,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
 
     public PagedResult<Announcement> GetAnnouncements(Guid? userId, Int32 page, Int32 pageSize)
     {
-        (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize); 
+        (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize);
 
         String expression = @"
             SELECT COUNT(*) OVER() AS totalRows, sub.*
@@ -161,11 +182,11 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
         };
 
         Page<AnnouncementDB> pageResult = _mainConnector.GetPage<AnnouncementDB>(expression, parameters);
-        
+
         Int64 totalRows = pageResult.TotalRows;
         Announcement[] announcements = pageResult.Values.Select(a => a.ToAnnouncement(_configuration.FileStorage_Host)).ToArray();
 
-        return new PagedResult<Announcement>(announcements, totalRows); 
+        return new PagedResult<Announcement>(announcements, totalRows);
     }
 
     public void RemoveAnnouncement(Guid announcementId, Guid userId)
@@ -185,6 +206,55 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
         };
 
         _mainConnector.ExecuteNonQuery(expression, parameters);
+    }
+
+    public AnnouncementViews[] GetAnnouncementViews(Guid[] announcementIds)
+    {
+        String expression = @"
+                SELECT announcementid, COUNT(userviewerid) AS count
+                FROM announcementviews
+                WHERE announcementid = ANY (@p_announcementIds) 
+                GROUP BY announcementid;";
+
+        NpgsqlParameter[] parameters =
+        {
+            new("p_announcementIds", announcementIds),
+        };
+
+        return _mainConnector.GetList<AnnouncementViews>(expression, parameters).ToArray();
+    }
+
+    public AnnouncementMessages[] GetAnnouncementMessages(Guid[] announcementIds)
+    {
+        String expression = @"
+                SELECT announcementid, COUNT(id) AS count
+                FROM chats
+                WHERE announcementid = ANY (@p_announcementIds) 
+                GROUP BY announcementid;";
+
+        NpgsqlParameter[] parameters =
+        {
+            new("p_announcementIds", announcementIds),
+        };
+
+        return _mainConnector.GetList<AnnouncementMessages>(expression, parameters).ToArray();
+
+    }
+
+    public AnnouncementFavorites[] GetAnnouncementFavorites(Guid[] announcementIds)
+    {
+        String expression = @"
+                SELECT announcementid, COUNT(userid) AS count
+                FROM favoriteannouncements
+                WHERE announcementid = ANY (@p_announcementIds) 
+                GROUP BY announcementid;";
+
+        NpgsqlParameter[] parameters =
+        {
+            new("p_announcementIds", announcementIds),
+        };
+
+        return _mainConnector.GetList<AnnouncementFavorites>(expression, parameters).ToArray();
     }
 
     #endregion Announcement

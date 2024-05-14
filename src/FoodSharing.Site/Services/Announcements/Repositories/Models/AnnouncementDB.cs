@@ -8,6 +8,7 @@ public class AnnouncementDB
     public String Description   { get; set; }
     public Guid CategoryId   { get; set; }
     public String GramsWeight   { get; set; }
+    public String Address   { get; set; }
     public String[] ImagesUrls   { get; set; }
     public Guid CreatedUserId  { get; set; }
     public Guid? ModifiedUserId  { get; set; }

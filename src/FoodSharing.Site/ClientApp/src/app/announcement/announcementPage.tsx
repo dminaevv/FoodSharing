@@ -56,7 +56,7 @@ export function AnnouncementPage() {
                 announcementInfo != null
                     ?
                     <Box sx={{ p: 2 }}>
-                        <Grid container spacing={2}>
+                        <Grid container spacing={2} direction={{ xs: 'column', md: 'row' }}>
                             <Grid item xs={8}>
                                 <Stack gap={2}>
                                     <Stack direction='row'>
@@ -159,7 +159,7 @@ export function AnnouncementPage() {
                         </Grid>
                     </Box>
                     :
-                    <Typography>Такого объявления нет!</Typography>
+                    <Typography>Такого продукта нет!</Typography>
             }
         </Page>
 

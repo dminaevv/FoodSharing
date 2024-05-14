@@ -28,6 +28,7 @@ CREATE TABLE announcements(
     Description varchar NOT NULL,
     CategoryId uuid NOT NULL,
     gramsweight float8 NOT NULL,
+    address varchar NOT NULL,
     ImagesUrls _varchar NOT NULL,
     CreatedUserId uuid NOT NULL,
     ModifiedUserId uuid,
@@ -82,3 +83,10 @@ CREATE TABLE tokens (
 	CreatedDateTimeUtc timestamp DEFAULT now() NOT NULL,
 	ModifiedDateTimeUtc timestamp NULL
 );
+
+CREATE TABLE announcementviews (
+	announcementid uuid NOT NULL,
+	userviewerid uuid NOT NULL,
+	viewingdatetimeutc timestamp NOT NULL
+);
+

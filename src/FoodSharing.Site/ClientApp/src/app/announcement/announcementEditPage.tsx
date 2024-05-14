@@ -60,7 +60,7 @@ export function AnnouncementEditPage() {
             const result = await AnnouncementsProvider.save(announcementBlank);
             if (!result.isSuccess) return addErrorNotification(result.errorsString);
 
-            addSuccessNotification("Объявление успешно сохранено");
+            addSuccessNotification("Продукт успешно добавлен");
             navigate(ProfileLinks.announcements)
         })
     }
@@ -86,7 +86,7 @@ export function AnnouncementEditPage() {
     return (
         <Page>
             <Box sx={{ px: 2, pt: 1 }}>
-                <Typography variant='h4'>{id == null ? "Создание объявления" : "Редактирование объявления"}</Typography>
+                <Typography variant='h4'>{id == null ? "Добавление продукта" : "Редактирование продукта"}</Typography>
                 <Box mt={2} maxWidth="600px">
                     <Stack gap={1}>
                         <TextField
@@ -121,6 +121,14 @@ export function AnnouncementEditPage() {
                             size="small"
                             value={announcementBlank.gramsWeight ?? ""}
                             onChange={event => changeWeight(event.target.value)}
+                        />
+
+                        <TextField
+                            label="Адрес"
+                            type="text"
+                            size="small"
+                            value={announcementBlank.address ?? ""}
+                            onChange={event => setAnnouncementBlank(prev => ({ ...prev, address: event.target.value }))}
                         />
                     </Stack>
 

@@ -29,6 +29,12 @@ public class AnnouncementService : IAnnouncementService
         _configuration = configuration;
     }
 
+    public void SaveView(Guid announcementId, User requestedUser)
+    {
+        AnnouncementView announcementView = new(announcementId, requestedUser.Id, DateTime.UtcNow);
+        _announcementRepository.SaveView(announcementView); 
+    }
+
     public Result SaveAnnouncement(AnnouncementBlank blank, User requestedUser)
     {
         PreprocessAnnouncementBlank(blank);
@@ -75,6 +81,8 @@ public class AnnouncementService : IAnnouncementService
         if (blank.Description.IsNullOrWhitespace()) return Result.Fail("Заполните описание");
         if (blank.CategoryId is not { } categoryId) return Result.Fail("Укажите категорию для объявления");
         if (blank.GramsWeight is not { } weight) return Result.Fail("Укажите вес");
+        if (blank.Address is not { } address|| address.IsNullOrWhitespace()) return Result.Fail("Укажите адрес");
+
         if (weight <= 0) return Result.Fail("Укажите корректное количество");
 
         if (blank.ImagesUrls.IsNullOrEmpty() && blank.UploadPhotos.IsNullOrEmpty())
@@ -95,7 +103,7 @@ public class AnnouncementService : IAnnouncementService
 
         validated = new AnnouncementBlank.Validated(
                 id, blank.Name, ownerUserId, blank.Description,
-                categoryId, weight, blank.ImagesUrls!, blank.UploadPhotos ?? Array.Empty<IFormFile>()
+                categoryId, weight, address, blank.ImagesUrls!, blank.UploadPhotos ?? Array.Empty<IFormFile>()
         );
 
         return Result.Success();
@@ -122,6 +130,22 @@ public class AnnouncementService : IAnnouncementService
     public Announcement? GetAnnouncement(Guid announcementId)
     {
         return _announcementRepository.GetAnnouncement(announcementId); 
+    }
+
+    public AnnouncementStatistics[] GetAnnouncementsStatistics(Guid[] announcementIds)
+    {
+        AnnouncementViews[]  views = _announcementRepository.GetAnnouncementViews(announcementIds); 
+        AnnouncementMessages[]  messages = _announcementRepository.GetAnnouncementMessages(announcementIds); 
+        AnnouncementFavorites[] favorites = _announcementRepository.GetAnnouncementFavorites(announcementIds); 
+        
+        return announcementIds.Select(announcementId =>
+        {
+            Int32 viewsCount = views.FirstOrDefault(s => s.AnnouncementId == announcementId)?.Count ?? 0;  
+            Int32 favoritesCount = favorites.FirstOrDefault(s => s.AnnouncementId == announcementId)?.Count ?? 0; 
+            Int32 messagesCount = messages.FirstOrDefault(s => s.AnnouncementId == announcementId)?.Count ?? 0; 
+
+            return new AnnouncementStatistics(announcementId, viewsCount, favoritesCount, messagesCount); 
+        }).ToArray();
     }
 
     public AnnouncementDetailInfo GetAnnouncementInfo(Guid announcementId, Guid requestedUserId)

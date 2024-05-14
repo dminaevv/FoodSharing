@@ -36,9 +36,14 @@ export class AnnouncementLinks {
     static create = '/announcement/add';
     static edit = '/announcement/edit/:id';
     static search = '/announcements/search/:searchText';
+    static searchCategory = '/announcements/category/:categoryId';
 
     static toSearch(searchText: string) {
         return `/announcements/search/${searchText}`;
+    }
+
+    static toCategory(categoryId: string) {
+        return `/announcements/category/${categoryId}`;
     }
 
     static toEdit(id: string) {

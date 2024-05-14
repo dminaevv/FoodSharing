@@ -1,0 +1,165 @@
+-- public.announcementcategories определение
+
+-- Drop table
+
+-- DROP TABLE announcementcategories;
+
+CREATE TABLE announcementcategories (
+	id uuid NOT NULL,
+	"name" varchar NOT NULL,
+	iconurl varchar NOT NULL,
+	CONSTRAINT announcementcategories_pkey PRIMARY KEY (id)
+);
+
+
+-- public.announcements определение
+
+-- Drop table
+
+-- DROP TABLE announcements;
+
+CREATE TABLE announcements (
+	id uuid NOT NULL,
+	"name" varchar NOT NULL,
+	owneruserid uuid NOT NULL,
+	description varchar NOT NULL,
+	categoryid uuid NOT NULL,
+	gramsweight float8 NOT NULL,
+	imagesurls _varchar NOT NULL,
+	createduserid uuid NOT NULL,
+	modifieduserid uuid NULL,
+	createddatetimeutc timestamp NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	isremoved bool NOT NULL,
+	address varchar NOT NULL,
+	CONSTRAINT announcement_pkey PRIMARY KEY (id)
+);
+
+
+-- public.announcementviews определение
+
+-- Drop table
+
+-- DROP TABLE announcementviews;
+
+CREATE TABLE announcementviews (
+	announcementid uuid NOT NULL,
+	userviewerid uuid NOT NULL,
+	viewingdatetimeutc timestamp NOT NULL,
+	CONSTRAINT announcementviews_pkey PRIMARY KEY (announcementid, userviewerid)
+);
+
+
+-- public.chats определение
+
+-- Drop table
+
+-- DROP TABLE chats;
+
+CREATE TABLE chats (
+	id uuid NOT NULL,
+	memberids _uuid NOT NULL,
+	announcementid uuid NULL,
+	createddatetimeutc timestamp NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	isremoved bool NOT NULL,
+	lastmessageid uuid NOT NULL,
+	CONSTRAINT dialogs_pkey PRIMARY KEY (id)
+);
+
+
+-- public.configurationsettings определение
+
+-- Drop table
+
+-- DROP TABLE configurationsettings;
+
+CREATE TABLE configurationsettings (
+	"key" varchar(100) NOT NULL,
+	value text NOT NULL,
+	CONSTRAINT configurationsettings_pkey PRIMARY KEY (key)
+);
+
+
+-- public.confirmationcodes определение
+
+-- Drop table
+
+-- DROP TABLE confirmationcodes;
+
+CREATE TABLE confirmationcodes (
+	email varchar NOT NULL,
+	code int4 NOT NULL,
+	expirationdatetimeutc timestamp NULL
+);
+
+
+-- public.favoriteannouncements определение
+
+-- Drop table
+
+-- DROP TABLE favoriteannouncements;
+
+CREATE TABLE favoriteannouncements (
+	announcementid uuid NOT NULL,
+	userid uuid NOT NULL,
+	additiondatetimeutc timestamp NOT NULL,
+	CONSTRAINT favoriteannouncements_pkey PRIMARY KEY (announcementid, userid)
+);
+
+
+-- public.messages определение
+
+-- Drop table
+
+-- DROP TABLE messages;
+
+CREATE TABLE messages (
+	id uuid NOT NULL,
+	chatid uuid NOT NULL,
+	"content" varchar NOT NULL,
+	createduserid uuid NOT NULL,
+	createddatetimeutc timestamp NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	isremoved bool NOT NULL,
+	CONSTRAINT messages_pkey PRIMARY KEY (id)
+);
+
+
+-- public.tokens определение
+
+-- Drop table
+
+-- DROP TABLE tokens;
+
+CREATE TABLE tokens (
+	"token" varchar NOT NULL,
+	userid uuid NOT NULL,
+	expirationdatetimeutc timestamp NOT NULL,
+	createddatetimeutc timestamp DEFAULT now() NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	CONSTRAINT tokens_pkey PRIMARY KEY (token)
+);
+
+
+-- public.users определение
+
+-- Drop table
+
+-- DROP TABLE users;
+
+CREATE TABLE users (
+	id uuid NOT NULL,
+	email varchar NOT NULL,
+	passwordhash varchar NOT NULL,
+	firstname varchar NULL,
+	lastname varchar NULL,
+	phone varchar NULL,
+	avatarurl varchar NULL,
+	createduserid uuid NOT NULL,
+	modifieduserid uuid NULL,
+	createddatetimeutc timestamp NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	isremoved bool NOT NULL,
+	CONSTRAINT users_pkey PRIMARY KEY (id)
+);
