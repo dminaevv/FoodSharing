@@ -109,17 +109,8 @@ export function AnnouncementPage() {
                                     <Grid item>
                                         <Stack gap={2}>
                                             <Box>
-                                                {/* <Typography variant='h5' mb={1} fontWeight='bold'>Адрес</Typography>
-                                                <YMaps>
-                                                    <Map
-                                                        defaultState={{ center: [55.75, 37.57], zoom: 9 }}
-                                                        width="100%"
-                                                        height="400px"
-                                                    >
-                                                        <Placemark geometry={[55.75, 37.57]} />
-                                                        <SearchControl options={{ float: 'right' }} />
-                                                    </Map>
-                                                </YMaps> */}
+                                                <Typography variant='h5' mb={1} fontWeight='bold'>Город: </Typography>
+                                                <Typography>{announcementInfo.cityName}</Typography>
                                             </Box>
                                             <Box>
                                                 <Typography variant='h5' mb={1} fontWeight='bold'>Описание</Typography>

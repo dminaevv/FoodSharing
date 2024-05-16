@@ -3,7 +3,6 @@ using FoodSharing.Site.Models.Announcements;
 using FoodSharing.Site.Services.Announcements;
 using FoodSharing.Site.Tools.Types;
 using Microsoft.AspNetCore.Mvc;
-using System.Numerics;
 
 namespace FoodSharing.Site.Controllers.Announcements;
 
@@ -28,7 +27,7 @@ public class AnnouncementController : BaseController
     [HttpGet("/announcement/{id}")]
     public IActionResult? AnnouncementPage(String id)
     {
-        Task.Run(() => _announcementService.SaveView(Guid.Parse(id), SystemUser.User));
+        _announcementService.SaveView(Guid.Parse(id), SystemUser.User);
         return ReactApp();
     }
 

@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Card, Grid, Stack, Typography } from "@mui/material";
+import { Autocomplete, Avatar, Box, Button, Card, Grid, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BlockUi } from "../../components/blockUi/blockUi";
@@ -6,12 +6,12 @@ import { CSelect } from "../../components/cSelect";
 import { AnnouncementCategory } from "../../domain/announcements/announcementCategory";
 import { AnnouncementShortInfo } from "../../domain/announcements/announcementShortInfo";
 import { AnnouncementsProvider } from "../../domain/announcements/announcementsProvider";
+import { City } from "../../domain/city/city";
+import { CityProvider } from "../../domain/city/cityProvider";
 import { AnnouncementLinks } from "../../tools/constants/links";
 import { AnnouncementList } from "../announcement/announcementList";
 import { Header } from "../header";
 import Page from "../infrastructure/page";
-
-
 
 export function HomePage() {
     const { searchText, categoryId } = useParams();
@@ -23,9 +23,14 @@ export function HomePage() {
     const [categories, setCategories] = useState<AnnouncementCategory[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<AnnouncementCategory | null>(null);
 
+    const [cities, setCities] = useState<City[]>([]);
+    const [selectedCity, setSelectedCity] = useState<City | null>(null);
+
+
     useEffect(() => {
         loadAnnouncements();
         loadCategories();
+        loadCities();
     }, [])
 
     useEffect(() => {
@@ -37,7 +42,6 @@ export function HomePage() {
     }, [categoryId])
 
     const isSearchMode = searchText != null;
-
     function search() {
         if (String.isNullOrEmpty(searchText)) {
             setAnnouncements([])
@@ -46,6 +50,13 @@ export function HomePage() {
         BlockUi.block(async () => {
             const announcements = await AnnouncementsProvider.search(searchText, 1, 50);
             setAnnouncements(announcements.values);
+        })
+    }
+
+    function loadCities() {
+        BlockUi.block(async () => {
+            const cities = await CityProvider.getCities();
+            setCities(cities);
         })
     }
 
@@ -133,14 +144,25 @@ export function HomePage() {
                                     clearable
                                     onChange={changeCategory}
                                 />
-                                <CSelect
-                                    label="Город"
-                                    value={selectedCategory}
+                                <Autocomplete
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Город"
+                                            inputProps={{
+                                                ...params.inputProps,
+                                                autoComplete: 'new-password'
+                                            }}
+                                        />
+                                    )}
+                                    fullWidth
+                                    autoHighlight
+                                    value={cities.find(c => c.id == selectedCity?.id) ?? null}
                                     getOptionLabel={option => option.name}
-                                    getOptionValue={option => option.id}
-                                    options={categories}
-                                    clearable
-                                    onChange={changeCategory}
+                                    options={cities}
+                                    size="small"
+                                    noOptionsText="Город не найден"
+                                    onChange={(_, city) => setSelectedCity(city)}
                                 />
                                 <Button variant="contained" fullWidth onClick={() => { setSelectedCategory(null); }}>
                                     Сбросить

@@ -1,5 +1,4 @@
-﻿using System.Data;
-using FoodSharing.Site.Models.Users;
+﻿using FoodSharing.Site.Models.Users;
 using FoodSharing.Site.Services.Users.Repositories;
 using FoodSharing.Site.Tools.Extensions;
 using FoodSharing.Site.Tools.Types;
@@ -8,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using FoodSharing.Site.Services.Files;
 using FoodSharing.Site.Models.Files;
-using System.Numerics;
 using IConfiguration = FoodSharing.Site.Models.Configurations.IConfiguration;
 
 namespace FoodSharing.Site.Services.Users;

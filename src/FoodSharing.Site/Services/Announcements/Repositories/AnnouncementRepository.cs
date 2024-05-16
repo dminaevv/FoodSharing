@@ -45,13 +45,13 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
         String expression = @"
         INSERT INTO announcements
         (
-            id, ""name"", owneruserid, description, categoryid, gramsweight, address, 
+            id, ""name"", owneruserid, description, categoryid, gramsweight, cityId, 
             imagesurls, createduserid, createddatetimeutc,isremoved
         )
         VALUES
         (
             @p_id,  @p_name, @p_ownerUserId, @p_description,  @p_categoryId, @p_gramsWeight,
-            @p_address, @p_imagesUrls, @p_userId, @p_dateTimeUtcNow, false
+            @p_cityId, @p_imagesUrls, @p_userId, @p_dateTimeUtcNow, false
 
         )ON CONFLICT (id)
          DO UPDATE SET
@@ -60,7 +60,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
          description = @p_description,
          categoryid = @p_categoryId,
          gramsweight = @p_gramsWeight,
-         address = @p_address,
+         cityId = @p_cityId,
          imagesurls = @p_imagesUrls,
          modifieduserid = @p_userId,
          modifieddatetimeutc = @p_dateTimeUtcNow";
@@ -73,7 +73,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             new("p_description", blank.Description),
             new("p_categoryId", blank.CategoryId),
             new("p_gramsWeight", blank.GramsWeight),
-            new("p_address", blank.Address),
+            new("p_cityId", blank.CityId),
             new("p_imagesUrls", blank.ImagesUrls),
             new("p_userId", userId),
             new("p_dateTimeUtcNow", DateTime.UtcNow)

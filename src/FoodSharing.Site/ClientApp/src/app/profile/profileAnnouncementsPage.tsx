@@ -2,7 +2,7 @@ import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Box, Button, Grid, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { Alert, Box, Button, Grid, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { BlockUi } from "../../components/blockUi/blockUi";
@@ -11,10 +11,13 @@ import { Announcement } from "../../domain/announcements/announcement";
 import { AnnouncementStatistics } from '../../domain/announcements/announcementStatistics';
 import { AnnouncementsProvider } from "../../domain/announcements/announcementsProvider";
 import { useConfirmDialog } from '../../hooks/useConfirmDialog';
+import { useSystemUser } from '../../hooks/useSystemUser';
 import { AnnouncementLinks } from '../../tools/constants/links';
 
 export function ProfileAnnouncementsPage() {
     const navigate = useNavigate();
+    const systemUser = useSystemUser();
+
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [announcementsStatistics, setAnnouncementsStatistics] = useState<AnnouncementStatistics[]>([]);
 
@@ -31,9 +34,17 @@ export function ProfileAnnouncementsPage() {
 
             const announcementsStatistics = await AnnouncementsProvider.GetAnnouncementsStatistics(announcements.map(a => a.id));
             setAnnouncementsStatistics(announcementsStatistics);
-
-            console.log(announcementsStatistics)
         })
+    }
+
+    function canCreateAnnouncement() {
+        if (systemUser == null) return false;
+
+        if (systemUser.user.firstName == null) return false;
+        if (systemUser.user.lastName == null) return false;
+        if (systemUser.user.phone == null) return false;
+
+        return true;
     }
 
     async function removeAnnouncement(id: string) {
@@ -48,9 +59,18 @@ export function ProfileAnnouncementsPage() {
 
     return (
         <Box>
+            {!canCreateAnnouncement() &&
+                <Alert severity="warning">Для того, чтобы разместить свой продукт, необходимо заполнить обязательные поля в профиле:
+                    {systemUser?.user.firstName == null && <Typography variant='body2'>- Имя</Typography>}
+                    {systemUser?.user.lastName == null && <Typography variant='body2'>- Фамилия</Typography>}
+                    {systemUser?.user.phone == null && <Typography variant='body2'>- Номер телефона</Typography>}
+                </Alert>
+            }
             <Stack direction='row' alignItems='center'>
                 <Typography variant="h4" sx={{ fontWeight: 'bold', my: { xs: 0, md: 2 } }}>Мои продукты</Typography>
-                <IconButton onClick={() => navigate(AnnouncementLinks.create)}><ControlPointIcon /></IconButton>
+                {canCreateAnnouncement() &&
+                    <IconButton onClick={() => navigate(AnnouncementLinks.create)}><ControlPointIcon /></IconButton>
+                }
             </Stack>
             <Grid container direction='column' wrap='nowrap' spacing={2} width="100%" mt={1} height="100">
                 {
@@ -100,6 +120,7 @@ export function ProfileAnnouncementsPage() {
                                     <Stack gap={1}>
                                         <Button size='small'
                                             variant='outlined'
+                                            disabled={!canCreateAnnouncement()}
                                             sx={{ fontSize: 12 }}
                                             color='info'
                                             onClick={() => navigate(AnnouncementLinks.toEdit(announcement.id))}

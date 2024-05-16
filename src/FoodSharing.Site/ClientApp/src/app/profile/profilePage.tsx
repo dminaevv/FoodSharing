@@ -7,7 +7,7 @@ import { enumToArrayNumber } from '../../tools/extensions/enumUtils';
 import Page from '../infrastructure/page';
 import { UserShortInfoCard } from '../users/userShortInfoCard';
 import { FavoritesPage } from './favouritesPage';
-import { ProfileAnnouncementsPage } from './profileAnnouncementPage';
+import { ProfileAnnouncementsPage } from './profileAnnouncementsPage';
 import { ProfileChatListPage } from './profileChatListPage';
 import { ProfileChatPage } from './profileChatPage';
 import { SettingsPage } from './profileSettingsPage';

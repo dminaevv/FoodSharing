@@ -99,7 +99,7 @@ export function AnnouncementCard(props: IProps) {
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap'
-                    }}>{props.announcement.address}</Typography>
+                    }}>{props.announcement.cityName}</Typography>
                 </Stack>
             </CardContent >
         </Card >

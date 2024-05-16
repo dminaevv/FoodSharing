@@ -1,8 +1,9 @@
-﻿using FoodSharing.Site.Models.Configurations;
-using FoodSharing.Site.Services.Announcements;
+﻿using FoodSharing.Site.Services.Announcements;
 using FoodSharing.Site.Services.Announcements.Repositories;
 using FoodSharing.Site.Services.Chat;
 using FoodSharing.Site.Services.Chat.Repositories;
+using FoodSharing.Site.Services.Cities;
+using FoodSharing.Site.Services.Cities.Repositories;
 using FoodSharing.Site.Services.Configurations;
 using FoodSharing.Site.Services.Configurations.Repositories;
 using FoodSharing.Site.Services.Files;
@@ -34,6 +35,7 @@ public static class ServicesConfigurator
         services.AddSingleton<IAnnouncementService, AnnouncementService>();
         services.AddSingleton<IConfigurationService, ConfigurationService>();
         services.AddSingleton<IChatService, ChatService>();
+        services.AddSingleton<ICityService, CityService>();
 
         #endregion Services
 
@@ -43,6 +45,7 @@ public static class ServicesConfigurator
         services.AddSingleton<IUsersRepository, UsersRepository>();
         services.AddSingleton<IAnnouncementRepository, AnnouncementRepository>();
         services.AddSingleton<IChatRepository, ChatRepository>();
+        services.AddSingleton<ICityRepository, CityRepository>();
 
         #endregion Repositories
 

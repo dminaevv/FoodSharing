@@ -8,13 +8,13 @@ public class Announcement
     public String Description  { get; }
     public Guid CategoryId  { get; }
     public String GramsWeight  { get; }
-    public String Address  { get; }
+    public Guid CityId  { get; }
     public String[] ImagesUrls  { get; }
     public DateTime CreatedAt  { get; }
 
     public Announcement(
-        Guid id, String name, Guid ownerUserId, String description, Guid categoryId,
-        String gramsWeight, String address, String[] imagesUrls, DateTime createdAt
+        Guid id, String name, Guid ownerUserId, String description, Guid categoryId, 
+        String gramsWeight, Guid cityId, String[] imagesUrls, DateTime createdAt
     )
     {
         Id = id;
@@ -23,7 +23,7 @@ public class Announcement
         Description = description;
         CategoryId = categoryId;
         GramsWeight = gramsWeight;
-        Address = address;
+        CityId = cityId;
         ImagesUrls = imagesUrls;
         CreatedAt = createdAt;
     }

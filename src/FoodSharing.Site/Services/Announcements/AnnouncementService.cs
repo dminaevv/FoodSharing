@@ -1,10 +1,11 @@
 ﻿using FoodSharing.Site.Models.Announcements;
+using FoodSharing.Site.Models.Cities;
 using FoodSharing.Site.Models.Files;
 using FoodSharing.Site.Models.Users;
 using FoodSharing.Site.Services.Announcements.Repositories;
+using FoodSharing.Site.Services.Cities;
 using FoodSharing.Site.Services.Files;
 using FoodSharing.Site.Services.Users;
-using FoodSharing.Site.Services.Users.Repositories.Models;
 using FoodSharing.Site.Tools.Extensions;
 using FoodSharing.Site.Tools.Types;
 using IConfiguration = FoodSharing.Site.Models.Configurations.IConfiguration;
@@ -17,16 +18,17 @@ public class AnnouncementService : IAnnouncementService
     private readonly IUsersService _usersService;
     private readonly IFileService _fileService;
     private readonly IConfiguration _configuration;
+    private readonly ICityService _cityService; 
 
     public AnnouncementService(
         IAnnouncementRepository announcementRepository, IUsersService usersService,
-        IFileService fileService, IConfiguration configuration
-    )
+        IFileService fileService, IConfiguration configuration, ICityService cityService)
     {
         _announcementRepository = announcementRepository;
         _usersService = usersService;
         _fileService = fileService;
         _configuration = configuration;
+        _cityService = cityService;
     }
 
     public void SaveView(Guid announcementId, User requestedUser)
@@ -37,6 +39,9 @@ public class AnnouncementService : IAnnouncementService
 
     public Result SaveAnnouncement(AnnouncementBlank blank, User requestedUser)
     {
+        if(!UserCanAccessToCreateAnnouncement(requestedUser)) return Result.Fail("Заполните необходимые параметры в профиле для публикации продукта");
+        if(!UserCanAccessToEditAnnouncement(blank, requestedUser)) return Result.Fail("У вас нет прав на редактирование данного продукта");
+
         PreprocessAnnouncementBlank(blank);
 
         Result validateAnnouncementBlankResult = ValidateAnnouncementBlank(blank, out AnnouncementBlank.Validated validated);
@@ -61,6 +66,23 @@ public class AnnouncementService : IAnnouncementService
         return Result.Success();
     }
 
+    private Boolean UserCanAccessToCreateAnnouncement(User requestedUser)
+    {
+        if (requestedUser.FirstName is null) return false; 
+        if (requestedUser.LastName is null) return false; 
+        if (requestedUser.Phone is null) return false; 
+
+        return true; 
+    }
+
+    private Boolean UserCanAccessToEditAnnouncement(AnnouncementBlank blank, User requestedUser)
+    {
+        if (blank.OwnerUserId != requestedUser.Id) return false; 
+
+        return true;
+    }
+
+
     private void PreprocessAnnouncementBlank(AnnouncementBlank blank)
     {
         blank.Id ??= Guid.NewGuid();
@@ -81,7 +103,7 @@ public class AnnouncementService : IAnnouncementService
         if (blank.Description.IsNullOrWhitespace()) return Result.Fail("Заполните описание");
         if (blank.CategoryId is not { } categoryId) return Result.Fail("Укажите категорию для объявления");
         if (blank.GramsWeight is not { } weight) return Result.Fail("Укажите вес");
-        if (blank.Address is not { } address|| address.IsNullOrWhitespace()) return Result.Fail("Укажите адрес");
+        if (blank.CityId is not { } cityId) return Result.Fail("Укажите город");
 
         if (weight <= 0) return Result.Fail("Укажите корректное количество");
 
@@ -103,7 +125,7 @@ public class AnnouncementService : IAnnouncementService
 
         validated = new AnnouncementBlank.Validated(
                 id, blank.Name, ownerUserId, blank.Description,
-                categoryId, weight, address, blank.ImagesUrls!, blank.UploadPhotos ?? Array.Empty<IFormFile>()
+                categoryId, weight, cityId, blank.ImagesUrls!, blank.UploadPhotos ?? Array.Empty<IFormFile>()
         );
 
         return Result.Success();
@@ -116,11 +138,16 @@ public class AnnouncementService : IAnnouncementService
             ? _announcementRepository.GetFavoriteAnnouncements(id)
             : Array.Empty<Announcement>();
 
+        Guid[] citiesIds = announcements.Values.Select(a => a.CityId).ToArray();
+        City[] cities = _cityService.GetCities(citiesIds); 
+
         AnnouncementShortInfo[] announcementInfo = announcements.Values
             .Select(announcement =>
             {
                 Boolean isFavorite = favoriteAnnouncements.Any(a => announcement.Id == a.Id);
-                return new AnnouncementShortInfo(announcement, isFavorite);
+                City city = cities.First(c => c.Id == announcement.CityId); 
+
+                return new AnnouncementShortInfo(announcement, city.Name, isFavorite); 
             })
             .ToArray();
 
@@ -153,9 +180,10 @@ public class AnnouncementService : IAnnouncementService
         Announcement announcement = _announcementRepository.GetAnnouncement(announcementId).NotNullOrThrow();
         User owner = _usersService.GetUser(announcement.OwnerUserId).NotNullOrThrow();
         AnnouncementCategory category = GetAnnouncementCategory(announcement.CategoryId);
+        City city = _cityService.GetCity(announcement.CityId);
         Boolean isFavorite = GetFavoriteAnnouncement(announcementId, requestedUserId) is not null; 
 
-        return new AnnouncementDetailInfo(announcement, owner, category, isFavorite); 
+        return new AnnouncementDetailInfo(announcement, owner, category, city.Name, isFavorite); 
     }
 
     public Announcement[] GetAnnouncements(Guid userId)
@@ -171,16 +199,19 @@ public class AnnouncementService : IAnnouncementService
     public PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo(Guid? userId, Int32 page, Int32 pageSize, Guid? requestedUserId)
     {
         PagedResult<Announcement> announcements = _announcementRepository.GetAnnouncements(userId, page, pageSize);
-        
         Announcement[] favoriteAnnouncements = requestedUserId is { } id
             ? _announcementRepository.GetFavoriteAnnouncements(id)
             : Array.Empty<Announcement>();
 
+        Guid[] citiesIds = announcements.Values.Select(a => a.CityId).ToArray();
+        City[] cities = _cityService.GetCities(citiesIds);
+
         AnnouncementShortInfo[] announcementInfo = announcements.Values
             .Select(announcement =>
             {
+                City city = cities.First(c => c.Id == announcement.CityId);
                 Boolean isFavorite = favoriteAnnouncements.Any(a => announcement.Id == a.Id);
-                return new AnnouncementShortInfo(announcement, isFavorite);
+                return new AnnouncementShortInfo(announcement, city.Name, isFavorite);
             })
             .ToArray();
 
@@ -230,8 +261,15 @@ public class AnnouncementService : IAnnouncementService
 
     public AnnouncementShortInfo[] GetFavoriteAnnouncementsShortInfo(Guid userId)
     {
-        var favoriteAnnouncements = GetFavoriteAnnouncements(userId);
-        return favoriteAnnouncements.Select(announcement => new AnnouncementShortInfo(announcement, isFavorite: true)).ToArray();
+        Announcement[] favoriteAnnouncements = GetFavoriteAnnouncements(userId);
+        Guid[] citiesIds = favoriteAnnouncements.Select(a => a.CityId).ToArray();
+        City[] cities = _cityService.GetCities(citiesIds);
+
+        return favoriteAnnouncements.Select(announcement =>
+        {
+            City city = cities.First(c => c.Id == announcement.CityId);
+            return new AnnouncementShortInfo(announcement, city.Name, isFavorite: true); 
+        }).ToArray();
     }
 
     public void RemoveFavoriteAnnouncement(Guid announcementId, Guid userId)
