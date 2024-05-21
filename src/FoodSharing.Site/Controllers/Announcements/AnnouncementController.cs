@@ -38,10 +38,11 @@ public class AnnouncementController : BaseController
         return _announcementService.SaveAnnouncement(blank, SystemUser.User); 
     }
 
-    [HttpGet("/announcement/search")]
-    public PagedResult<AnnouncementShortInfo> Search([FromQuery] String searchText, [FromQuery] Int32 page, [FromQuery] Int32 pageSize)
+    public record SearchRequest(String? SearchText, Guid? CategoryId, Guid? CityId, Int32 Page, Int32 PageSize);
+    [HttpPost("/announcement/search")]
+    public PagedResult<AnnouncementShortInfo> Search([FromBody] SearchRequest request)
     {
-        return _announcementService.Search(searchText, page, pageSize, SystemUser.Id);
+        return _announcementService.Search(request.SearchText, request.CategoryId, request.CityId, request.Page, request.PageSize, SystemUser.Id);
     }
 
     public record GetAnnouncementRequest(Guid Id);

@@ -122,7 +122,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             .ToArray();
     }
 
-    public PagedResult<Announcement> Search(String searchText, Int32 page, Int32 pageSize)
+    public PagedResult<Announcement> Search(String? searchText, Guid? categoryId, Guid? cityId, Int32 page, Int32 pageSize)
     {
         (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize);
 
@@ -131,7 +131,9 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             FROM (
                 SELECT *
                 FROM announcements
-                WHERE name % @searchText OR description % @searchText
+                WHERE (@searchText IS NULL OR (name % @searchText OR description % @searchText))
+                AND (@categoryId IS NULL OR categoryid = @categoryId )
+                AND (@cityId IS NULL OR cityid = @cityId)
                 AND isremoved = false
                 ORDER BY createddatetimeutc
                 OFFSET @offset
@@ -140,7 +142,21 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
 
         NpgsqlParameter[] parameters =
         {
-            new("searchText", searchText),
+            new("searchText", NpgsqlTypes.NpgsqlDbType.Text)
+            {
+                Value = searchText ?? (Object)DBNull.Value,
+                IsNullable = true
+            },
+            new("categoryId", NpgsqlTypes.NpgsqlDbType.Uuid)
+            {
+                Value = categoryId ?? (Object)DBNull.Value,
+                IsNullable = true
+            },
+            new("cityId", NpgsqlTypes.NpgsqlDbType.Uuid)
+            {
+                Value = cityId ?? (Object)DBNull.Value,
+                IsNullable = true
+            },
             new("offset", offset),
             new("limit", limit)
         };

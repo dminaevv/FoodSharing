@@ -10,7 +10,7 @@ public interface IAnnouncementService
 
     void SaveView(Guid announcementId, User requestedUser);
     Result SaveAnnouncement(AnnouncementBlank blank, User requestedUser);
-    PagedResult<AnnouncementShortInfo> Search(String searchText, Int32 page, Int32 pageSize, Guid? requestedUserId);
+    PagedResult<AnnouncementShortInfo> Search(String? searchText, Guid? categoryId, Guid? cityId, Int32 page, Int32 pageSize, Guid? requestedUserId);
     Announcement? GetAnnouncement(Guid announcementId);
     AnnouncementStatistics[] GetAnnouncementsStatistics(Guid[] announcementIds);
     AnnouncementDetailInfo GetAnnouncementInfo(Guid announcementId, Guid requestedUserId);

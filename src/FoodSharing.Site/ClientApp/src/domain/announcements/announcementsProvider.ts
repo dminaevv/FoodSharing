@@ -15,8 +15,8 @@ export class AnnouncementsProvider {
         return mapToResult(any);
     }
 
-    public static async search(searchText: string, page: number, pageSize: number): Promise<PagedResult<AnnouncementShortInfo>> {
-        const any = await HttpClient.get("/announcement/search", { searchText, page, pageSize });
+    public static async search(searchText: string | null, categoryId: string | null, cityId: string | null, page: number, pageSize: number): Promise<PagedResult<AnnouncementShortInfo>> {
+        const any = await HttpClient.post("/announcement/search", { searchText, categoryId, cityId, page, pageSize });
 
         const totalRows = any.totalRows;
         const values = (any.values as Announcement[]).map(v => mapToAnnouncementShortInfo(v))

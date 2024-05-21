@@ -58,7 +58,7 @@ export function ProfileAnnouncementsPage() {
     }
 
     return (
-        <Box>
+        <Box sx={{ height: "100%" }}>
             {!canCreateAnnouncement() &&
                 <Alert severity="warning">Для того, чтобы разместить свой продукт, необходимо заполнить обязательные поля в профиле:
                     {systemUser?.user.firstName == null && <Typography variant='body2'>- Имя</Typography>}
@@ -72,7 +72,7 @@ export function ProfileAnnouncementsPage() {
                     <IconButton onClick={() => navigate(AnnouncementLinks.create)}><ControlPointIcon /></IconButton>
                 }
             </Stack>
-            <Grid container direction='column' wrap='nowrap' spacing={2} width="100%" mt={1} height="100">
+            <Grid container direction='column' wrap='nowrap' spacing={2} width="100%" mt={1} sx={{ height: "100%", overflowY: "auto" }}>
                 {
                     announcements.map(announcement => {
                         const announcementsStatistic = announcementsStatistics.find(s => s.announcementId == announcement.id);

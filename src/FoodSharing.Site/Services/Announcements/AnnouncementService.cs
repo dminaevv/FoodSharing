@@ -131,9 +131,10 @@ public class AnnouncementService : IAnnouncementService
         return Result.Success();
     }
 
-    public PagedResult<AnnouncementShortInfo> Search(String searchText, Int32 page, Int32 pageSize, Guid? requestedUserId)
+    public PagedResult<AnnouncementShortInfo> Search(String? searchText, Guid? categoryId, Guid? cityId, Int32 page, Int32 pageSize, Guid? requestedUserId)
     {
-        PagedResult<Announcement> announcements = _announcementRepository.Search(searchText, page, pageSize);
+        PagedResult<Announcement> announcements = _announcementRepository.Search(searchText, categoryId, cityId, page, pageSize);
+
         Announcement[] favoriteAnnouncements = requestedUserId is { } id
             ? _announcementRepository.GetFavoriteAnnouncements(id)
             : Array.Empty<Announcement>();

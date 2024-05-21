@@ -20,9 +20,9 @@ export default function Page(props: IProps & PropsWithChildren) {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
-        <Box display='flex' flexDirection='column' height="100vh" width="100%" sx={{ ...props.sx }}>
+        <Box display='flex' flexDirection='column' height="100vh" width="100%" sx={{ ...props.sx, overflow: 'hidden' }}>
             <Header sx={{ mx: 2, mt: 2, display: { xs: 'none', md: 'block' } }} />
-            <Box sx={{ height: "100%" }}>
+            <Box sx={{ height: "100%", overflowY: 'auto' }}>
                 {props.children}
             </Box>
             {
