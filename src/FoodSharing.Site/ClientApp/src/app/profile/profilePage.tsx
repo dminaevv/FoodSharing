@@ -7,8 +7,7 @@ import { enumToArrayNumber } from '../../tools/extensions/enumUtils';
 import Page from '../infrastructure/page';
 import { UserShortInfoCard } from '../users/userShortInfoCard';
 import { FavoritesPage } from './favouritesPage';
-import { FeedbacksPage } from './feedbacksPage';
-import { ProfileAnnouncementPage } from './profileAnnouncementPage';
+import { ProfileAnnouncementsPage } from './profileAnnouncementsPage';
 import { ProfileChatListPage } from './profileChatListPage';
 import { ProfileChatPage } from './profileChatPage';
 import { SettingsPage } from './profileSettingsPage';
@@ -17,7 +16,6 @@ enum PageType {
     Announcement,
     Chats,
     Chat,
-    Feedbacks,
     Favourites,
     Settings
 }
@@ -37,10 +35,9 @@ export function ProfilePage() {
 
     function getPageTypeDisplayName(pageType: PageType) {
         switch (pageType) {
-            case PageType.Announcement: return "Мои объявления";
+            case PageType.Announcement: return "Мои продукты";
             case PageType.Chats: return "Мои сообщения";
             case PageType.Chat: return "Переписка";
-            case PageType.Feedbacks: return "Мои отзывы";
             case PageType.Favourites: return "Избранное";
             case PageType.Settings: return "Настройки";
 
@@ -53,7 +50,6 @@ export function ProfilePage() {
             case PageType.Announcement: return "profile/announcements";
             case PageType.Chats: return "profile/chats";
             case PageType.Chat: return "profile/chat";
-            case PageType.Feedbacks: return "profile/feedbacks";
             case PageType.Favourites: return "profile/favorites";
             case PageType.Settings: return "profile/settings";
 
@@ -66,7 +62,6 @@ export function ProfilePage() {
             case "/profile/announcements": return PageType.Announcement;
             case "/profile/chats": return PageType.Chats;
             case "/profile/chat": return PageType.Chat;
-            case "/profile/feedbacks": return PageType.Feedbacks;
             case "/profile/favorites": return PageType.Favourites;
             case "/profile/settings": return PageType.Settings;
         }
@@ -77,7 +72,6 @@ export function ProfilePage() {
             case PageType.Announcement: return true;
             case PageType.Chats: return true;
             case PageType.Chat: return false;
-            case PageType.Feedbacks: return true;
             case PageType.Favourites: return true;
             case PageType.Settings: return true;
 
@@ -87,7 +81,7 @@ export function ProfilePage() {
 
     return (
         <Page>
-            <Grid container>
+            <Grid container sx={{ height: "100%" }}>
                 <Grid item xs={3} sx={{ display: { xs: 'none', md: 'block' }, p: 2 }}>
                     <UserShortInfoCard user={user} />
                     <Divider />
@@ -109,13 +103,12 @@ export function ProfilePage() {
                         }
                     </Box>
                 </Grid>
-                <Grid item xs={12} md={9} sx={{ p: 2, height: '100%' }}>
+                <Grid item xs={12} md={9} sx={{ p: 2, height: '100%', overflow: 'hidden' }}>
                     <Routes>
-                        <Route path="/announcements" element={<ProfileAnnouncementPage />} />
+                        <Route path="/announcements" element={<ProfileAnnouncementsPage />} />
                         <Route path="/chats" element={<ProfileChatListPage />} />
                         <Route path="/chat/:chatId" element={<ProfileChatPage />} />
                         <Route path="/chat/announcement/:announcementId" element={<ProfileChatPage />} />
-                        <Route path="/feedbacks" element={<FeedbacksPage />} />
                         <Route path="/favorites" element={<FavoritesPage />} />
                         <Route path="/settings" element={<SettingsPage />} />
                     </Routes>

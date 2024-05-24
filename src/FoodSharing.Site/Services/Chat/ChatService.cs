@@ -2,7 +2,6 @@
 using FoodSharing.Site.Models.Chats;
 using FoodSharing.Site.Models.Users;
 using FoodSharing.Site.Services.Announcements;
-using FoodSharing.Site.Services.Announcements.Repositories.Models;
 using FoodSharing.Site.Services.Chat.Repositories;
 using FoodSharing.Site.Services.Users;
 using FoodSharing.Site.Tools.Types;

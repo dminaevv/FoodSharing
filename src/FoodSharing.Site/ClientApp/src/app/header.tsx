@@ -35,7 +35,7 @@ export function Header(props: IProps & PropsWithChildren) {
 
     return (
         <Box sx={props.sx}>
-            <Grid container spacing={3} sx={{ mb: { xs: 2, sm: 2 } }}>
+            <Grid container spacing={3} sx={{ mb: { xs: 0, sm: 2 } }}>
                 <Grid item xs={0} sm={1} md={3} sx={{ display: { xs: 'none', sm: 'flex' }, cursor: 'pointer' }} alignItems='center' onClick={() => navigate(InfrastructureLinks.home)}>
                     <Stack gap={1} direction='row' alignItems='center'>
                         <img src={logo} width='50px' />

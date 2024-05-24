@@ -83,6 +83,8 @@ export function ProfileChatPage() {
     };
 
     function startConnection() {
+        if (chatIdState == null) return;
+
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`/chat?chatId=${chatIdState}`)
             .build();
@@ -124,34 +126,37 @@ export function ProfileChatPage() {
         }
     };
 
+
     return (
-        <Stack direction="column" gap={1.5} overflow='hidden' width="100%" maxHeight="85vh" >
-            {
-                announcement != null &&
-                <Stack sx={{
-                    margin: 0.2,
-                    borderRadius: "10px",
-                }}>
-                    <Paper sx={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)", height: '100%' }}>
-                        <Stack direction='row' gap={2} p={1}>
-                            <Box sx={{ width: "60px" }}>
-                                <img src={announcement.imagesUrls[0]} style={{ width: "100%", objectFit: 'contain' }} alt="announcement" />
-                            </Box>
-                            <Stack>
-                                <CLink text={announcement.name} href={AnnouncementLinks.toAnnouncement(announcement.id)} sx={{
-                                    lineHeight: 1, overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                    lineHeightStep: 1
-                                }} />
-                                <Typography fontSize={14} sx={{ color: '#808080', lineHeight: 2 }}>{announcement.description}</Typography>
+        <Stack sx={{ height: '100%', overflow: 'hidden' }} gap={2}>
+            <Stack sx={{ height: "80px" }}>
+                {
+                    announcement != null &&
+                    <Stack sx={{
+                        margin: 0.2,
+                        borderRadius: "10px",
+                    }}>
+                        <Paper sx={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)", height: '100%' }}>
+                            <Stack direction='row' gap={2} p={1}>
+                                <Box sx={{ width: "60px" }}>
+                                    <img src={announcement.imagesUrls[0]} style={{ width: "100%", objectFit: 'contain' }} alt="announcement" />
+                                </Box>
+                                <Stack>
+                                    <CLink text={announcement.name} href={AnnouncementLinks.toAnnouncement(announcement.id)} sx={{
+                                        lineHeight: 1, overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        lineHeightStep: 1
+                                    }} />
+                                    <Typography fontSize={14} sx={{ color: '#808080', lineHeight: 2 }}>{announcement.description}</Typography>
+                                </Stack>
                             </Stack>
-                        </Stack>
-                    </Paper>
-                </Stack>
-            }
-            <Stack direction='column' gap={1.5} sx={{ height: "100%", width: '100%', overflow: 'hidden', maxHeight: '100%' }}>
-                <Stack direction='column' gap={1} sx={{ width: '100%', flex: '1 1 auto', overflowY: "auto", }}>
+                        </Paper>
+                    </Stack>
+                }
+            </Stack>
+            <Stack sx={{ overflowY: 'auto', height: "100%" }}>
+                <Stack direction='column' gap={1}>
                     {messages.length > 0
                         ? messages.map((message, index) => {
                             const member = members.find(m => m.id === message.createdUserId)!;
@@ -176,21 +181,25 @@ export function ProfileChatPage() {
                     }
                     <div ref={messagesEndRef} />
                 </Stack>
-                <Stack>
-                    <TextField
-                        label="Сообщение"
-                        variant="outlined"
-                        fullWidth
-                        value={messageBlank.content ?? ''}
-                        onKeyDown={onKeyDown}
-                        multiline
-                        maxRows={10}
-                        onChange={(e) => setMessageBlank(prev => ({ ...prev, content: e.target.value }))}
-                        style={{ marginBottom: '10px' }}
-                    />
-                    <Button variant="contained" onClick={onSendMessage}>
-                        Отправить
-                    </Button>
+            </Stack>
+            <Stack sx={{ height: "105px" }}>
+                <Stack direction='column' gap={1.5}>
+                    <Stack sx={{ height: '105px' }}>
+                        <TextField
+                            label="Сообщение"
+                            variant="outlined"
+                            fullWidth
+                            value={messageBlank.content ?? ''}
+                            onKeyDown={onKeyDown}
+                            multiline
+                            maxRows={10}
+                            onChange={(e) => setMessageBlank(prev => ({ ...prev, content: e.target.value }))}
+                            style={{ marginBottom: '10px' }}
+                        />
+                        <Button variant="contained" onClick={onSendMessage}>
+                            Отправить
+                        </Button>
+                    </Stack>
                 </Stack>
             </Stack>
         </Stack>

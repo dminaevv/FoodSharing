@@ -8,6 +8,7 @@ export class AnnouncementDetailInfo {
         public description: string,
         public category: AnnouncementCategory,
         public gramsWeight: number,
+        public cityName: string,
         public imagesUrls: string[],
         public owner: User,
         public isFavorite: boolean
@@ -21,6 +22,7 @@ export function mapToAnnouncementDetailInfo(data: any) {
         data.description,
         mapToAnnouncementCategory(data.category),
         data.gramsWeight,
+        data.cityName,
         data.imagesUrls,
         mapToUser(data.owner),
         data.isFavorite

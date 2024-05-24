@@ -1,0 +1,285 @@
+-- public.announcementcategories определение
+
+-- Drop table
+
+-- DROP TABLE announcementcategories;
+
+CREATE TABLE announcementcategories (
+	id uuid NOT NULL,
+	"name" varchar NOT NULL,
+	iconurl varchar NOT NULL,
+	CONSTRAINT announcementcategories_pkey PRIMARY KEY (id)
+);
+
+
+-- public.announcements определение
+
+-- Drop table
+
+-- DROP TABLE announcements;
+
+CREATE TABLE announcements (
+	id uuid NOT NULL,
+	"name" varchar NOT NULL,
+	owneruserid uuid NOT NULL,
+	description varchar NOT NULL,
+	categoryid uuid NOT NULL,
+	gramsweight float8 NOT NULL,
+	imagesurls _varchar NOT NULL,
+	createduserid uuid NOT NULL,
+	modifieduserid uuid NULL,
+	createddatetimeutc timestamp NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	isremoved bool NOT NULL,
+	cityid uuid NOT NULL,
+	CONSTRAINT announcement_pkey PRIMARY KEY (id)
+);
+
+
+-- public.announcementviews определение
+
+-- Drop table
+
+-- DROP TABLE announcementviews;
+
+CREATE TABLE announcementviews (
+	announcementid uuid NOT NULL,
+	userviewerid uuid NOT NULL,
+	viewingdatetimeutc timestamp NOT NULL,
+	CONSTRAINT announcementviews_pkey PRIMARY KEY (announcementid, userviewerid)
+);
+
+
+-- public.chats определение
+
+-- Drop table
+
+-- DROP TABLE chats;
+
+CREATE TABLE chats (
+	id uuid NOT NULL,
+	memberids _uuid NOT NULL,
+	announcementid uuid NULL,
+	createddatetimeutc timestamp NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	isremoved bool NOT NULL,
+	lastmessageid uuid NOT NULL,
+	CONSTRAINT dialogs_pkey PRIMARY KEY (id)
+);
+
+
+-- public.configurationsettings определение
+
+-- Drop table
+
+-- DROP TABLE configurationsettings;
+
+CREATE TABLE configurationsettings (
+	"key" varchar(100) NOT NULL,
+	value text NOT NULL,
+	CONSTRAINT configurationsettings_pkey PRIMARY KEY (key)
+);
+
+
+-- public.confirmationcodes определение
+
+-- Drop table
+
+-- DROP TABLE confirmationcodes;
+
+CREATE TABLE confirmationcodes (
+	email varchar NOT NULL,
+	code int4 NOT NULL,
+	expirationdatetimeutc timestamp NULL
+);
+
+
+-- public.favoriteannouncements определение
+
+-- Drop table
+
+-- DROP TABLE favoriteannouncements;
+
+CREATE TABLE favoriteannouncements (
+	announcementid uuid NOT NULL,
+	userid uuid NOT NULL,
+	additiondatetimeutc timestamp NOT NULL,
+	CONSTRAINT favoriteannouncements_pkey PRIMARY KEY (announcementid, userid)
+);
+
+
+-- public.messages определение
+
+-- Drop table
+
+-- DROP TABLE messages;
+
+CREATE TABLE messages (
+	id uuid NOT NULL,
+	chatid uuid NOT NULL,
+	"content" varchar NOT NULL,
+	createduserid uuid NOT NULL,
+	createddatetimeutc timestamp NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	isremoved bool NOT NULL,
+	CONSTRAINT messages_pkey PRIMARY KEY (id)
+);
+
+
+-- public.tokens определение
+
+-- Drop table
+
+-- DROP TABLE tokens;
+
+CREATE TABLE tokens (
+	"token" varchar NOT NULL,
+	userid uuid NOT NULL,
+	expirationdatetimeutc timestamp NOT NULL,
+	createddatetimeutc timestamp DEFAULT now() NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	CONSTRAINT tokens_pkey PRIMARY KEY (token)
+);
+
+
+-- public.users определение
+
+-- Drop table
+
+-- DROP TABLE users;
+
+CREATE TABLE users (
+	id uuid NOT NULL,
+	email varchar NOT NULL,
+	passwordhash varchar NOT NULL,
+	firstname varchar NULL,
+	lastname varchar NULL,
+	phone varchar NULL,
+	avatarurl varchar NULL,
+	createduserid uuid NOT NULL,
+	modifieduserid uuid NULL,
+	createddatetimeutc timestamp NOT NULL,
+	modifieddatetimeutc timestamp NULL,
+	isremoved bool NOT NULL,
+	CONSTRAINT users_pkey PRIMARY KEY (id)
+);
+
+
+-- public.cities определение
+
+-- Drop table
+
+-- DROP TABLE cities;
+
+CREATE TABLE cities (
+	id uuid NOT NULL,
+	"name" varchar NOT NULL,
+	CONSTRAINT cities_pk PRIMARY KEY (id)
+);
+
+INSERT INTO cities (id, "name")
+VALUES
+   ('8c3e58e1-9aed-40b0-8642-412a1eb4200e', 'Калининград'),
+('b5d0ceeb-c7cf-48db-b6ac-7168700e9f87', 'Краснодар'),
+('6bc03728-5e18-4026-9f12-4859a07a61ca', 'Белгород'),
+('6f8caea8-e42e-4aed-a2c0-719a5c9fe639', 'Домодедово'),
+('b0616ab6-7a39-4aef-b452-d879cdbc72e9', 'Иркутск'),
+('563f96d7-f1f0-4b2a-8718-e0967e1da27e', 'Химки'),
+('ee47e224-300c-4ee9-99e6-e3e13fde9b4e', 'Подольск'),
+('f42bb0ff-d3ba-46f0-aee2-0d74318d41ec', 'Екатеринбург'),
+('8155ba86-666d-4c9f-8d8c-7078e1d071bf', 'Обнинск'),
+('61a9f822-660d-4ed5-a6e1-1d3ff8423e0b', 'Тюмень'),
+('0d77dc9a-10a6-4299-a515-e6e42a4c1a1b', 'Ростов-на-Дону'),
+('483eea90-4102-4adb-81de-540da2fd0ced', 'Челябинск'),
+('1d22e14e-4211-4f89-9856-1c7031c2fe70', 'Томск'),
+('ce5984a0-8019-426b-9864-3dedde8966eb', 'Самара'),
+('1c66388c-1172-4731-9205-bb89e8cf5ef2', 'Новосибирск'),
+('e167b5e8-a43b-4117-9ad8-570b614356e1', 'Сочи'),
+('204f2315-f341-4720-8185-c9221323e133', 'Казань'),
+('94989bce-64bf-4c61-9b59-9fcb949b4b49', 'Сургут'),
+('fecc46c0-3662-4957-807f-0b05d0a16c3f', 'Междуреченск'),
+('45ac5f5d-04bd-4382-ace5-a207d467a772', 'Коломна'),
+('e3d8b1c4-ae64-4c76-b899-adb8e5f60b2b', 'Пермь'),
+('c48e8ba0-366d-4a12-ad82-5061f3dd0ac7', 'Ярославль'),
+('a747f751-1dc9-4882-978f-9bc5eeaa6989', 'Липецк'),
+('dbbc9052-e35a-4b3b-9cf4-5452997a3c9b', 'Калуга'),
+('8c302f17-2877-4279-9453-b3905502a5b1', 'Тула'),
+('53a821ca-f438-4d78-9a86-bff1038942a4', 'Старый Оскол'), 
+('274a82aa-4f9f-41d2-bfc7-4702544051c8', 'Ухта'),
+('8966481b-df17-46ef-b96a-0236d63e1d5a', 'Новороссийск'),
+('3532d2ce-a40e-4428-a025-8d20b0260222', 'Новотроицк'),
+('c7e9b9e5-5f98-4d99-847d-e2f80d62bf96', 'Норильск'),
+('2c5ae4bd-6a03-4fdb-a5bb-64e8e1243127', 'Саратов'),
+('ad4230f8-8fee-4e1c-9286-5a27acced5aa', 'Владивосток'),
+('63a5ae98-13eb-4502-bb85-d242f2535118', 'Новый Уренгой'), 
+('fe13f7b7-4685-4303-ab84-78de5fb428ae', 'Братск'),
+('746ddc28-eda6-4267-81f7-e45f9102e08f', 'Омск'),
+('997fd084-cac0-4a44-a075-38468b33a6cd', 'Красноярск'),
+('d0eeff9c-5719-4091-b6f9-6220aec2e559', 'Серпухов'),
+('1e3025f4-251d-4949-b3ff-9d5271d8d582', 'Петропавловск-Камчатский'),
+('e103f532-fc58-433a-a75e-dff91014078c', 'Новокузнецк'),
+('f6f0f229-2c80-4ad7-849e-360faba1e8fc', 'Нижний Новгород'), 
+('3332fe50-05d5-4fd5-9c43-2b1b1bc06fe8', 'Магнитогорск'),
+('6b82405a-2dba-485c-b394-cb80e910eb60', 'Великий Новгород'), 
+('c55082bc-3908-4937-b4b3-6259d6df0cd4', 'Миасс'),
+('01fffacf-04d5-493f-870a-a66231b47246', 'Хабаровск'),
+('f98448fe-8147-4085-87b8-d6926fe6cc41', 'Череповец'),
+('7825b65a-3c05-4814-84e8-386da91b655e', 'Владикавказ'),
+('29db2b85-4125-48d1-a864-0a81b866ca2c', 'Якутск'),
+('6ae94e0f-b023-40f3-b843-2f17c1ec8242', 'Благовещенск'),
+('71a0d8d6-633c-4414-aa5d-deaedf0f9cf2', 'Королев'),
+('1d43a7e5-00f5-4dbf-a526-d722b893d2ab', 'Воронеж'),
+('a593b2be-e268-478d-9a40-88aa6551d741', 'Волгодонск'),
+('80ee45e1-92d3-42f8-9bc1-e8e3dbf68c3c', 'Уфа'),
+('e455be64-aa0c-4234-b5e8-1f8fff0d51b8', 'Нижневартовск'),
+('acd00c5b-3f3c-48e6-b504-f27218451153', 'Кемерово'),
+('f5dcde9b-70d7-4dca-8dc1-3524bba5d635', 'Орел'),
+('c0cdbd4d-2ecd-4026-89e4-1f0a5f773c3e', 'Чебоксары'),
+('510f8f4b-8834-4fda-806d-2ba104afb464', 'Архангельск'),
+('60f1acc6-21fd-4bc3-99b8-547b93bfe16e', 'Ленинск -Кузнецкий'),
+('dd8a9cdd-adfb-45be-ae18-da66982ef32f', 'Нижнекамск'),
+('01304993-d002-4d31-b644-ef2f5a6ebeeb', 'Владимир'),
+('b1ae6fec-8375-414b-9d03-0f246a2738a0', 'Сыктывкар'),
+('1adef224-5cca-4cf9-a01d-bc2270c3311d', 'Рыбинск'),
+('7a511a50-d7a8-4bce-94c1-ef0c0e870870', 'Рязань'),
+('1bc02d23-023d-491f-ad3c-78c0e9c11559', 'Ставрополь'),
+('92efff56-966c-48a9-96a4-c28d1da8d6e0', 'Южно-Сахалинск'),
+('a1a92497-e00c-467f-973c-47f93268c8a7', 'Мурманск'),
+('d217ffd1-4940-431f-b328-bdab05b6c2fb', 'Тверь'),
+('9de3df2a-d406-4527-abc7-86d252c958d4', 'Киров'),
+('877a3921-011f-4552-b762-aedd172a03f9', 'Тамбов'),
+('d8e905e8-325c-4014-a182-567cefe3ce1d', 'Курск'),
+('d220c8a2-af2a-4be1-ad70-3b86a0aa86a1', 'Каменск-Уральский'),
+('86c109c6-d3cf-4260-9266-d2ebfa56f550', 'Пенза'),
+('26edd93c-c449-434c-afcf-109b8e529177', 'Дзержинск'),
+('1d82d556-6584-4a78-8082-2558aecce5fb', 'Смоленск'),
+('3a0cfd73-198a-4be4-b7f4-0ad0f6bcbf0c', 'Ангарск'),
+('5f61febd-7a39-42d2-8ffd-ac5213b237b4', 'Новокуйбышевск'),
+('6a627338-885d-41ff-9b8a-1297996e8372', 'Пятигорск'),
+('37db113c-f837-479e-b943-664d4d0d1691', 'Петрозаводск'),
+('a9aac075-93a8-4a94-9bf6-f1286cd8006b', 'Киселевск'),
+('9dc781c5-8f78-4f0f-a746-b49e12686f28', 'Арзамас'),
+('17f096fc-0b43-4f33-aab5-549b2ba8c7e7', 'Нижний Тагил'), 
+('df84c021-296c-4893-9a43-8457339d4dce', 'Елец'),
+('28af04f1-aa04-41a3-b15c-0ae07fb140a5', 'Ижевск'),
+('ff857146-e933-4f16-97f2-bd77b3258dd8', 'Астрахань'),
+('6643f1f5-388e-4e80-9474-f072fb92716e', 'Новочеркасск'),
+('900bae09-a0ef-4061-8f11-0396adc18495', 'Набережные Челны'), 
+('58120f17-1f62-4191-895e-e5a3222667ed', 'Тольятти'),
+('293a8355-10d1-4c5e-9783-93696587e1c1', 'Новомосковск'),
+('f5513b7c-2673-4715-b6b8-ac4131ba2a50', 'Березники'),
+('0dc3a118-0fd3-4ea0-8e16-34b46e70389b', 'Элиста'),
+('8f0015fe-62ad-4ad5-809f-f00618632516', 'Волгоград'),
+('ed7d8477-9542-4260-8c8a-4591804a58c2', 'Первоуральск'),
+('083060aa-5fb2-4f70-9a2b-1016f7122b85', 'Салават'),
+('210456ee-33da-4fa5-a0da-7644bbe7b68d', 'Батайск'),
+('50238e6a-e00a-4b66-97ea-cdf41dd05d4d', 'Таганрог'),
+('1840ed60-ff5b-4ad8-86c8-54b7ee622d5d', 'Майкоп'),
+('bd8ac5c0-2f94-4ecb-9727-64a5cc2b45d1', 'Находка'),
+('8871d135-695a-4746-ae5c-12d8099532f4', 'Абакан'),
+('47b5c9e0-f081-4735-895b-e3e20a34f25a', 'Новочебоксарск'),
+('91239d2f-9bd1-4387-946b-a8d9ccc8d6cb', 'Оренбург');
+
+
+
+

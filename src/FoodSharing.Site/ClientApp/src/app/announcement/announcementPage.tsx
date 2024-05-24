@@ -56,7 +56,7 @@ export function AnnouncementPage() {
                 announcementInfo != null
                     ?
                     <Box sx={{ p: 2 }}>
-                        <Grid container spacing={2}>
+                        <Grid container spacing={2} direction={{ xs: 'column', md: 'row' }}>
                             <Grid item xs={8}>
                                 <Stack gap={2}>
                                     <Stack direction='row'>
@@ -109,17 +109,8 @@ export function AnnouncementPage() {
                                     <Grid item>
                                         <Stack gap={2}>
                                             <Box>
-                                                {/* <Typography variant='h5' mb={1} fontWeight='bold'>Адрес</Typography>
-                                                <YMaps>
-                                                    <Map
-                                                        defaultState={{ center: [55.75, 37.57], zoom: 9 }}
-                                                        width="100%"
-                                                        height="400px"
-                                                    >
-                                                        <Placemark geometry={[55.75, 37.57]} />
-                                                        <SearchControl options={{ float: 'right' }} />
-                                                    </Map>
-                                                </YMaps> */}
+                                                <Typography variant='h5' mb={1} fontWeight='bold'>Город: </Typography>
+                                                <Typography>{announcementInfo.cityName}</Typography>
                                             </Box>
                                             <Box>
                                                 <Typography variant='h5' mb={1} fontWeight='bold'>Описание</Typography>
@@ -159,7 +150,7 @@ export function AnnouncementPage() {
                         </Grid>
                     </Box>
                     :
-                    <Typography>Такого объявления нет!</Typography>
+                    <Typography>Такого продукта нет!</Typography>
             }
         </Page>
 

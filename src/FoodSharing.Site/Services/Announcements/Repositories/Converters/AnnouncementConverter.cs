@@ -11,7 +11,7 @@ public static class AnnouncementConverter
 
         return new Announcement(
             db.Id, db.Name, db.OwnerUserId, db.Description,
-            db.CategoryId, db.GramsWeight, imagesUrls, db.CreatedDateTimeUtc
+            db.CategoryId, db.GramsWeight, db.CityId, imagesUrls, db.CreatedDateTimeUtc
         ); 
     }
 

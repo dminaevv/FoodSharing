@@ -15,12 +15,19 @@ public class AnnouncementController : BaseController
         _announcementService = announcementService;
     }
 
-    [HttpGet("/announcement/{id}")]
     [HttpGet("/announcement/add")]
     [HttpGet("/announcement/edit/{id}")]
     [HttpGet("/announcements/search/{searchText}")]
+    [HttpGet("/announcements/category/{categoryId}")]
     public IActionResult Index()
     {
+        return ReactApp();
+    }
+
+    [HttpGet("/announcement/{id}")]
+    public IActionResult? AnnouncementPage(String id)
+    {
+        _announcementService.SaveView(Guid.Parse(id), SystemUser.User);
         return ReactApp();
     }
 
@@ -31,10 +38,11 @@ public class AnnouncementController : BaseController
         return _announcementService.SaveAnnouncement(blank, SystemUser.User);
     }
 
-    [HttpGet("/announcement/search")]
-    public PagedResult<AnnouncementShortInfo> Search([FromQuery] String? searchText, [FromQuery] Int32 page, [FromQuery] Int32 pageSize)
+    public record SearchRequest(String? SearchText, Guid? CategoryId, Guid? CityId, Int32 Page, Int32 PageSize);
+    [HttpPost("/announcement/search")]
+    public PagedResult<AnnouncementShortInfo> Search([FromBody] SearchRequest request)
     {
-        return _announcementService.Search(searchText, page, pageSize, SystemUser.Id);
+        return _announcementService.Search(request.SearchText, request.CategoryId, request.CityId, request.Page, request.PageSize, SystemUser.Id);
     }
 
     public record GetAnnouncementRequest(Guid Id);
@@ -72,6 +80,13 @@ public class AnnouncementController : BaseController
         return _announcementService.GetAnnouncementsPageInfo(userId: null, page, pageSize, SystemUser.Id);
     }
 
+
+    [HttpPost("/announcement/get-announcements-statistics")]
+    public AnnouncementStatistics[] GetAnnouncementsStatistics([FromBody] Guid[] announcementIds)
+    {
+        return _announcementService.GetAnnouncementsStatistics(announcementIds);
+    }
+
     public record RemoveAnnouncementRequest(Guid Id);
     [HttpPost("/announcement/remove")]
     public Result RemoveAnnouncement([FromBody] RemoveAnnouncementRequest request)
@@ -99,6 +114,12 @@ public class AnnouncementController : BaseController
     public AnnouncementCategory[] GetAllAnnouncementCategories()
     {
         return _announcementService.GetAnnouncementCategories();
+    }
+
+    [HttpGet("/announcement/get-category")]
+    public AnnouncementCategory GetAnnouncementCategory([FromQuery] Guid categoryId)
+    {
+        return _announcementService.GetAnnouncementCategory(categoryId);
     }
 
     #endregion Category

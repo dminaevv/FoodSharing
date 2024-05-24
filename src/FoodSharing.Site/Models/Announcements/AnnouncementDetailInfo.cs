@@ -1,4 +1,4 @@
-﻿    using FoodSharing.Site.Models.Users;
+﻿using FoodSharing.Site.Models.Users;
 
     namespace FoodSharing.Site.Models.Announcements;
 
@@ -9,13 +9,14 @@ public class AnnouncementDetailInfo
     public String Description { get; }
     public AnnouncementCategory Category { get; }
     public String GramsWeight { get; }
+    public String CityName { get; }
     public String[] ImagesUrls { get; }
     public DateTime CreatedAt { get; }
     public User Owner { get;  }
     public Boolean IsFavorite { get; }
 
     public AnnouncementDetailInfo(
-        Announcement announcement, User owner, AnnouncementCategory category, Boolean isFavorite
+        Announcement announcement, User owner, AnnouncementCategory category, String cityName, Boolean isFavorite
     )
     {
         Id = announcement.Id;
@@ -23,6 +24,7 @@ public class AnnouncementDetailInfo
         Description = announcement.Description;
         Category = category;
         GramsWeight = announcement.GramsWeight;
+        CityName = cityName;     
         ImagesUrls = announcement.ImagesUrls;
         CreatedAt = announcement.CreatedAt;
         Owner = owner;

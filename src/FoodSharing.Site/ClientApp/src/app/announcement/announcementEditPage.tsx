@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BlockUi } from "../../components/blockUi/blockUi";
@@ -6,6 +6,8 @@ import { CSelect } from "../../components/cSelect";
 import { AnnouncementBlank, mapToAnnouncementBlank } from "../../domain/announcements/announcementBlank";
 import { AnnouncementCategory } from "../../domain/announcements/announcementCategory";
 import { AnnouncementsProvider } from "../../domain/announcements/announcementsProvider";
+import { City } from "../../domain/city/city";
+import { CityProvider } from "../../domain/city/cityProvider";
 import { useNotifications } from "../../hooks/useNotifications";
 import { useSystemUser } from "../../hooks/useSystemUser";
 import { ProfileLinks } from "../../tools/constants/links";
@@ -20,12 +22,24 @@ export function AnnouncementEditPage() {
     const [announcementBlank, setAnnouncementBlank] = useState<AnnouncementBlank>(AnnouncementBlank.Empty(systemUser!.id));
     const [uploadPhotos, setUploadPhotos] = useState<File[]>([]);
     const [categories, setCategories] = useState<AnnouncementCategory[]>([]);
+    const [cities, setCities] = useState<City[]>([]);
 
     const { addErrorNotification, addSuccessNotification } = useNotifications();
 
     useEffect(() => {
         loadPhoto();
     }, [uploadPhotos])
+
+    useEffect(() => {
+        loadCities();
+    }, [])
+
+    function loadCities() {
+        BlockUi.block(async () => {
+            const cities = await CityProvider.getCities();
+            setCities(cities);
+        })
+    }
 
     async function loadPhoto() {
         setAnnouncementBlank(prev => ({ ...prev, uploadPhotos }))
@@ -60,7 +74,7 @@ export function AnnouncementEditPage() {
             const result = await AnnouncementsProvider.save(announcementBlank);
             if (!result.isSuccess) return addErrorNotification(result.errorsString);
 
-            addSuccessNotification("Объявление успешно сохранено");
+            addSuccessNotification("Продукт успешно добавлен");
             navigate(ProfileLinks.announcements)
         })
     }
@@ -83,10 +97,17 @@ export function AnnouncementEditPage() {
         }));
     }
 
+    function changeCity(city: City | null) {
+        setAnnouncementBlank((prevAnnouncement) => ({
+            ...prevAnnouncement,
+            cityId: city?.id ?? null,
+        }));
+    }
+
     return (
         <Page>
             <Box sx={{ px: 2, pt: 1 }}>
-                <Typography variant='h4'>{id == null ? "Создание объявления" : "Редактирование объявления"}</Typography>
+                <Typography variant='h4'>{id == null ? "Добавление продукта" : "Редактирование продукта"}</Typography>
                 <Box mt={2} maxWidth="600px">
                     <Stack gap={1}>
                         <TextField
@@ -121,6 +142,26 @@ export function AnnouncementEditPage() {
                             size="small"
                             value={announcementBlank.gramsWeight ?? ""}
                             onChange={event => changeWeight(event.target.value)}
+                        />
+
+                        <Autocomplete
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Город"
+                                    inputProps={{
+                                        ...params.inputProps,
+                                        autoComplete: 'new-password'
+                                    }}
+                                />
+                            )}
+                            autoHighlight
+                            value={cities.find(c => c.id == announcementBlank.cityId) ?? null}
+                            getOptionLabel={option => option.name}
+                            options={cities}
+                            size="small"
+                            noOptionsText="Город не найден"
+                            onChange={(_, city) => changeCity(city)}
                         />
                     </Stack>
 
