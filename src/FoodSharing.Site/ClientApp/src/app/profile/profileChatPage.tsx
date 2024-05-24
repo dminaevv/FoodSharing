@@ -139,7 +139,7 @@ export function ProfileChatPage() {
                         <Paper sx={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)", height: '100%' }}>
                             <Stack direction='row' gap={2} p={1}>
                                 <Box sx={{ width: "60px" }}>
-                                    <img src={announcement.imagesUrls[0]} style={{ width: "100%", objectFit: 'contain' }} alt="announcement" />
+                                    <img src={announcement.imagesUrls[0]} style={{ width: "100%", objectFit: 'contain', aspectRatio: '4/3' }} alt="announcement" />
                                 </Box>
                                 <Stack>
                                     <CLink text={announcement.name} href={AnnouncementLinks.toAnnouncement(announcement.id)} sx={{

@@ -14,11 +14,6 @@ import Page from "../infrastructure/page";
 import { CPagination } from "../../components/cPagination";
 
 interface IFilter {
-    page: number;
-    pageSize: number;
-}
-
-interface IFilter {
     selectedCategory: AnnouncementCategory | null;
     selectedCity: City | null;
 }
@@ -48,7 +43,6 @@ export function HomePage() {
     function search() {
         BlockUi.block(async () => {
             const announcements = await AnnouncementsProvider.search(searchText ?? null, filter.selectedCategory?.id ?? null, filter.selectedCity?.id ?? null, 1, 50);
-            console.log(announcements)
             setAnnouncements(announcements.values);
         })
     }

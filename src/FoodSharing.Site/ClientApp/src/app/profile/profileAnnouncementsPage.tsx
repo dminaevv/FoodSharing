@@ -72,17 +72,18 @@ export function ProfileAnnouncementsPage() {
                     <IconButton onClick={() => navigate(AnnouncementLinks.create)}><ControlPointIcon /></IconButton>
                 }
             </Stack>
-            <Grid container direction='column' wrap='nowrap' spacing={2} width="100%" mt={1} sx={{ height: "100%", overflowY: "auto" }}>
-                {
-                    announcements.map(announcement => {
+            <Grid container direction='column' wrap='nowrap' spacing={2} sx={{ width: "100%", height: "100%", overflowY: "auto", py: 2 }}>
+                {announcements.length != 0
+
+                    ? announcements.map(announcement => {
                         const announcementsStatistic = announcementsStatistics.find(s => s.announcementId == announcement.id);
 
                         return (
                             <Grid key={announcement.id} item xs container columnSpacing={{ xs: 0, md: 2 }} rowSpacing={2} wrap="nowrap" direction={{ xs: 'column', md: 'row' }} >
-                                <Grid item xs={3}>
-                                    <img src={announcement.imagesUrls[0]} width="100%" height={"100%"} style={{ objectFit: "cover", borderRadius: 10 }} />
+                                <Grid item xs={3} md={3}>
+                                    <img src={announcement.imagesUrls[0]} width="100%" style={{ objectFit: "cover", borderRadius: 10 }} />
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={4} md={4}>
                                     <Stack>
                                         <CLink href={AnnouncementLinks.toAnnouncement(announcement.id)} text={announcement.name} sx={{ mb: 1 }} />
                                         <Typography variant="body2" color="text.secondary" sx={{
@@ -94,7 +95,7 @@ export function ProfileAnnouncementsPage() {
                                         </Typography>
                                     </Stack>
                                 </Grid>
-                                <Grid item xs={3} >
+                                <Grid item xs={3} md={3} >
                                     <Stack >
                                         <Tooltip title="Количество просмотров продукта">
                                             <Stack direction='row' gap={1} alignItems='center'>
@@ -116,7 +117,7 @@ export function ProfileAnnouncementsPage() {
                                         </Tooltip>
                                     </Stack>
                                 </Grid>
-                                <Grid item xs={2}>
+                                <Grid item xs={2} md={2}>
                                     <Stack gap={1}>
                                         <Button size='small'
                                             variant='outlined'
@@ -143,6 +144,7 @@ export function ProfileAnnouncementsPage() {
                         )
                     }
                     )
+                    : <Typography>У вас ещё нет созданных продуктов</Typography>
                 }
             </Grid>
         </Box>

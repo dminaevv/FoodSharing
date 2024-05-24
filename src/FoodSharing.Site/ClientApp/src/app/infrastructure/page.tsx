@@ -21,13 +21,13 @@ export default function Page(props: IProps & PropsWithChildren) {
 
     return (
         <Box display='flex' flexDirection='column' height="100vh" width="100%" sx={{ ...props.sx, overflow: 'hidden' }}>
-            <Header sx={{ mx: 2, mt: 2, display: { xs: 'none', md: 'block' } }} />
+            <Header sx={{ mx: 2, mt: 2, display: { xs: 'none', sm: 'block' } }} />
             <Box sx={{ height: "100%", overflowY: 'auto' }}>
                 {props.children}
             </Box>
             {
                 isMobile &&
-                <Box>
+                <Box sx={{ height: "auto" }}>
                     <BottomNavigation >
                         <BottomNavigationAction label="Поиск" icon={<SearchIcon />} onClick={() => navigate(InfrastructureLinks.home)} />
                         <BottomNavigationAction label="Избранное" icon={<FavoriteIcon />} onClick={() => navigate(ProfileLinks.favorites)} />

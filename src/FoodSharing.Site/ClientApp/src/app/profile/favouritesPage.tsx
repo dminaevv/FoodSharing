@@ -23,7 +23,10 @@ export function FavoritesPage() {
         <Box>
             <Typography variant="h4" sx={{ fontWeight: 'bold', my: { xs: 0, md: 2 } }}>Избранное</Typography>
             <Box mt={2} >
-                <AnnouncementList announcements={favoriteAnnouncements} />
+                {favoriteAnnouncements.length != 0
+                    ? <AnnouncementList announcements={favoriteAnnouncements} />
+                    : <Typography>У вас ещё нет избранных продуктов</Typography>
+                }
             </Box>
         </Box>
     )

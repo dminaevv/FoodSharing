@@ -43,7 +43,9 @@ export function ProfileChatListPage() {
             <Card key={chat.id} sx={{ borderRadius: 3, '&:hover': { backgroundColor: '#f7f7f7', cursor: 'pointer' }, transition: 'background-color 0.3s' }} onClick={() => navigate(`/profile/chat/${chat.id}`)}>
                 <Stack direction='row' justifyContent='space-between' p={2}>
                     <Stack direction='row' gap={2} overflow='hidden'>
-                        <img src={announcement.imagesUrls[0]} width={110} height={65} style={{ objectFit: "cover", borderRadius: 10 }} />
+                        <Stack width="110px" height="65px">
+                            <img src={announcement.imagesUrls[0]} style={{ width: "110px", height: "100%", objectFit: "cover", borderRadius: 10, aspectRatio: '4/3' }} />
+                        </Stack>
                         <Stack direction='column'>
                             <Typography fontSize={16} fontWeight='bold' sx={{ lineHeight: 1.4 }}>
                                 {

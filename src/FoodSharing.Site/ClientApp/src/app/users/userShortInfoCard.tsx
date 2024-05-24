@@ -13,9 +13,6 @@ export function UserShortInfoCard(props: IProps) {
             <Typography variant="h4" sx={{ mt: 2 }}>
                 {props.user.getFullName ?? "Пользователь"}
             </Typography>
-            <Typography variant="body2" color="textSecondary" gutterBottom>
-                0,0 - 0 отзывов
-            </Typography>
             <Typography variant="body2" color="text.secondary" >
                 На платформе с {props.user.registrationDate.getFullYear()} года
             </Typography>

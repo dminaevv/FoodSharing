@@ -80,10 +80,10 @@ export function AnnouncementPage() {
                                         }
 
                                     </Box>
-                                    <Stack gap={1} width="600px">
-                                        <Box height="500px" position='relative' display='flex' alignItems='center' overflow='hidden'>
+                                    <Stack gap={1} maxWidth="600px" width="100%">
+                                        <Box maxHeight="500px" height="100%" position='relative' display='flex' alignItems='center' overflow='hidden'>
                                             <Box sx={{ zIndex: 10, width: '100%', height: "100%" }}>
-                                                <img src={selectedImageUrl ?? ""} style={{ width: "100%", height: "100%", objectFit: 'contain' }} />
+                                                <img src={selectedImageUrl ?? ""} style={{ width: "100%", height: "100%", objectFit: 'contain', aspectRatio: '4/3' }} />
                                             </Box>
                                             <Box sx={{ position: 'absolute', left: 0, top: 0, zIndex: 1, width: "100%", height: "100%" }}>
                                                 <img src={selectedImageUrl ?? ""} style={{ width: "100%", height: "100%", objectFit: 'cover', filter: "blur(20px)" }} />
@@ -93,7 +93,7 @@ export function AnnouncementPage() {
                                             <Grid container direction='row' sx={{ overflow: 'hidden' }} spacing={1}>
                                                 {
                                                     announcementInfo.imagesUrls.map((url, index) =>
-                                                        <Grid item xs={1.5} key={index}>
+                                                        <Grid item xs={3.5} sm={3} md={2.5} lg={2} xl={1.5} key={index}>
                                                             <img
                                                                 src={url}
                                                                 alt='Изображение'
@@ -129,9 +129,6 @@ export function AnnouncementPage() {
                                     <Stack gap={1} direction='row' justifyContent='space-between'>
                                         <Stack>
                                             <CLink text={announcementInfo.owner.getFullName ?? "Пользователь"} href={UsersLinks.toUser(announcementInfo.owner.id)} />
-                                            <Typography variant="body2" color="text.secondary" gutterBottom>
-                                                0,0 - 0 отзывов
-                                            </Typography>
                                             <Typography variant="body2" color="text.secondary" >
                                                 На платформе с {announcementInfo.owner.registrationDate.getFullYear()} года
                                             </Typography>
