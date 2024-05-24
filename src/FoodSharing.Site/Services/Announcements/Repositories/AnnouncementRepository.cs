@@ -101,25 +101,26 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
             .ToArray();
     }
 
-    public PagedResult<Announcement> Search(String searchText, Int32 page, Int32 pageSize)
+    public PagedResult<Announcement> Search(String? searchText, Int32 page, Int32 pageSize)
     {
         (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize);
 
         String expression = @"
-            SELECT COUNT(*) OVER() AS totalRows, sub.*
+            SELECT totalRows, sub.*
             FROM (
-                SELECT *
-                FROM announcements
-                WHERE name % @searchText OR description % @searchText
+                SELECT *, (SELECT COUNT(*) FROM announcements WHERE isremoved = false) AS totalRows
+                FROM announcements 
+                WHERE (@searchText = '' OR name % @searchText OR description % @searchText)
                 AND isremoved = false
                 ORDER BY createddatetimeutc
                 OFFSET @offset
                 LIMIT @limit
-            ) AS sub;";
+            ) AS sub;
+            ";
 
         NpgsqlParameter[] parameters =
         {
-            new("searchText", searchText),
+            new("searchText", searchText ?? String.Empty),
             new("offset", offset),
             new("limit", limit)
         };
@@ -134,12 +135,12 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
 
     public PagedResult<Announcement> GetAnnouncements(Guid? userId, Int32 page, Int32 pageSize)
     {
-        (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize); 
+        (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize);
 
         String expression = @"
-            SELECT COUNT(*) OVER() AS totalRows, sub.*
+            SELECT totalRows, sub.*
             FROM (
-                SELECT *
+                SELECT *, (SELECT COUNT(*) FROM announcements WHERE isremoved = false) AS totalRows
                 FROM announcements 
                 WHERE 
                 (@p_userId IS NULL OR owneruserid = @p_userId)
@@ -147,7 +148,8 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
                 ORDER BY createddatetimeutc
                 OFFSET @offset
                 LIMIT @limit
-            ) AS sub;";
+            ) AS sub;
+            ";
 
         NpgsqlParameter[] parameters =
         {
@@ -161,11 +163,11 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
         };
 
         Page<AnnouncementDB> pageResult = _mainConnector.GetPage<AnnouncementDB>(expression, parameters);
-        
+
         Int64 totalRows = pageResult.TotalRows;
         Announcement[] announcements = pageResult.Values.Select(a => a.ToAnnouncement(_configuration.FileStorage_Host)).ToArray();
 
-        return new PagedResult<Announcement>(announcements, totalRows); 
+        return new PagedResult<Announcement>(announcements, totalRows);
     }
 
     public void RemoveAnnouncement(Guid announcementId, Guid userId)

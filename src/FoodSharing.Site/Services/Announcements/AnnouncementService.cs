@@ -4,7 +4,6 @@ using FoodSharing.Site.Models.Users;
 using FoodSharing.Site.Services.Announcements.Repositories;
 using FoodSharing.Site.Services.Files;
 using FoodSharing.Site.Services.Users;
-using FoodSharing.Site.Services.Users.Repositories.Models;
 using FoodSharing.Site.Tools.Extensions;
 using FoodSharing.Site.Tools.Types;
 using IConfiguration = FoodSharing.Site.Models.Configurations.IConfiguration;
@@ -34,7 +33,7 @@ public class AnnouncementService : IAnnouncementService
         PreprocessAnnouncementBlank(blank);
 
         Result validateAnnouncementBlankResult = ValidateAnnouncementBlank(blank, out AnnouncementBlank.Validated validated);
-        if(!validateAnnouncementBlankResult.IsSuccess) return Result.Fail(validateAnnouncementBlankResult.Errors);
+        if (!validateAnnouncementBlankResult.IsSuccess) return Result.Fail(validateAnnouncementBlankResult.Errors);
 
         if (!validated.UploadPhotos.IsEmpty())
         {
@@ -48,8 +47,8 @@ public class AnnouncementService : IAnnouncementService
 
             String[] photoUrls = _fileService.SaveAnnouncementPhotos(photoFiles);
             validated.ImagesUrls.AddRange(photoUrls);
-        } 
-       
+        }
+
         _announcementRepository.SaveAnnouncement(validated, requestedUser.Id);
 
         return Result.Success();
@@ -80,7 +79,7 @@ public class AnnouncementService : IAnnouncementService
         if (blank.ImagesUrls.IsNullOrEmpty() && blank.UploadPhotos.IsNullOrEmpty())
             return Result.Fail("Прикрепите хотя бы одно фото");
 
-        Int32 maxFileSizeInMb = 5; 
+        Int32 maxFileSizeInMb = 5;
         Int64 maxFileSizeInByte = maxFileSizeInMb * 1024 * 1024;
 
         if (blank.UploadPhotos is not null)
@@ -89,7 +88,7 @@ public class AnnouncementService : IAnnouncementService
                 return Result.Fail($"Максимальный размер фото - {maxFileSizeInMb}");
 
             String[] allowedImageTypes = { "image/jpeg", "image/png", "image/jpg" };
-            if (blank.UploadPhotos.Any(photo =>!allowedImageTypes.Contains(photo.ContentType)))
+            if (blank.UploadPhotos.Any(photo => !allowedImageTypes.Contains(photo.ContentType)))
                 return Result.Fail("Вы загрузили недопустимый формат фото");
         }
 
@@ -101,7 +100,7 @@ public class AnnouncementService : IAnnouncementService
         return Result.Success();
     }
 
-    public PagedResult<AnnouncementShortInfo> Search(String searchText, Int32 page, Int32 pageSize, Guid? requestedUserId)
+    public PagedResult<AnnouncementShortInfo> Search(String? searchText, Int32 page, Int32 pageSize, Guid? requestedUserId)
     {
         PagedResult<Announcement> announcements = _announcementRepository.Search(searchText, page, pageSize);
         Announcement[] favoriteAnnouncements = requestedUserId is { } id
@@ -121,7 +120,7 @@ public class AnnouncementService : IAnnouncementService
 
     public Announcement? GetAnnouncement(Guid announcementId)
     {
-        return _announcementRepository.GetAnnouncement(announcementId); 
+        return _announcementRepository.GetAnnouncement(announcementId);
     }
 
     public AnnouncementDetailInfo GetAnnouncementInfo(Guid announcementId, Guid requestedUserId)
@@ -129,14 +128,14 @@ public class AnnouncementService : IAnnouncementService
         Announcement announcement = _announcementRepository.GetAnnouncement(announcementId).NotNullOrThrow();
         User owner = _usersService.GetUser(announcement.OwnerUserId).NotNullOrThrow();
         AnnouncementCategory category = GetAnnouncementCategory(announcement.CategoryId);
-        Boolean isFavorite = GetFavoriteAnnouncement(announcementId, requestedUserId) is not null; 
+        Boolean isFavorite = GetFavoriteAnnouncement(announcementId, requestedUserId) is not null;
 
-        return new AnnouncementDetailInfo(announcement, owner, category, isFavorite); 
+        return new AnnouncementDetailInfo(announcement, owner, category, isFavorite);
     }
 
     public Announcement[] GetAnnouncements(Guid userId)
     {
-        return _announcementRepository.GetAnnouncements(userId); 
+        return _announcementRepository.GetAnnouncements(userId);
     }
 
     public Announcement[] GetAnnouncements(Guid[] announcementIds)
@@ -147,7 +146,7 @@ public class AnnouncementService : IAnnouncementService
     public PagedResult<AnnouncementShortInfo> GetAnnouncementsPageInfo(Guid? userId, Int32 page, Int32 pageSize, Guid? requestedUserId)
     {
         PagedResult<Announcement> announcements = _announcementRepository.GetAnnouncements(userId, page, pageSize);
-        
+
         Announcement[] favoriteAnnouncements = requestedUserId is { } id
             ? _announcementRepository.GetFavoriteAnnouncements(id)
             : Array.Empty<Announcement>();
@@ -166,7 +165,7 @@ public class AnnouncementService : IAnnouncementService
     public Result RemoveAnnouncement(Guid announcementId, Guid userId)
     {
         _announcementRepository.RemoveAnnouncement(announcementId, userId);
-        
+
         return Result.Success();
     }
 
@@ -188,7 +187,7 @@ public class AnnouncementService : IAnnouncementService
     public void AddFavoriteAnnouncement(Guid announcementId, Guid userId)
     {
         Announcement? existFavoriteAnnouncement = GetFavoriteAnnouncement(announcementId, userId);
-        if (existFavoriteAnnouncement is not null) 
+        if (existFavoriteAnnouncement is not null)
             throw new Exception($"Попытка добавить уже добавленный товар в избранное announcementId: {announcementId} userId: {userId}");
 
         _announcementRepository.AddFavoriteAnnouncement(announcementId, userId);
@@ -220,14 +219,14 @@ public class AnnouncementService : IAnnouncementService
     public AnnouncementCategory GetAnnouncementCategory(Guid categoryId)
     {
         AnnouncementCategory? category = _announcementRepository.GetAnnouncementCategory(categoryId);
-        if (category is null) throw new Exception($"Не удалось найти категорию id: {categoryId}"); 
+        if (category is null) throw new Exception($"Не удалось найти категорию id: {categoryId}");
 
         return category;
     }
 
     public AnnouncementCategory[] GetAnnouncementCategories()
     {
-        return _announcementRepository.GetAnnouncementCategories(); 
+        return _announcementRepository.GetAnnouncementCategories();
     }
 
 

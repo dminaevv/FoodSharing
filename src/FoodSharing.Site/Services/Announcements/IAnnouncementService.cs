@@ -9,7 +9,7 @@ public interface IAnnouncementService
     #region Announcement
 
     Result SaveAnnouncement(AnnouncementBlank blank, User requestedUser);
-    PagedResult<AnnouncementShortInfo> Search(String searchText, Int32 page, Int32 pageSize, Guid? requestedUserId);
+    PagedResult<AnnouncementShortInfo> Search(String? searchText, Int32 page, Int32 pageSize, Guid? requestedUserId);
     Announcement? GetAnnouncement(Guid announcementId);
     AnnouncementDetailInfo GetAnnouncementInfo(Guid announcementId, Guid requestedUserId);
     Announcement[] GetAnnouncements(Guid userId);

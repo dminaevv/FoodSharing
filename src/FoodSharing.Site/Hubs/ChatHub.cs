@@ -9,13 +9,13 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace FoodSharing.Site.Hubs;
 
-public class ChatHub: Hub
+public class ChatHub : Hub
 {
     private readonly IUsersService _usersService;
     private readonly IChatService _chatService;
     private readonly IAnnouncementService _announcementService;
 
-    private ChatService.UserConnection[] _connections => _chatService.GetConnections();
+    private ChatService.UserConnection[] Connections => _chatService.GetConnections();
 
     public ChatHub(IUsersService usersService, IChatService chatService, IAnnouncementService announcementService)
     {
@@ -32,37 +32,37 @@ public class ChatHub: Hub
         Chat? existChat = _chatService.GetChat(request.Message.ChatId);
         if (existChat is null)
         {
-           Announcement? announcement =  _announcementService.GetAnnouncement(request.AnnouncementId);
-           if (announcement is null) throw new Exception("");
+            Announcement? announcement = _announcementService.GetAnnouncement(request.AnnouncementId);
+            if (announcement is null) throw new Exception("");
 
-           User? user = _usersService.GetUser(announcement.OwnerUserId);
-           if (user is null) throw new Exception("");
+            User? user = _usersService.GetUser(announcement.OwnerUserId);
+            if (user is null) throw new Exception("");
 
-           Chat chat = Chat.Create(
-               request.Message.ChatId, request.AnnouncementId, request.Message.Id, user.Id,
-               request.Message.CreatedUserId
-           );
+            Chat chat = Chat.Create(
+                request.Message.ChatId, request.AnnouncementId, request.Message.Id, user.Id,
+                request.Message.CreatedUserId
+            );
             _chatService.SaveChat(chat);
         }
 
         //TODO Denis Вот тут добавить проверку, может ли этот пользователь отправить сообщение 
-        _chatService.SaveMessage(request.Message); 
+        _chatService.SaveMessage(request.Message);
 
         ChatService.UserConnection[] recipientInChatConnections = _chatService.GetUserConnections(request.Message.ChatId)
             .Where(c => c.ConnectionId != senderConnectionId)
             .ToArray();
 
         IReadOnlyList<String> connectionIds = recipientInChatConnections.Select(r => r.ConnectionId).ToList();
-        await Clients.Clients(connectionIds).SendAsync("NewMessage", request.Message); 
+        await Clients.Clients(connectionIds).SendAsync("NewMessage", request.Message);
     }
 
     public override async Task OnConnectedAsync()
     {
         HttpContext? httpContext = Context.GetHttpContext();
-        if (httpContext is null) throw new Exception(); 
+        if (httpContext is null) throw new Exception();
 
         String? systemUserToken = httpContext.Request.Cookies[CookieNames.SystemUserToken];
-        if(systemUserToken is null) throw new UnauthorizedAccessException();
+        if (systemUserToken is null) throw new UnauthorizedAccessException();
 
         User? user = _usersService.GetUserByToken(systemUserToken);
         if (user is null) throw new UnauthorizedAccessException();
@@ -86,10 +86,10 @@ public class ChatHub: Hub
         String connectionId = Context.ConnectionId;
 
         Guid? userId = Context.Items["UserId"] as Guid?;
-        if (userId is not {} user) throw new UnauthorizedAccessException();
+        if (userId is not { } user) throw new UnauthorizedAccessException();
 
         Guid? chatId = Context.Items["ChatId"] as Guid?;
-        if (chatId is not {} chat) throw new Exception();
+        if (chatId is not { } chat) throw new Exception();
 
         _chatService.RemoveConnection(connectionId, user, chat);
 

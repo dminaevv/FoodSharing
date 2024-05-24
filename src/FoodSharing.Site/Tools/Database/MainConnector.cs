@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace FoodSharing.Site.Tools.Database;
 
-public class MainConnector: IMainConnector
+public class MainConnector : IMainConnector
 {
     private readonly String _connectionString;
 

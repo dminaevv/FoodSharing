@@ -28,11 +28,11 @@ public class AnnouncementController : BaseController
     [HttpPost("/announcement/save")]
     public Result SaveAnnouncement([FromForm] AnnouncementBlank blank)
     {
-        return _announcementService.SaveAnnouncement(blank, SystemUser.User); 
+        return _announcementService.SaveAnnouncement(blank, SystemUser.User);
     }
 
     [HttpGet("/announcement/search")]
-    public PagedResult<AnnouncementShortInfo> Search([FromQuery] String searchText, [FromQuery] Int32 page, [FromQuery] Int32 pageSize)
+    public PagedResult<AnnouncementShortInfo> Search([FromQuery] String? searchText, [FromQuery] Int32 page, [FromQuery] Int32 pageSize)
     {
         return _announcementService.Search(searchText, page, pageSize, SystemUser.Id);
     }

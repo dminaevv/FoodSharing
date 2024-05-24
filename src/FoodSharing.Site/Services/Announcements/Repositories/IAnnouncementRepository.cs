@@ -11,7 +11,7 @@ public interface IAnnouncementRepository
     Announcement? GetAnnouncement(Guid announcementId);
     Announcement[] GetAnnouncements(Guid userId);
     Announcement[] GetAnnouncements(Guid[] announcementIds);
-    PagedResult<Announcement> Search(String searchText, Int32 page, Int32 pageSize); 
+    PagedResult<Announcement> Search(String? searchText, Int32 page, Int32 pageSize);
     PagedResult<Announcement> GetAnnouncements(Guid? userId, Int32 page, Int32 pageSize);
     void RemoveAnnouncement(Guid announcementId, Guid userId);
 
