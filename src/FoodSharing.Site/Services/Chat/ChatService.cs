@@ -74,7 +74,7 @@ public class ChatService : IChatService
 
     public (Models.Chats.Chat[], Message[], User[], Announcement[]) GetChats(Guid userId)
     {
-        Models.Chats.Chat[] chats =  _chatRepository.GetChats(userId);
+        Models.Chats.Chat[] chats = _chatRepository.GetChats(userId);
 
         Guid[] lastMessageIds = chats.Select(c => c.LastMessageId).ToArray();
         Message[] lasMessages = GetMessages(lastMessageIds);
@@ -82,8 +82,8 @@ public class ChatService : IChatService
         Guid[] chatMembers = chats.SelectMany(c => c.MemberIds).ToArray();
         User[] users = _usersService.GetUsers(chatMembers);
 
-       Guid[] announcementIds = chats.Where(c => c.AnnouncementId is not null).Select(c => c.AnnouncementId!.Value).ToArray();
-       Announcement[] announcements = _announcementService.GetAnnouncements(announcementIds);
+        Guid[] announcementIds = chats.Where(c => c.AnnouncementId is not null).Select(c => c.AnnouncementId!.Value).ToArray();
+        Announcement[] announcements = _announcementService.GetAnnouncements(announcementIds);
 
         return (chats, lasMessages, users, announcements);
     }
@@ -131,6 +131,16 @@ public class ChatService : IChatService
     public Message[] GetMessages(Guid chatId)
     {
         return _chatRepository.GetMessages(chatId);
+    }
+
+    public Message[] GetUnReadMessages(Guid userId, Guid chatId)
+    {
+        return _chatRepository.GetUnReadMessages(userId, chatId);
+    }
+
+    public void MarkMessagesAsRead(Guid[] messageIds)
+    {
+        _chatRepository.MarkMessagesAsRead(messageIds);
     }
 
     public Message[] GetMessages(Guid[] messageIds)

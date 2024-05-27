@@ -17,7 +17,9 @@ public interface IChatRepository
     #region Messages
     void SaveMessage(Message message);
     Message[] GetMessages(Guid dialogId);
+    Message[] GetUnReadMessages(Guid userId, Guid chatId);
     Message[] GetMessages(Guid[] messageIds);
+    void MarkMessagesAsRead(Guid[] messageIds);
 
     #endregion Messages
 }

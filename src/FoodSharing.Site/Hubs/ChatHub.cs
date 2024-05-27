@@ -5,6 +5,7 @@ using FoodSharing.Site.Models.Users;
 using FoodSharing.Site.Services.Announcements;
 using FoodSharing.Site.Services.Chat;
 using FoodSharing.Site.Services.Users;
+using FoodSharing.Site.Tools.Extensions;
 using Microsoft.AspNetCore.SignalR;
 
 namespace FoodSharing.Site.Hubs;
@@ -24,12 +25,16 @@ public class ChatHub : Hub
         _announcementService = announcementService;
     }
 
-    public record NewMessageRequest(Message Message, Guid AnnouncementId);
-    public async Task SendMessage(NewMessageRequest request)
+    public record NewMessageRequest(MessageBlank MessageBlank, Guid AnnouncementId);
+    public async Task<Message?> SendMessage(NewMessageRequest request)
     {
-        String senderConnectionId = Context.ConnectionId;
+        if (request.MessageBlank.Content is not { } content || content.IsNullOrWhitespace()) return null;
 
-        Chat? existChat = _chatService.GetChat(request.Message.ChatId);
+        Guid userId = (Guid)(Context.Items["UserId"] as Guid?)!;
+        Guid messageId = Guid.NewGuid();
+        Guid chatId = (Guid)(Context.Items["ChatId"] as Guid?)!;
+
+        Chat? existChat = _chatService.GetChat(chatId);
         if (existChat is null)
         {
             Announcement? announcement = _announcementService.GetAnnouncement(request.AnnouncementId);
@@ -39,21 +44,38 @@ public class ChatHub : Hub
             if (user is null) throw new Exception("");
 
             Chat chat = Chat.Create(
-                request.Message.ChatId, request.AnnouncementId, request.Message.Id, user.Id,
-                request.Message.CreatedUserId
+                chatId, request.AnnouncementId, messageId, user.Id,
+                userId
             );
             _chatService.SaveChat(chat);
+            chatId = chat.Id;
         }
 
-        //TODO Denis Вот тут добавить проверку, может ли этот пользователь отправить сообщение 
-        _chatService.SaveMessage(request.Message);
+        Message message = new(messageId, (Guid)chatId!, content, userId, MessageStatus.Sent, DateTime.UtcNow);
+        _chatService.SaveMessage(message);
 
-        ChatService.UserConnection[] recipientInChatConnections = _chatService.GetUserConnections(request.Message.ChatId)
+        String senderConnectionId = Context.ConnectionId;
+        ChatService.UserConnection[] recipientInChatConnections = _chatService.GetUserConnections(message.ChatId)
             .Where(c => c.ConnectionId != senderConnectionId)
             .ToArray();
 
         IReadOnlyList<String> connectionIds = recipientInChatConnections.Select(r => r.ConnectionId).ToList();
-        await Clients.Clients(connectionIds).SendAsync("NewMessage", request.Message);
+        await Clients.Clients(connectionIds).SendAsync("NewMessage", message);
+
+        return message;
+    }
+
+    public async Task MarkMessagesAsRead(Object parameters)
+    {
+        Guid userId = (Guid)(Context.Items["UserId"] as Guid?)!;
+        Guid chatId = (Guid)(Context.Items["ChatId"] as Guid?)!;
+
+        Message[] unreadMessages = _chatService.GetUnReadMessages(userId, chatId);
+        Guid[] messageIds = unreadMessages.Select(m => m.Id).ToArray();
+        _chatService.MarkMessagesAsRead(messageIds);
+
+        String[] connectionIds = Connections.Where(c => c.ChatId == chatId).Select(c => c.ConnectionId).ToArray();
+        await Clients.Clients(connectionIds).SendAsync("MessagesRead", messageIds);
     }
 
     public override async Task OnConnectedAsync()

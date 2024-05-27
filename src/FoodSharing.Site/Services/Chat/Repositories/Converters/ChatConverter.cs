@@ -7,7 +7,7 @@ public static class ChatConverter
 {
     public static Message ToMessage(this MessageDB db)
     {
-        return new Message(db.Id, db.ChatId, db.CreatedUserId, db.Content, db.CreatedDateTimeUtc); 
+        return new Message(db.Id, db.ChatId, db.Content, db.CreatedUserId, db.Status, db.CreatedDateTimeUtc);
     }
 
     public static Site.Models.Chats.Chat ToChat(this ChatDB db)

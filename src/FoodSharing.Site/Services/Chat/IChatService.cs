@@ -31,6 +31,8 @@ public interface IChatService
 
     Result SaveMessage(Message message);
     Message[] GetMessages(Guid chatId);
+    Message[] GetUnReadMessages(Guid userId, Guid chatId);
+    void MarkMessagesAsRead(Guid[] messageIds);
 
 
     #endregion Messages
