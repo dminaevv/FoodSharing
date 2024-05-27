@@ -20,14 +20,14 @@ export default function Page(props: IProps & PropsWithChildren) {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
-        <Box display='flex' flexDirection='column' height="100vh" width="100%" sx={{ ...props.sx, overflow: 'hidden' }}>
+        <Box display='flex' flexDirection='column' height="100vh" sx={{ ...props.sx, overflow: 'hidden' }}>
             <Header sx={{ mx: 2, mt: 2, display: { xs: 'none', sm: 'block' } }} />
-            <Box sx={{ height: "100%", overflowY: 'auto' }}>
+            <Box sx={{ height: "100%", overflowY: 'auto', overflowX: 'hidden' }}>
                 {props.children}
             </Box>
             {
                 isMobile &&
-                <Box sx={{ height: "auto" }}>
+                <Box sx={{ height: "auto", width: "100%" }}>
                     <BottomNavigation >
                         <BottomNavigationAction label="Поиск" icon={<SearchIcon />} onClick={() => navigate(InfrastructureLinks.home)} />
                         <BottomNavigationAction label="Избранное" icon={<FavoriteIcon />} onClick={() => navigate(ProfileLinks.favorites)} />

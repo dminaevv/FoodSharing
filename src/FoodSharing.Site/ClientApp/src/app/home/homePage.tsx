@@ -2,6 +2,7 @@ import { Autocomplete, Avatar, Box, Button, Card, Grid, Stack, TextField, Typogr
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BlockUi } from "../../components/blockUi/blockUi";
+import { CPagination } from "../../components/cPagination";
 import { CSelect } from "../../components/cSelect";
 import { AnnouncementCategory } from "../../domain/announcements/announcementCategory";
 import { AnnouncementShortInfo } from "../../domain/announcements/announcementShortInfo";
@@ -11,11 +12,12 @@ import { CityProvider } from "../../domain/city/cityProvider";
 import { AnnouncementList } from "../announcement/announcementList";
 import { Header } from "../header";
 import Page from "../infrastructure/page";
-import { CPagination } from "../../components/cPagination";
 
 interface IFilter {
     selectedCategory: AnnouncementCategory | null;
     selectedCity: City | null;
+    page: number;
+    pageSize: number;
 }
 
 export function HomePage() {
@@ -25,7 +27,8 @@ export function HomePage() {
 
     const [categories, setCategories] = useState<AnnouncementCategory[]>([]);
     const [cities, setCities] = useState<City[]>([]);
-    const [filter, setFilter] = useState<IFilter>({ selectedCategory: null, selectedCity: null });
+    const [filters, setFilters] = useState<IFilter>({ selectedCategory: null, selectedCity: null, page: 1, pageSize: 50 });
+    const [totalRows, setTotalRows] = useState<number>(0);
 
     useEffect(() => {
         loadCategories();
@@ -37,14 +40,25 @@ export function HomePage() {
     }, [categoryId])
 
     useEffect(() => {
-        search();
-    }, [filter.selectedCategory, filter.selectedCity, searchText])
+        search({});
+    }, [filters.selectedCategory, filters.selectedCity, searchText])
 
-    function search() {
+    function search(parameters: Partial<IFilter>) {
+        const newFilters = { ...filters, ...parameters };
+
         BlockUi.block(async () => {
-            const announcements = await AnnouncementsProvider.search(searchText ?? null, filter.selectedCategory?.id ?? null, filter.selectedCity?.id ?? null, 1, 50);
-            setAnnouncements(announcements.values);
+            const announcementsRequestResult = await AnnouncementsProvider.search(
+                searchText ?? null,
+                newFilters.selectedCategory?.id ?? null,
+                newFilters.selectedCity?.id ?? null,
+                newFilters.page,
+                newFilters.pageSize
+            );
+            setAnnouncements(announcementsRequestResult.values);
+            setTotalRows(announcementsRequestResult.totalRows)
         })
+
+        setFilters(newFilters);
     }
 
     function loadCities() {
@@ -55,11 +69,11 @@ export function HomePage() {
     }
 
     function loadCategory() {
-        if (categoryId == null) return setFilter(prev => ({ ...prev, selectedCategory: null }));
+        if (categoryId == null) return setFilters(prev => ({ ...prev, selectedCategory: null }));
 
         BlockUi.block(async () => {
             const category = await AnnouncementsProvider.getCategory(categoryId);
-            setFilter(prev => ({ ...prev, selectedCategory: category }));
+            setFilters(prev => ({ ...prev, selectedCategory: category }));
         })
     }
 
@@ -71,9 +85,9 @@ export function HomePage() {
     }
 
     function changeCategory(category: AnnouncementCategory | null) {
-        if (category == null) return setFilter(prev => ({ ...prev, selectedCategory: category }));
+        if (category == null) return setFilters(prev => ({ ...prev, selectedCategory: category }));
 
-        setFilter(prev => ({ ...prev, selectedCategory: category }));
+        setFilters(prev => ({ ...prev, selectedCategory: category }));
     }
 
     return (
@@ -83,14 +97,14 @@ export function HomePage() {
                 <Grid container direction={{ xs: 'column-reverse', md: 'row' }} wrap="nowrap" mt={{ xs: 1, md: 2 }} spacing={2} sx={{ overflowY: 'auto' }}>
                     <Grid item xs={8} sx={{ pb: { xs: 1, md: 0 }, height: "100%", overflowY: 'auto' }}>
                         {
-                            filter.selectedCategory != null &&
+                            filters.selectedCategory != null &&
                             <Stack direction='row' gap={2} alignItems='center' mb={3}>
                                 <Avatar
                                     alt="Avatar"
                                     sx={{ width: 100, height: 100 }}
-                                    src={filter.selectedCategory.iconUrl}
+                                    src={filters.selectedCategory.iconUrl}
                                 />
-                                <Typography variant="h3" fontWeight='Bold'>{filter.selectedCategory.name}</Typography>
+                                <Typography variant="h3" fontWeight='Bold'>{filters.selectedCategory.name}</Typography>
                             </Stack>
                         }
                         {
@@ -108,6 +122,18 @@ export function HomePage() {
                                 </Typography>
                             </>
                         }
+                        {totalRows > filters.pageSize &&
+                            <CPagination
+                                totalRows={totalRows}
+                                page={filters.page}
+                                pageSize={filters.pageSize}
+                                showTotalRows
+                                totalRowsText="Всего продуктов"
+                                pageSizeOptions={[10, 50, 100]}
+                                onChangePageSize={pageSize => search({ page: 1, pageSize })}
+                                onChange={page => search({ page })}
+                            />
+                        }
 
                     </Grid>
                     <Grid item xs={4} sx={{ height: "100%" }}>
@@ -118,7 +144,7 @@ export function HomePage() {
                             <Stack spacing={2} alignItems="center">
                                 <CSelect
                                     label="Категория"
-                                    value={filter.selectedCategory}
+                                    value={filters.selectedCategory}
                                     getOptionLabel={option => option.name}
                                     getOptionValue={option => option.id}
                                     options={categories}
@@ -138,21 +164,20 @@ export function HomePage() {
                                     )}
                                     fullWidth
                                     autoHighlight
-                                    value={cities.find(c => c.id == filter.selectedCity?.id) ?? null}
+                                    value={cities.find(c => c.id == filters.selectedCity?.id) ?? null}
                                     getOptionLabel={option => option.name}
                                     options={cities}
                                     size="small"
                                     noOptionsText="Город не найден"
-                                    onChange={(_, selectedCity) => setFilter(prev => ({ ...prev, selectedCity }))}
+                                    onChange={(_, selectedCity) => setFilters(prev => ({ ...prev, selectedCity }))}
                                 />
-                                <Button variant="contained" fullWidth onClick={() => setFilter(prev => ({ selectedCategory: null, selectedCity: null }))}>
+                                <Button variant="contained" fullWidth onClick={() => setFilters({ selectedCategory: null, selectedCity: null, page: 1, pageSize: 50 })}>
                                     Сбросить
                                 </Button>
                             </Stack>
                         </Card>
                     </Grid>
                 </Grid>
-
             </Box>
         </Page >
     )

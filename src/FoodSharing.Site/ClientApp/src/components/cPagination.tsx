@@ -1,4 +1,4 @@
-import { Box, MenuItem, Pagination, Select, SelectChangeEvent, SxProps, Theme } from "@mui/material"
+import { Box, MenuItem, Pagination, Select, SelectChangeEvent, SxProps, Theme, Typography, useMediaQuery, useTheme } from "@mui/material"
 import React, { ChangeEvent, memo, useState } from "react"
 
 interface Props {
@@ -17,12 +17,17 @@ interface Props {
 
 export const CPagination = memo((props: Props) => {
     let handler: NodeJS.Timeout;
+    const theme = useTheme();
+    const isSm = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const mode = props.mode != null ? props.mode : 'desktop';
+    const mode = props.mode != null
+        ? props.mode
+        : isSm
+            ? 'mobile'
+            : 'desktop';
 
     const [inputPage, setInputPage] = useState<string | null>(null);
     const pageCount: number = Math.ceil(props.totalRows / props.pageSize);
-    const size: 'small' | 'medium' = mode === 'mobile' ? 'small' : 'medium';
 
     function onChange(event: React.ChangeEvent<unknown>, page: number) {
         setInputPage(null);
@@ -78,7 +83,7 @@ export const CPagination = memo((props: Props) => {
     const selectStyle: SxProps<Theme> = {
         fontSize: '0.9rem',
         width: '72px',
-        height: mode !== 'mobile' ? '32px' : '26px',
+        height: '32px',
         textAlign: 'center',
         "&.Mui-focused .MuiOutlinedInput-notchedOutline": { border: '1px solid #c4c4c4' },
         "& fieldset": { top: '0px' },
@@ -86,11 +91,12 @@ export const CPagination = memo((props: Props) => {
     }
 
     return (
-        <Box sx={{ m: 2, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <Box sx={{ m: 1, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: mode == 'mobile' ? "center" : 'left' }}>
             <Box component="span" sx={{ mr: props.showTotalRows === true ? 3 : 0, display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
-                {props.pageSizeOptions && props.onChangePageSize &&
+                {
+                    props.pageSizeOptions && props.onChangePageSize &&
                     <Box sx={{ mr: 1 }}>
-                        <Select sx={selectStyle} value={props.pageSize} onChange={changePageSize}>
+                        <Select sx={selectStyle} size={"small"} value={props.pageSize} onChange={changePageSize}>
                             {pageSizes.map((pc, index) => (
                                 <MenuItem key={index} value={pc}>{pc.toString()}</MenuItem>
                             ))}
@@ -103,33 +109,15 @@ export const CPagination = memo((props: Props) => {
                         shape={props.shape ?? 'rounded'}
                         color={props.color ?? 'primary'}
                         variant='outlined'
-                        size={size}
+                        size={'medium'}
                         page={props.page}
                         count={pageCount}
                         onChange={onChange}
-                        boundaryCount={1}
+                        boundaryCount={0}
                         siblingCount={1}
                     />
                 </Box>
-                {mode === 'mobile' ?
-                    <Box sx={{ ml: 1 }}>
-                        <input type="number"
-                            value={getValue()}
-                            onChange={setPage}
-                            style={{
-                                fontSize: '0.9rem', width: '52px', height: '26px', paddingTop: 0, paddingBottom: 0, paddingLeft: 5,
-                                paddingRight: 5, border: getInputBorder(), borderRadius: '5px', textAlign: 'center'
-                            }}
-                            disabled={pageCount < 1}
-                            pattern='[0-9]*'
-                            min={0}
-                            maxLength={5}
-                            onBlur={() => { setInputPage(null) }}
-                        />
-                    </Box>
-
-                    :
-
+                {mode != 'mobile' &&
                     <Box sx={{ ml: 1 }}>
                         <input type="number"
                             value={getValue()}
@@ -148,10 +136,10 @@ export const CPagination = memo((props: Props) => {
                 }
             </Box>
 
-            {props.showTotalRows &&
-                <Box sx={{ p: '4px' }}>
+            {props.showTotalRows && mode != 'mobile' &&
+                <Typography sx={{ p: '4px' }}>
                     {props.totalRowsText}:&nbsp;{props.totalRows < 1 ? '–' : props.totalRows}
-                </Box>
+                </Typography>
             }
         </Box>
     )

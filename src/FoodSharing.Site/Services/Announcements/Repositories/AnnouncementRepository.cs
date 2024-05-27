@@ -127,12 +127,21 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
         (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize);
 
         String expression = @"
-            SELECT COUNT(*) OVER() AS totalRows, sub.*
+           SELECT
+            (
+                 SELECT COUNT(*)  
+                 FROM announcements 
+                 WHERE (@searchText IS NULL OR (name % @searchText OR description % @searchText))
+                AND (@categoryId IS NULL OR categoryid = @categoryId)
+                AND (@cityId IS NULL OR cityid = @cityId)
+                AND isremoved = false
+            ) AS totalRows, 
+            sub.*
             FROM (
                 SELECT *
                 FROM announcements
                 WHERE (@searchText IS NULL OR (name % @searchText OR description % @searchText))
-                AND (@categoryId IS NULL OR categoryid = @categoryId )
+                AND (@categoryId IS NULL OR categoryid = @categoryId)
                 AND (@cityId IS NULL OR cityid = @cityId)
                 AND isremoved = false
                 ORDER BY createddatetimeutc
@@ -174,7 +183,14 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
         (Int32 offset, Int32 limit) = NormalizeRange(page, pageSize);
 
         String expression = @"
-            SELECT COUNT(*) OVER() AS totalRows, sub.*
+            SELECT   
+            (
+                SELECT COUNT(*)  
+                FROM announcements 
+                WHERE 
+                (@p_userId IS NULL OR owneruserid = @p_userId)
+                AND isremoved = false
+            ) AS totalRows,  sub.*
             FROM (
                 SELECT *
                 FROM announcements 
