@@ -1,6 +1,6 @@
 import * as signalR from '@microsoft/signalr';
-import { Avatar, Box, Button, Paper, Stack, TextField, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { Avatar, Box, Button, Card, IconButton, Paper, Stack, TextField, Typography } from '@mui/material';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BlockUi } from '../../components/blockUi/blockUi';
 import { CLink } from '../../components/link';
@@ -13,6 +13,9 @@ import { User } from '../../domain/users/user';
 import { useSystemUser } from '../../hooks/useSystemUser';
 import { AnnouncementLinks, UsersLinks } from '../../tools/constants/links';
 import { Uuid } from '../../tools/uuid';
+import { MessageStatus } from '../../domain/messages/messageStatus';
+import CheckIcon from '@mui/icons-material/Check';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 export function ProfileChatPage() {
     const { chatId, announcementId } = useParams<{ chatId?: string, announcementId: string }>();
@@ -27,8 +30,14 @@ export function ProfileChatPage() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [messageBlank, setMessageBlank] = useState<MessageBlank>(MessageBlank.empty());
     const [members, setMembers] = useState<User[]>([]);
+    const [initialScrollDone, setInitialScrollDone] = useState(false);
+    const [messagesIsLoaded, setMessagesIsLoaded] = useState(false);
+
+    const unReadMessageCount = useMemo(() => messages.filter(m => m.status == MessageStatus.Sent && m.createdUserId != systemUser?.id).length, [messages]);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const lastMessageRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         loadAnnouncement(announcementId ?? null);
@@ -40,8 +49,44 @@ export function ProfileChatPage() {
     }, [chatIdState])
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages])
+        if (!initialScrollDone && messagesIsLoaded) {
+            scrollToBottom();
+            setInitialScrollDone(true);
+            return;
+        }
+
+        const container = messagesContainerRef.current;
+        if (container == null) return;
+
+        const isUserAtBottom = container.scrollHeight - container.scrollTop;
+
+        if (isUserAtBottom < 500) {
+            scrollToBottom();
+        }
+    }, [messages.length]);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            const entry = entries[0];
+            if (entry.isIntersecting) {
+                markMessagesAsRead();
+            }
+        }, {
+            root: messagesContainerRef.current,
+            rootMargin: '0px',
+            threshold: 1.0
+        });
+
+        if (lastMessageRef.current) {
+            observer.observe(lastMessageRef.current);
+        }
+
+        return () => {
+            if (lastMessageRef.current) {
+                observer.unobserve(lastMessageRef.current);
+            }
+        };
+    }, [messages]);
 
     function loadChat() {
         BlockUi.block(async () => {
@@ -66,6 +111,8 @@ export function ProfileChatPage() {
                 setMessages(result.messages);
                 loadAnnouncement(result.chat.announcementId)
             }
+
+            setMessagesIsLoaded(true)
         })
     }
 
@@ -80,7 +127,13 @@ export function ProfileChatPage() {
 
     function scrollToBottom() {
         messagesEndRef.current?.scrollIntoView();
-    };
+    }
+
+    async function markMessagesAsRead() {
+        if (connection == null) return;
+
+        await connection.send("MarkMessagesAsRead", {});
+    }
 
     function startConnection() {
         if (chatIdState == null) return;
@@ -94,6 +147,16 @@ export function ProfileChatPage() {
             setMessages(prevMessages => [...prevMessages, message]);
         });
 
+        connection.on('MessagesRead', (messageIds: string[]) => {
+            setMessages(prevMessages => prevMessages.map(message => {
+                if (messageIds.includes(message.id)) {
+                    return { ...message, status: MessageStatus.Read } as Message;
+                }
+                return message;
+            }));
+        });
+
+
         connection.start().then(() => {
             setConnection(connection);
         });
@@ -103,35 +166,27 @@ export function ProfileChatPage() {
         };
     }
 
-    async function onSendMessage() {
+    async function sendMessage() {
         if (systemUser == null) throw new Error();
 
-        const blank = { ...messageBlank };
-        blank.chatId = chatIdState;
-        blank.createdUserId = systemUser.id;
-        blank.createdDateTimeUtc = new Date();
-        blank.id = Uuid.create();
+        const message = await connection?.invoke("SendMessage", { messageBlank, announcementId });
+        if (message == null) return;
 
-        const message = mapToMessage(blank);
-        setMessages(prev => ([...prev, message]))
-
-        await connection?.send("SendMessage", { message, announcementId });
-        setMessageBlank(MessageBlank.empty())
+        setMessages(prev => ([...prev, mapToMessage(message)]));
+        setMessageBlank(MessageBlank.empty());
     };
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
-            onSendMessage();
+            sendMessage();
         }
     };
-
 
     return (
         <Stack sx={{ height: '100%', overflow: 'hidden' }} gap={2}>
             <Stack sx={{ height: "80px" }}>
-                {
-                    announcement != null &&
+                {announcement != null &&
                     <Stack sx={{
                         margin: 0.2,
                         borderRadius: "10px",
@@ -155,13 +210,15 @@ export function ProfileChatPage() {
                     </Stack>
                 }
             </Stack>
-            <Stack sx={{ overflowY: 'auto', height: "100%" }}>
-                <Stack direction='column' gap={1}>
+            <Stack sx={{ overflowY: 'auto', height: "100%" }} ref={messagesContainerRef}>
+                <Stack direction='column' gap={1} >
                     {messages.length > 0
                         ? messages.map((message, index) => {
                             const member = members.find(m => m.id === message.createdUserId)!;
+                            const isLastMessage = index === messages.length - 1;
+
                             return (
-                                <Box key={index} >
+                                <Box key={index} ref={isLastMessage ? lastMessageRef : null}>
                                     <Stack direction="row" alignItems="flex-start" gap={1} >
                                         <Avatar alt="Avatar" sx={{ width: 40, height: 40 }} src={member.avatarUrl ?? 'https://www.abc.net.au/news/image/8314104-1x1-940x940.jpg'} />
                                         <Stack>
@@ -170,6 +227,10 @@ export function ProfileChatPage() {
                                                 <Typography variant="subtitle2" style={{ color: '#808080' }}>
                                                     {message.createdDateTimeUtc.toLocaleTimeString()}
                                                 </Typography>
+                                                <Stack direction='row'>
+                                                    <CheckIcon sx={{ fontSize: 15, color: message.status == MessageStatus.Read ? "#3778fa" : "#9f9f9f" }} />
+                                                    {message.status == MessageStatus.Read && <CheckIcon sx={{ fontSize: 15, color: "#3778fa" }} />}
+                                                </Stack>
                                             </Stack>
                                             <Typography style={{ whiteSpace: 'pre-wrap' }}>{message.content}</Typography>
                                         </Stack>
@@ -182,7 +243,19 @@ export function ProfileChatPage() {
                     <div ref={messagesEndRef} />
                 </Stack>
             </Stack>
-            <Stack sx={{ height: "105px" }}>
+
+            <Stack sx={{ height: "105px", position: 'relative' }}>
+                {unReadMessageCount != 0 &&
+                    <Paper elevation={2}
+                        sx={{ position: 'absolute', top: -45, cursor: 'pointer', backgroundColor: 'white', borderRadius: 10, px: 1, py: 0.5 }} onClick={scrollToBottom}>
+                        <Stack direction='row' alignItems='center'>
+                            <Typography>
+                                Новые сообщения
+                            </Typography>
+                            <KeyboardArrowDownIcon />
+                        </Stack>
+                    </Paper>
+                }
                 <Stack direction='column' gap={1.5}>
                     <Stack sx={{ height: '105px' }}>
                         <TextField
@@ -196,7 +269,7 @@ export function ProfileChatPage() {
                             onChange={(e) => setMessageBlank(prev => ({ ...prev, content: e.target.value }))}
                             style={{ marginBottom: '10px' }}
                         />
-                        <Button variant="contained" onClick={onSendMessage}>
+                        <Button variant="contained" onClick={sendMessage}>
                             Отправить
                         </Button>
                     </Stack>

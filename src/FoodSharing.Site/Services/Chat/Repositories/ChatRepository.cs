@@ -77,8 +77,8 @@ public class ChatRepository : IChatRepository
         String expression = @"SELECT * FROM chats WHERE announcementId = @p_announcementId AND @p_requestedUserId = ANY(memberids)";
         NpgsqlParameter[] parameters =
         {
-            new("p_announcementId", announcementId), 
-            new("p_requestedUserId", requestedUserId) 
+            new("p_announcementId", announcementId),
+            new("p_requestedUserId", requestedUserId)
         };
 
         return _mainConnector.Get<ChatDB?>(expression, parameters)?.ToChat();
@@ -93,11 +93,11 @@ public class ChatRepository : IChatRepository
         String expression = @"
         INSERT INTO messages
         (
-            id, chatid, ""content"", createduserid, 
+            id, chatid, ""content"", createduserid, status,
             createddatetimeutc, isremoved   
         )
         VALUES(
-             @p_id, @p_chatId, @p_content, @p_createdUserId,
+             @p_id, @p_chatId, @p_content, @p_createdUserId, @p_status,
              @p_createdDateTimeUtc, false
         )
          ON CONFLICT (id)
@@ -112,6 +112,7 @@ public class ChatRepository : IChatRepository
              new("p_chatId", message.ChatId),
              new("p_content", message.Content),
              new("p_createdUserId", message.CreatedUserId),
+             new("p_status", (Int32)message.Status),
              new("p_createdDateTimeUtc", message.CreatedDateTimeUtc),
              new("p_dateTimeUtcNow", utcNow)
 
@@ -140,6 +141,23 @@ public class ChatRepository : IChatRepository
         return _mainConnector.GetList<MessageDB>(expression, parameters).Select(message => message.ToMessage()).ToArray();
     }
 
+    public Message[] GetUnReadMessages(Guid userId, Guid chatId)
+    {
+        String expression = @"
+        SELECT * FROM messages WHERE chatId = @p_chatId 
+        AND createduserid != @p_userId AND status = @p_unreadStatus
+        ORDER BY createddatetimeutc";
+
+        NpgsqlParameter[] parameters =
+        {
+            new("p_userId", userId),
+            new("p_chatId", chatId),
+            new("p_unreadStatus", MessageStatus.Sent)
+        };
+
+        return _mainConnector.GetList<MessageDB>(expression, parameters).Select(message => message.ToMessage()).ToArray();
+    }
+
     public Message[] GetMessages(Guid[] messageIds)
     {
         String expression = @"SELECT * FROM messages WHERE id = ANY(@p_messageIds) ORDER BY createddatetimeutc";
@@ -150,6 +168,19 @@ public class ChatRepository : IChatRepository
 
         return _mainConnector.GetList<MessageDB>(expression, parameters).Select(message => message.ToMessage()).ToArray();
     }
+
+    public void MarkMessagesAsRead(Guid[] messageIds)
+    {
+        String expression = @"UPDATE messages SET status = @p_readStatus WHERE id = ANY(@p_messageIds) ";
+        NpgsqlParameter[] parameters =
+        {
+            new("p_messageIds", messageIds),
+            new("p_readStatus", (Int32)MessageStatus.Read)
+        };
+
+        _mainConnector.ExecuteNonQuery(expression, parameters);
+    }
+
 
     #endregion Messages
 
