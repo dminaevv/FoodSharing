@@ -47,7 +47,7 @@ export function AnnouncementCard(props: IProps) {
                 sx={{
                     width: '100%',
                     aspectRatio: '4/3',
-                    objectFit: 'cover',
+                    objectFit: 'contain',
                 }}
                 image={props.announcement.mainImgUrl}
             />

@@ -79,11 +79,11 @@ export function ProfileAnnouncementsPage() {
                         const announcementsStatistic = announcementsStatistics.find(s => s.announcementId == announcement.id);
 
                         return (
-                            <Grid key={announcement.id} item xs container columnSpacing={{ xs: 0, md: 2 }} rowSpacing={2} wrap="nowrap" direction={{ xs: 'column', md: 'row' }} >
-                                <Grid item xs={3} md={3}>
-                                    <img src={announcement.imagesUrls[0]} width="100%" style={{ objectFit: "cover", borderRadius: 10 }} />
+                            <Grid key={announcement.id} item xs container columnSpacing={{ xs: 0, md: 2 }} rowSpacing={2} wrap="nowrap" direction={{ xs: 'column', md: 'row' }}  >
+                                <Grid item xs={2} md={3}>
+                                    <img src={announcement.imagesUrls[0]} style={{ width: "100%", objectFit: "contain", borderRadius: 10, aspectRatio: '4/3' }} />
                                 </Grid>
-                                <Grid item xs={4} md={4}>
+                                <Grid item xs={4} md={4} sx={{ overflow: "hidden" }}>
                                     <Stack>
                                         <CLink href={AnnouncementLinks.toAnnouncement(announcement.id)} text={announcement.name} sx={{ mb: 1 }} />
                                         <Typography variant="body2" color="text.secondary" sx={{
@@ -117,7 +117,7 @@ export function ProfileAnnouncementsPage() {
                                         </Tooltip>
                                     </Stack>
                                 </Grid>
-                                <Grid item xs={2} md={2}>
+                                <Grid item xs={3} md={2}>
                                     <Stack gap={1}>
                                         <Button size='small'
                                             variant='outlined'

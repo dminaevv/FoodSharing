@@ -107,8 +107,8 @@ export function ProfilePage() {
                     <Routes>
                         <Route path="/announcements" element={<ProfileAnnouncementsPage />} />
                         <Route path="/chats" element={<ProfileChatListPage />} />
-                        <Route path="/chat/:chatId" element={<ProfileChatPage />} />
                         <Route path="/chat/announcement/:announcementId" element={<ProfileChatPage />} />
+                        <Route path="/chat/:chatId" element={<ProfileChatPage />} />
                         <Route path="/favorites" element={<FavoritesPage />} />
                         <Route path="/settings" element={<SettingsPage />} />
                     </Routes>

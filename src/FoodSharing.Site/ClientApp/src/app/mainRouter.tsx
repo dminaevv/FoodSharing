@@ -12,27 +12,25 @@ import { UserPage } from "./users/userPage";
 
 export function MainRouter() {
     return (
-        <StrictMode>
-            <BrowserRouter>
-                <Routes>
-                    <Route path={InfrastructureLinks.home} element={<HomePage />} />
-                    <Route path={AnnouncementLinks.search} element={<HomePage />} />
-                    <Route path={AnnouncementLinks.searchCategory} element={<HomePage />} />
+        <BrowserRouter>
+            <Routes>
+                <Route path={InfrastructureLinks.home} element={<HomePage />} />
+                <Route path={AnnouncementLinks.search} element={<HomePage />} />
+                <Route path={AnnouncementLinks.searchCategory} element={<HomePage />} />
 
-                    <Route path={AuthLinks.login} element={<LoginPage />} />
-                    <Route path={AuthLinks.register} element={<RegisterPage />} />
-                    <Route path={AuthLinks.resetPassword} element={<ResetPasswordPage />} />
+                <Route path={AuthLinks.login} element={<LoginPage />} />
+                <Route path={AuthLinks.register} element={<RegisterPage />} />
+                <Route path={AuthLinks.resetPassword} element={<ResetPasswordPage />} />
 
-                    <Route path={`${ProfileLinks.main}/*`} element={<ProfilePage />} />
+                <Route path={`${ProfileLinks.main}/*`} element={<ProfilePage />} />
 
-                    <Route path={AnnouncementLinks.announcement} element={<AnnouncementPage />} />
-                    <Route path={AnnouncementLinks.create} element={<AnnouncementEditPage />} />
-                    <Route path={AnnouncementLinks.edit} element={<AnnouncementEditPage />} />
+                <Route path={AnnouncementLinks.announcement} element={<AnnouncementPage />} />
+                <Route path={AnnouncementLinks.create} element={<AnnouncementEditPage />} />
+                <Route path={AnnouncementLinks.edit} element={<AnnouncementEditPage />} />
 
-                    <Route path={UsersLinks.user} element={<UserPage />} />
+                <Route path={UsersLinks.user} element={<UserPage />} />
 
-                </Routes>
-            </BrowserRouter>
-        </StrictMode>
+            </Routes>
+        </BrowserRouter>
     )
 }

@@ -6,15 +6,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
+    <link rel="icon" href="@Url.Content($"~/ico.ico")" type="image/x-icon">
+    <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FoodSharing</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-    />
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"/>
     <script src="https://api-maps.yandex.ru/2.1/?apikey=dc8c41ab-5e86-4118-a64a-47729141294c&lang=ru_RU" type="text/javascript"></script>
     <script>
         var systemUser = @Html.Raw(JsonSerializer.Serialize(Model.SystemUser, new JsonSerializerOptions

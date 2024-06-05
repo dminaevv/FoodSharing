@@ -40,8 +40,11 @@ export function ProfileChatPage() {
     const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        if (systemUser?.id == null) return;
+
         loadAnnouncement(announcementId ?? null);
         loadChat();
+
     }, [systemUser?.id])
 
     useEffect(() => {
@@ -60,7 +63,7 @@ export function ProfileChatPage() {
 
         const isUserAtBottom = container.scrollHeight - container.scrollTop;
 
-        if (isUserAtBottom < 500) {
+        if (isUserAtBottom < 1500) {
             scrollToBottom();
         }
     }, [messages.length]);
@@ -86,7 +89,7 @@ export function ProfileChatPage() {
                 observer.unobserve(lastMessageRef.current);
             }
         };
-    }, [messages]);
+    }, [messages.length, connection]);
 
     function loadChat() {
         BlockUi.block(async () => {
@@ -131,12 +134,11 @@ export function ProfileChatPage() {
 
     async function markMessagesAsRead() {
         if (connection == null) return;
-
         await connection.send("MarkMessagesAsRead", {});
     }
 
     function startConnection() {
-        if (chatIdState == null) return;
+        if (chatIdState == null || String.isNullOrWhitespace(chatIdState)) return;
 
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(`/chat?chatId=${chatIdState}`)
@@ -193,24 +195,30 @@ export function ProfileChatPage() {
                     }}>
                         <Paper sx={{ boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)", height: '100%' }}>
                             <Stack direction='row' gap={2} p={1}>
-                                <Box sx={{ width: "60px" }}>
+                                <Box sx={{ width: "10%" }}>
                                     <img src={announcement.imagesUrls[0]} style={{ width: "100%", objectFit: 'contain', aspectRatio: '4/3' }} alt="announcement" />
                                 </Box>
-                                <Stack>
+                                <Stack sx={{ maxWidth: "80%" }}>
                                     <CLink text={announcement.name} href={AnnouncementLinks.toAnnouncement(announcement.id)} sx={{
                                         lineHeight: 1, overflow: 'hidden',
                                         textOverflow: 'ellipsis',
                                         whiteSpace: 'nowrap',
                                         lineHeightStep: 1
                                     }} />
-                                    <Typography fontSize={14} sx={{ color: '#808080', lineHeight: 2 }}>{announcement.description}</Typography>
+                                    <Typography fontSize={14} sx={{
+                                        mt: 2,
+                                        color: '#808080', lineHeight: 1, overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        lineHeightStep: 1
+                                    }}>{announcement.description}</Typography>
                                 </Stack>
                             </Stack>
                         </Paper>
                     </Stack>
                 }
             </Stack>
-            <Stack sx={{ overflowY: 'auto', height: "100%" }} ref={messagesContainerRef}>
+            <Stack sx={{ overflowY: 'auto', height: "100%", mt: 2 }} ref={messagesContainerRef}>
                 <Stack direction='column' gap={1} >
                     {messages.length > 0
                         ? messages.map((message, index) => {

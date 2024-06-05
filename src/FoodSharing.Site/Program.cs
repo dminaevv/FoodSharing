@@ -1,9 +1,9 @@
+using FoodSharing.Site;
+using FoodSharing.Site.Hubs;
 using FoodSharing.Site.Infrastructure;
 using FoodSharing.Site.Services;
 using Microsoft.AspNetCore.Http.Features;
 using System.Text.Json;
-using FoodSharing.Site;
-using FoodSharing.Site.Hubs;
 using static System.Int32;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -31,16 +31,16 @@ app.Use((context, next) =>
     return next();
 });
 app.UseExceptionsHandler();
-app.UseStatusCodePagesWithRedirects("/Error/{0}");
 app.UseStaticFiles();
 app.UseResponseCompression();
 app.UseRouting();
-//app.UseCors(options =>
-//{
-//    options.AllowAnyOrigin()
-//        .AllowAnyMethod()
-//        .AllowAnyHeader();
-//});
+app.UseCors(options =>
+{
+    options.AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()
+        .WithOrigins("https://foodsharing.virtuumlab.ru");
+});
 app.MapHub<ChatHub>("/chat");
 app.UseMiddleware<SiteMiddleware>();
 app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());

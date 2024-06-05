@@ -84,7 +84,7 @@ public class AnnouncementRepository : BaseRepository, IAnnouncementRepository
 
     public Announcement? GetAnnouncement(Guid announcementId)
     {
-        String expression = @"SELECT * FROM announcements WHERE id = @p_id AND isremoved = false";
+        String expression = @"SELECT * FROM announcements WHERE id = @p_id";
 
         NpgsqlParameter[] parameters =
         {
