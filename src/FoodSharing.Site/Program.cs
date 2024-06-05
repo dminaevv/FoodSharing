@@ -24,6 +24,9 @@ builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 builder.Services.AddSignalR();
 builder.Services.AddResponseCompression();
 
+builder.Services.AddSwaggerGen();
+
+
 WebApplication app = builder.Build();
 app.Use((context, next) =>
 {
@@ -43,5 +46,9 @@ app.UseCors(options =>
 });
 app.MapHub<ChatHub>("/chat");
 app.UseMiddleware<SiteMiddleware>();
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseEndpoints(endpoints => endpoints.MapDefaultControllerRoute());
 app.Run();

@@ -72,7 +72,7 @@ export function ProfileAnnouncementsPage() {
                     <IconButton onClick={() => navigate(AnnouncementLinks.create)}><ControlPointIcon /></IconButton>
                 }
             </Stack>
-            <Grid container direction='column' wrap='nowrap' spacing={2} sx={{ width: "100%", height: "100%", overflowY: "auto", py: 2 }}>
+            <Grid container direction='column' wrap='nowrap' spacing={2} sx={{ width: "100%", maxWidth: "100vw", height: "100%", overflowY: "auto", py: 2 }}>
                 {announcements.length != 0
 
                     ? announcements.map(announcement => {

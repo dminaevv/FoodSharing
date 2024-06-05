@@ -40,7 +40,7 @@ export function ProfileChatListPage() {
         const announcement = announcements.find(a => a.id == chat.announcementId)!
 
         return (
-            <Card key={chat.id} sx={{ borderRadius: 3, '&:hover': { backgroundColor: '#f7f7f7', cursor: 'pointer' }, transition: 'background-color 0.3s' }} onClick={() => navigate(`/profile/chat/${chat.id}`)}>
+            <Card key={chat.id} sx={{ borderRadius: 3, '&:hover': { backgroundColor: '#f7f7f7', width: "100%", cursor: 'pointer' }, transition: 'background-color 0.3s' }} onClick={() => navigate(`/profile/chat/${chat.id}`)}>
                 <Stack direction='row' justifyContent='space-between' p={2}>
                     <Stack direction='row' gap={2} overflow='hidden'>
                         <Stack width="110px" height="65px">
@@ -75,7 +75,10 @@ export function ProfileChatListPage() {
 
     return (
         <Stack direction='column' gap={2} flexWrap='nowrap'>
-            {chats.map(renderChat)}
+            {chats.length != 0
+                ? chats.map(renderChat)
+                : <Typography justifyContent='center' mt={2} textAlign='center'>Чатов ещё нет</Typography>
+            }
         </Stack>
     )
 }
