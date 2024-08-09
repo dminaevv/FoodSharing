@@ -20,6 +20,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 export function ProfileChatPage() {
     const { chatId, announcementId } = useParams<{ chatId?: string, announcementId: string }>();
 
+
     const systemUser = useSystemUser();
 
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
